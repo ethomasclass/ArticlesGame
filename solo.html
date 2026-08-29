@@ -492,7 +492,8 @@ function finish(requested, collected, excuses){
       return '<div class="line ' + (x.choice==="full"?"ok":(x.choice==="none"?"bad":"")) + '">' + x.text + "</div>";
     }).join("");
   }
-  $("o-hist").textContent = D.HISTORY_NOTES[r.id] || "";
+  $("o-hist").innerHTML = (D.HISTORY_NOTES[r.id] || "").split("\n\n")
+    .map(function(x){ return "<p>" + x + "</p>"; }).join("");
   HIST.push({ id:r.id, title:r.title, passed:RESULT.passed, yes:RESULT.yes, no:RESULT.no,
     abstain:RESULT.abstain, quorum:RESULT.quorum, requested:requested, collected:collected,
     stabilityAfter: Math.round(STAB) });

@@ -142,6 +142,41 @@
         '</tbody></table>' +
       '</div>';
 
+    /* ---- the other half of the story ---- */
+    var W = D.WHAT_WORKED;
+    if (W) {
+      html +=
+        '<div class="card">' +
+          '<div class="eyebrow">Before you decide it was all a disaster</div>' +
+          '<h2>' + W.title + '</h2>' +
+          W.body.split("\n\n").map(function (x) { return "<p>" + x + "</p>"; }).join("") +
+          '<div class="callout warn" style="margin-top:12px"><p class="small" style="margin:0">' +
+            W.note + '</p></div>' +
+        '</div>';
+    }
+
+    /* ---- two men, one rebellion ---- */
+    if (D.VOICES && D.VOICES.length) {
+      html +=
+        '<div class="card">' +
+          '<div class="eyebrow">Two people watch the same rebellion</div>' +
+          '<h2>Did Shays\u2019 Rebellion prove the government had to change?</h2>' +
+          '<div class="grid g2">' +
+          D.VOICES.map(function (v) {
+            return '<div class="inset">' +
+              '<div style="font-weight:700;font-size:1.1rem">' + v.who + '</div>' +
+              '<div class="small muted" style="margin-bottom:8px">' + v.role + '</div>' +
+              '<blockquote style="margin:0 0 10px;padding-left:12px;border-left:4px solid var(--gold);' +
+                'font-size:1.05rem;font-style:italic">' + v.quote + '</blockquote>' +
+              '<div class="small">' + v.gloss + '</div>' +
+            '</div>';
+          }).join("") +
+          '</div>' +
+          '<p class="center lede" style="margin:14px 0 0">They are both looking at the same four dead ' +
+          'farmers in Springfield. Which one is right?</p>' +
+        '</div>';
+    }
+
     /* ---- the six weaknesses ---- */
     html +=
       '<div class="card">' +
@@ -169,6 +204,8 @@
             '<li>If you could change exactly one rule of this government, which one, and what would break as a result?</li>' +
             '<li>The states were afraid of a strong central government because of what they had just fought a war against. Were they wrong to be afraid?</li>' +
             '<li>By Round 4 the treasury was empty because of what happened in Round 1. Where else does that pattern show up in history?</li>' +
+            '<li>The Northwest Ordinance worked when almost nothing else did. What made that one different?</li>' +
+            '<li>Jefferson\u2019s 1784 plan to ban slavery in the west lost by one vote, because one man was too sick to attend. What do you do with a fact like that?</li>' +
           '</ul>' +
           '<hr class="rule">' +
           '<p class="small" style="color:#c9bfae;margin:0">Exit ticket: <em>Name one weakness of the Articles you ' +

@@ -36,6 +36,29 @@ anyway. That is the argument for the Constitution, and students make it themselv
 
 ---
 
+## The cold open: the candy vote
+
+Before any history happens, the class spends five minutes trying to agree on one snack under the
+Articles' own rules — one vote per group whatever its size, nine of thirteen to decide anything,
+and everybody has to chip in.
+
+It fails. With four choices and a nine-of-thirteen bar it nearly always fails, and then some groups
+say they will not bring the money anyway. The reveal names what just happened in that room and
+attaches each fact to the thing it demonstrates:
+
+| What happened to you | What it shows |
+|---|---|
+| No snack got nine of thirteen | Most proposals died without ever being voted down |
+| The class split four ways | Thirteen groups each voted for themselves |
+| Every group counted the same | Virginia had 700,000 people. Delaware had 59,000. Same vote. |
+| Five groups would not pay | Congress could ask for money. It could not collect it. |
+
+Then one line: *"In 1786, the states found themselves in exactly this situation."*
+
+Edit the question and the four choices on the setup screen, or switch it off if you are short on time.
+Everything the simulation is about to do — one vote each, nine of thirteen, and the gap between voting
+yes and actually paying — the class has already felt before it hears the word "requisition".
+
 ## The four resolutions
 
 | # | Resolution | Weakness it exposes | Rule |
@@ -67,9 +90,9 @@ Island alone blocked it in 1782, New York alone blocked it in 1786.
 
 | Time | What happens |
 |---|---|
-| 0–5 | Open `teacher.html`, pick the student states, create the session, put the code on the board. Groups of two open `student.html` and claim a state. |
-| 5–8 | Read the framing paragraph on your lobby screen. Groups read their secret objective. |
-| 8–34 | Four rounds, about 6½ minutes each: brief → 2-minute debate → vote → result → payment → reveal. |
+| 0–4 | Open `teacher.html`, pick the student states, create the session, put the code on the board. Groups of two open `student.html` and claim a state. |
+| 4–9 | The candy vote. It fails, and you show them why. |
+| 9–34 | Four rounds: read-aloud → 2-minute debate → vote → result → payment → reveal. |
 | 34–40 | Debrief screen, with discussion questions and an exit ticket. |
 
 You drive every transition. Nothing advances without you clicking.
@@ -233,6 +256,8 @@ Nearly everything a teacher would want to change is in **`assets/game-data.js`**
 - `STATES` — each state's background, secret objective, two internal factions, treasury, and bot weights
 - `RESOLUTIONS` — the text students read, the yes/no arguments, vote rule, tags
 - `question`, `ifPasses`, `ifFails` — the briefing shown before the vote
+- `COLD_OPEN` — the candy vote and the lessons its outcome fires
+- `WHAT_WORKED`, `VOICES` — the Northwest Ordinance and the Knox/Jefferson quotes in the debrief
 - `narration` on each resolution — the opening scene you read to the class
 - `HISTORY_NOTES` — the "what actually happened" box after each round
 - `GLOSSARY` and `WEAKNESSES` — used in the debrief
@@ -258,6 +283,7 @@ node tests/map.test.js           # map board, roll call, payment reveal
 node tests/deals.test.js         # bot offers answer, human offers are only delivered
 node tests/narration.test.js     # read-aloud on both screens, live treasury token
 node tests/explain.test.js       # every resolution states the question, both outcomes and the stake
+node tests/coldopen.test.js      # candy vote, the refusal to pay, and the reveal that names the lesson
 ```
 
 The multiplayer test replaces the Firebase SDK with a small localStorage-backed stand-in

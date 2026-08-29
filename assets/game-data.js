@@ -406,13 +406,103 @@
      that the outcome they just produced is the outcome that happened.
      ---------------------------------------------------------------------- */
   var HISTORY_NOTES = {
-    debt: "In real life, Congress asked the states for about $15 million between 1781 and 1786. It received about $2.5 million. That is roughly one dollar for every six requested. The United States defaulted on its loans from France.",
-    trade: "In real life, New York really did tax goods bound for New Jersey and Connecticut, and New Jersey really did tax the New York lighthouse at Sandy Hook. Congress asked states to stop. They did not stop. This trade chaos is a direct reason the Constitutional Convention was called.",
+    debt: "In real life, Congress asked the states for about $15 million between 1781 and 1786. It received about $2.5 million — roughly one dollar for every six requested. The United States defaulted on its loans from France.\n\nThere was a second cost. Britain had promised in 1783 to leave its forts on American soil — Detroit, Niagara, Oswego, Michilimackinac. It refused to go, pointing out that Americans were not paying the pre-war debts they owed British merchants either. Congress could not make the states pay, so it could not make Britain leave.",
+    trade: "In real life, New York really did tax goods bound for New Jersey and Connecticut, and New Jersey really did tax the New York lighthouse at Sandy Hook. Congress asked the states to stop. They did not stop.\n\nIt went further than taxes. Spain closed the Mississippi River to American boats in 1784, cutting off every farmer west of the mountains. In 1786 John Jay negotiated a treaty that would have given up the river for 25 years in exchange for trade deals that helped northern merchants. The South was furious. Congress split along North and South lines and the treaty died. This chaos is a direct reason the Constitutional Convention was called.",
     impost: "In real life this was tried twice. In 1782, twelve states approved the import tax and Rhode Island alone rejected it. In 1786, the plan was tried again and New York alone rejected it. Both times, one state out of thirteen was enough.",
-    shays: "In real life, Congress authorized 1,340 troops in October 1786 and asked the states to pay for them. The states sent almost nothing. The rebellion was finally stopped in February 1787 by a private army paid for by Boston merchants. Three months later, the Constitutional Convention opened in Philadelphia."
+    shays: "In real life, Congress authorized 1,340 troops in October 1786 and asked the states to pay for them. The states sent almost nothing.\n\nOn January 25, 1787, Shays led about 1,200 men against the Springfield arsenal, planning to march on Boston afterward. The militia opened fire. Four farmers were killed and the rest scattered. The rebellion was put down not by Congress but by a private army of 4,000 paid for by Boston merchants and led by General Benjamin Lincoln.\n\nThree months later, the Constitutional Convention opened in Philadelphia."
   };
 
+  /* ----------------------------------------------------------------------
+     THE COLD OPEN — "The Candy Vote"
+     Before any history happens, the class tries to agree on one snack under
+     the Articles' own rules: one vote per group, nine of thirteen to decide
+     anything, and everybody has to chip in. It fails for exactly the reasons
+     the Confederation failed, and then the room is told so.
+     ---------------------------------------------------------------------- */
+  var COLD_OPEN = {
+    question: "We can buy ONE treat for the whole class. Everybody chips in $5. What are we getting?",
+    options: ["Sour candy", "Chocolate", "Chips and salty snacks", "Doughnuts"],
+    payQuestion: "Is your group actually going to bring the $5?",
+    rules: [
+      "Your group gets one vote. So does every other group, big or small.",
+      "Nine of the thirteen groups have to pick the SAME thing, or nobody gets anything.",
+      "If it wins, every group has to bring the money. Nobody can make you."
+    ],
+    // Each row fires only if the class actually produced that outcome, so the
+    // debrief describes what happened in this room rather than a generic list.
+    lessons: [
+      { when: "nowinner",
+        what: "No snack got nine of thirteen groups.",
+        why: "Nine out of thirteen is a very high bar. Under the Articles, most proposals died exactly like this — not voted down, just never able to reach nine." },
+      { when: "split",
+        what: "The class split across {optionCount} different snacks.",
+        why: "Thirteen groups wanted thirteen different things. The states were the same: each one voted for what was good for itself, not for the class." },
+      { when: "smallequal",
+        what: "Every group counted the same, however big it was.",
+        why: "Under the Articles each state got exactly one vote. Virginia had about 700,000 people. Delaware had about 59,000. Same vote." },
+      { when: "refusers",
+        what: "{n} group{s} said they would not bring the money.",
+        why: "This is the whole problem. Congress could only ASK the states for money. There was no president to collect it and no court to sue them. States said yes and then sent nothing." },
+      { when: "nopower",
+        what: "Nobody in this room could force anyone to agree.",
+        why: "There was no president and no national court. Congress could pass something and then simply watch nothing happen." },
+      { when: "winner",
+        what: "You actually got nine of thirteen. That almost never happened.",
+        why: "Congress did sometimes reach nine. The trouble came next — when the states had to actually do the thing they had voted for." }
+    ],
+    bridge: "In 1786, the states found themselves in exactly this situation."
+  };
+
+  /* ----------------------------------------------------------------------
+     THE OTHER HALF OF THE STORY
+     The Articles were not a total failure, and the debrief should say so —
+     otherwise students learn a cartoon. Congress governed the west well.
+     ---------------------------------------------------------------------- */
+  var WHAT_WORKED = {
+    title: "One thing the Articles got right",
+    body: "Congress under the Articles did do something lasting. The Land Ordinance of 1785 " +
+          "surveyed the western territory into a grid of townships that could be sold off in " +
+          "orderly pieces. Then the Northwest Ordinance of 1787 set the rules for governing that " +
+          "land: once a territory reached 60,000 people it could apply to become a state, equal " +
+          "to the original thirteen — not a colony of them. And it banned slavery in the whole " +
+          "Northwest Territory.\n\n" +
+          "That is a real achievement, passed by the same broke, powerless Congress you have been " +
+          "playing. It is worth asking why this one worked when nothing else did. One answer: it " +
+          "cost the states nothing and took nothing away from them.\n\n" +
+          "It is also worth knowing that Thomas Jefferson had tried this three years earlier. His " +
+          "1784 plan would have banned slavery in every western territory after 1800. It lost by a " +
+          "single vote, because one delegate from New Jersey was too sick to come to the chamber " +
+          "that day. Jefferson later wrote that the fate of millions was determined by the absence " +
+          "of one man.",
+    note: "The land these laws organised was not empty. It was home to the Shawnee, Miami, " +
+          "Delaware, and many other nations, who had not agreed to any of it."
+  };
+
+  /* Two men look at the same rebellion and see opposite things. Good for the
+     last five minutes of class. */
+  var VOICES = [
+    {
+      who: "General Henry Knox",
+      role: "Washington's close aide, writing after Shays' Rebellion",
+      quote: "What is to afford us our security against the violence of lawless men? Our government " +
+             "must be braced, changed, or altered to secure our lives and property.",
+      gloss: "Knox is frightened. To him the rebellion proves the government is too weak and must be rebuilt."
+    },
+    {
+      who: "Thomas Jefferson",
+      role: "writing from Paris, November 1787",
+      quote: "What country before ever existed a century and a half without a rebellion? … The tree " +
+             "of liberty must be refreshed from time to time with the blood of patriots and tyrants.",
+      gloss: "Jefferson is 3,000 miles away and unbothered. To him an occasional rebellion is healthy — " +
+             "it warns rulers that people are still paying attention. He thought the Convention was " +
+             "overreacting."
+    }
+  ];
+
   window.AOC = {
+    COLD_OPEN: COLD_OPEN,
+    WHAT_WORKED: WHAT_WORKED,
+    VOICES: VOICES,
     TAGS: TAGS,
     STATES: STATES,
     RESOLUTIONS: RESOLUTIONS,

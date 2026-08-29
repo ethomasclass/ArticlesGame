@@ -72,6 +72,13 @@
       <h2>Set the pace</h2>
       <div class="grid g3">
         <div class="field">
+          <label for="cold-open">Open with the candy vote</label>
+          <select id="cold-open">
+            <option value="on" selected>Yes — 5 minutes, recommended</option>
+            <option value="off">No — go straight to 1786</option>
+          </select>
+        </div>
+        <div class="field">
           <label for="caucus-len">Debate time per resolution</label>
           <select id="caucus-len">
             <option value="90">90 seconds — very tight</option>
@@ -93,6 +100,24 @@
             <option value="on" selected>On — bots sometimes skip Congress</option>
             <option value="off">Off — all 13 states always present</option>
           </select>
+        </div>
+      </div>
+      <div id="cold-fields">
+        <hr class="rule">
+        <div class="eyebrow">The candy vote</div>
+        <p class="small muted">Before any history, the class tries to agree on one snack under the
+        Articles' own rules — one vote per group, nine of thirteen to decide, everybody chips in.
+        It fails for the same reasons the Confederation failed, and then you show them why.
+        Change the snacks to whatever your class actually wants.</p>
+        <div class="field">
+          <label for="co-q">The question you put to the class</label>
+          <input type="text" id="co-q">
+        </div>
+        <div class="grid g2">
+          <div class="field"><label for="co-o0">Choice 1</label><input type="text" id="co-o0"></div>
+          <div class="field"><label for="co-o1">Choice 2</label><input type="text" id="co-o1"></div>
+          <div class="field"><label for="co-o2">Choice 3</label><input type="text" id="co-o2"></div>
+          <div class="field"><label for="co-o3">Choice 4</label><input type="text" id="co-o3"></div>
         </div>
       </div>
       <button class="btn big" id="create-btn">Create the session</button>
@@ -134,6 +159,53 @@
           <button class="btn ghost sm" id="fill-bots-btn">Turn unclaimed states into bots</button>
           <hr class="rule">
           <p class="small muted">You can start before every group joins. Any state nobody claimed is played by a bot.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= COLD OPEN ================= -->
+  <section id="coldopen" class="hidden">
+    <div class="split">
+      <div>
+        <div class="card">
+          <div class="eyebrow">Before we start · read this to the class</div>
+          <h1 id="co-question" style="font-size:2.1rem">—</h1>
+          <div class="inset">
+            <ul class="clean" id="co-rules" style="font-size:1.08rem"></ul>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="spread">
+            <h3 style="margin:0" id="co-heading">The vote</h3>
+            <span class="pill" id="co-count">0 of 13 voted</span>
+          </div>
+          <div class="optgrid" id="co-options" style="margin-top:14px"></div>
+        </div>
+
+        <div class="card hidden" id="co-reveal">
+          <h2 id="co-verdict">—</h2>
+          <p class="lede" id="co-summary"></p>
+          <hr class="rule">
+          <div class="eyebrow">This just happened to you. It happened to them too.</div>
+          <div id="co-lessons"></div>
+          <div class="bridge" id="co-bridge"></div>
+        </div>
+      </div>
+
+      <div class="ctl">
+        <div class="card tight">
+          <div class="spread" style="margin-bottom:8px">
+            <span class="eyebrow" style="margin:0">Now</span>
+            <span class="phase-flag pill" id="co-flag">Voting</span>
+          </div>
+          <button class="btn gold big" id="co-next">Close the vote</button>
+          <button class="btn ghost sm" id="co-skip">Skip to 1786</button>
+        </div>
+        <div class="card tight">
+          <div class="eyebrow">Say to the class</div>
+          <div id="co-prompt" style="font-size:.95rem">—</div>
         </div>
       </div>
     </div>
@@ -330,12 +402,24 @@ function drawPicks(){
 window.preset = function(k){ picked = PRESETS[k].slice(); drawPicks(); };
 drawPicks();
 
+// cold-open defaults, editable before the session is created
+$("co-q").value = D.COLD_OPEN.question;
+D.COLD_OPEN.options.forEach(function(o, i){ $("co-o" + i).value = o; });
+$("cold-open").addEventListener("change", function(){
+  $("cold-fields").classList.toggle("hidden", this.value !== "on");
+});
+
 $("create-btn").addEventListener("click", function(){
   var b = $("create-btn"); b.disabled = true; b.textContent = "Creating…";
+  var opts = [0,1,2,3].map(function(i){ return $("co-o" + i).value.trim(); })
+    .filter(function(x){ return x; });
   NET.createGame(picked, {
     caucusLen: parseInt($("caucus-len").value,10),
     dealLimit: parseInt($("deal-limit").value,10),
-    absences: $("absences").value === "on"
+    absences: $("absences").value === "on",
+    coldOpen: $("cold-open").value === "on",
+    coldQuestion: $("co-q").value.trim() || D.COLD_OPEN.question,
+    coldOptions: opts.length >= 2 ? opts : D.COLD_OPEN.options.slice()
   }).then(function(code){
     CODE = code;
     $("game-code").textContent = code;
@@ -595,6 +679,7 @@ function render(){
     return;
   }
   if (G.status === "lobby") return renderLobby();
+  if (G.status === "coldopen") return renderColdOpen();
 
   $("lobby").classList.add("hidden");
   $("game").classList.remove("hidden");
@@ -675,7 +760,8 @@ function render(){
     }
     var hn = (ph === "reveal" || ph === "done");
     $("history-note").classList.toggle("hidden", !hn);
-    if (hn) $("history-text").textContent = D.HISTORY_NOTES[r.id] || "";
+    if (hn) $("history-text").innerHTML = (D.HISTORY_NOTES[r.id] || "").split("\n\n")
+      .map(function(x){ return "<p>" + x + "</p>"; }).join("");
   } else {
     rc.classList.add("hidden"); $("tally-pill").textContent = "";
   }
@@ -843,7 +929,148 @@ $("fill-bots-btn").addEventListener("click", function(){
     .map(function(s){ return { name:s.name, patch:{ isBot:true } }; });
   if (ups.length) NET.batchStates(CODE, ups);
 });
-$("begin-btn").addEventListener("click", function(){ startRound(0); });
+$("begin-btn").addEventListener("click", function(){
+  if (G.settings && G.settings.coldOpen) {
+    autoBotUnclaimed().then(function(){
+      NET.updateGame(CODE, { status:"coldopen", phase:"co_vote", round:-1,
+        activeBots: botRoster() });
+    });
+  } else {
+    startRound(0);
+  }
+});
+
+/* ---------------------------------------------------------- the cold open
+   The class tries to agree on a snack under the Articles' rules before it
+   ever hears the word "requisition". When it fails — and with four choices
+   and a nine-of-thirteen bar it nearly always fails — the reveal names the
+   reason and hands it straight to 1786.                                   */
+var CO_PROMPTS = {
+  co_vote: "Read the question and the three rules. Then let every group pick one. Do not help them.",
+  co_pay:  "It is decided — or it isn't. Now ask the real question: is your group actually bringing the money?",
+  co_reveal: "Read each row out loud. Then read the last line and start the simulation."
+};
+
+function coldVotes(){
+  var counts = (G.settings.coldOptions || []).map(function(){ return []; });
+  STATES.forEach(function(s){
+    if (s.coldVote === undefined || s.coldVote === null) return;
+    if (counts[s.coldVote]) counts[s.coldVote].push(s.abbr);
+  });
+  return counts;
+}
+
+function renderColdOpen(){
+  $("lobby").classList.add("hidden");
+  $("game").classList.add("hidden");
+  $("coldopen").classList.remove("hidden");
+
+  var opts = G.settings.coldOptions || [];
+  $("co-question").textContent = G.settings.coldQuestion || D.COLD_OPEN.question;
+  $("co-rules").innerHTML = D.COLD_OPEN.rules.map(function(r){ return "<li>" + r + "</li>"; }).join("");
+
+  var counts = coldVotes();
+  var best = -1, bestN = -1;
+  counts.forEach(function(c, i){ if (c.length > bestN) { bestN = c.length; best = i; } });
+  var voted = counts.reduce(function(a, c){ return a + c.length; }, 0);
+  var winner = bestN >= 9 ? best : -1;
+
+  $("co-count").textContent = voted + " of " + STATES.length + " voted";
+  $("co-options").innerHTML = opts.map(function(o, i){
+    var c = counts[i] || [];
+    var cls = "optcard" + (winner === i ? " win" : (i === best && bestN > 0 ? " lead" : ""));
+    return '<div class="' + cls + '"><div class="lbl">' + o + '</div>' +
+           '<div class="cnt">' + c.length + '</div><div class="of">of 9 needed</div>' +
+           '<div class="who">' + (c.join(" · ") || "&nbsp;") + '</div></div>';
+  }).join("");
+
+  var ph = G.phase;
+  $("co-flag").textContent = ({co_vote:"Voting", co_pay:"Paying", co_reveal:"The point"})[ph] || ph;
+  $("co-prompt").textContent = CO_PROMPTS[ph] || "";
+  $("co-heading").textContent = ph === "co_pay" ? "Who is actually bringing the money?" : "The vote";
+  $("co-next").textContent = ph === "co_vote" ? "Close the vote"
+    : (ph === "co_pay" ? "Show them what just happened" : "Begin Resolution 1 — 1786");
+
+  if (ph === "co_pay") {
+    var payers = STATES.filter(function(s){ return s.coldPay === true; }).length;
+    var refusers = STATES.filter(function(s){ return s.coldPay === false; }).length;
+    $("co-count").textContent = (payers + refusers) + " of " + STATES.length + " answered";
+  }
+
+  $("co-reveal").classList.toggle("hidden", ph !== "co_reveal");
+  if (ph === "co_reveal") renderColdReveal(counts, winner, best, bestN);
+}
+
+function renderColdReveal(counts, winner, best, bestN){
+  var opts = G.settings.coldOptions || [];
+  var refusers = STATES.filter(function(s){ return s.coldPay === false; });
+  var chosenCount = counts.filter(function(c){ return c.length > 0; }).length;
+
+  $("co-verdict").textContent = winner >= 0
+    ? "You agreed on " + opts[winner] + "."
+    : "The class could not agree on anything.";
+  $("co-verdict").style.color = winner >= 0 ? "#1d5233" : "#8a2019";
+  $("co-summary").textContent = winner >= 0
+    ? ("It got " + bestN + " of the 13 groups. Then " + refusers.length +
+       " group" + (refusers.length === 1 ? "" : "s") + " said they would not bring the money.")
+    : ("The best any choice managed was " + bestN + " groups out of 13. Nine were needed. Nobody gets anything.");
+
+  var fired = [];
+  D.COLD_OPEN.lessons.forEach(function(L){
+    var use = false, what = L.what;
+    if (L.when === "nowinner" && winner < 0) use = true;
+    if (L.when === "winner" && winner >= 0) use = true;
+    if (L.when === "split" && chosenCount > 1) {
+      use = true; what = what.replace("{optionCount}", chosenCount);
+    }
+    if (L.when === "smallequal") use = true;
+    if (L.when === "refusers" && refusers.length > 0) {
+      use = true;
+      what = what.replace("{n}", refusers.length).replace("{s}", refusers.length === 1 ? "" : "s");
+    }
+    if (L.when === "nopower") use = true;
+    if (use) fired.push({ what: what, why: L.why });
+  });
+
+  $("co-lessons").innerHTML = fired.map(function(f){
+    return '<div class="lesson"><div class="what">' + f.what + '</div>' +
+           '<div class="why">' + f.why + '</div></div>';
+  }).join("");
+  $("co-bridge").textContent = D.COLD_OPEN.bridge;
+}
+
+$("co-next").addEventListener("click", function(){
+  if (G.phase === "co_vote") {
+    // any group that never voted is recorded as not voting at all
+    var patches = STATES.filter(function(s){ return s.coldVote === undefined || s.coldVote === null; })
+      .map(function(s){
+        var opts = G.settings.coldOptions || [];
+        var rnd = E.seededRandom(CODE + "|candy|" + s.name);
+        return { name:s.name, patch:{ coldVote: Math.floor(rnd() * opts.length) } };
+      });
+    (patches.length ? NET.batchStates(CODE, patches) : Promise.resolve())
+      .then(function(){ return NET.updateGame(CODE, { phase:"co_pay" }); });
+    return;
+  }
+  if (G.phase === "co_pay") {
+    var ups = STATES.filter(function(s){ return s.coldPay === undefined || s.coldPay === null; })
+      .map(function(s){
+        var rnd = E.seededRandom(CODE + "|candypay|" + s.name);
+        // bots mostly say yes, and a stubborn few do not — the same shape as
+        // the requisition that is coming in five minutes
+        return { name:s.name, patch:{ coldPay: rnd() > 0.32 } };
+      });
+    (ups.length ? NET.batchStates(CODE, ups) : Promise.resolve())
+      .then(function(){ return NET.updateGame(CODE, { phase:"co_reveal" }); });
+    return;
+  }
+  $("coldopen").classList.add("hidden");
+  startRound(0);
+});
+$("co-skip").addEventListener("click", function(){
+  $("coldopen").classList.add("hidden");
+  startRound(0);
+});
 
 // Any state slot nobody actually claimed is played by a bot. Without this a
 // no-show group silently abstains every round, and abstentions sink a vote
@@ -879,6 +1106,7 @@ function absentFor(idx){
 }
 
 function startRound(idx){
+  $("coldopen").classList.add("hidden");
   return autoBotUnclaimed().then(function(){
     return NET.updateGame(CODE, {
       status:"running", round: idx, phase:"brief", activeBots: botRoster(),
