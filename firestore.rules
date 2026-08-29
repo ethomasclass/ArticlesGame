@@ -1,0 +1,32 @@
+rules_version = '2';
+
+// Rules for the classroom game. Students are not signed in — they identify
+// themselves by typing a 4-letter code the teacher reads off the board — so
+// the game documents have to be writable without authentication.
+//
+// What this allows: anyone who knows the project ID can read and write
+// documents under /games. What is stored there: state names, vote choices,
+// and whatever first names students type in. Nothing else. No email
+// addresses, no student IDs, no grades.
+//
+// If you want this locked down harder, the two usual options are Firebase
+// App Check (ties writes to your own web pages) or anonymous auth. Neither is
+// necessary for a class period, but both are reasonable if the project is
+// shared across a district.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /games/{code} {
+      allow read, write: if true;
+
+      match /states/{stateName} {
+        allow read, write: if true;
+      }
+    }
+
+    // Everything else in the project stays closed.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Delegation — The Confederation Problem</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%276%27 fill=%27%238a3324%27/%3E%3Ctext x=%2716%27 y=%2723%27 font-size=%2719%27 text-anchor=%27middle%27 fill=%27%23f5ecd8%27 font-family=%27Georgia,serif%27%3E13%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/styles.css">
+<style>
+  .vote-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  .vote-row .btn{font-size:1.35rem;padding:1.1em .5em;width:100%}
+  @media(max-width:600px){.vote-row{grid-template-columns:1fr}}
+  .faction{background:var(--parch-2);border:1px solid var(--line);border-left:5px solid var(--gold-dk);
+    border-radius:0 8px 8px 0;padding:11px 14px}
+  .faction .who{font-weight:700}
+  .claim{display:block;width:100%;text-align:left;background:var(--parch-2);border:2px solid var(--line);
+    border-radius:9px;padding:11px 13px;cursor:pointer;font-family:inherit;font-size:1rem;transition:.15s;margin-bottom:9px}
+  .claim:hover:not(:disabled){border-color:var(--gold);background:var(--parch-3)}
+  .claim:disabled{opacity:.45;cursor:not-allowed}
+  .claim .t{font-weight:700;font-size:1.1rem}
+  .claim .d{font-size:.8rem;color:var(--ink-faint);line-height:1.35}
+  .bill{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed var(--line)}
+  .bill:last-child{border:0}
+  .deal-form{display:grid;grid-template-columns:1fr 1fr auto;gap:9px;align-items:end}
+  @media(max-width:700px){.deal-form{grid-template-columns:1fr}}
+  .waiting{font-size:1.2rem;text-align:center;padding:22px}
+  .waiting .dot{animation:blink 1.4s infinite}
+  @keyframes blink{0%,100%{opacity:.25}50%{opacity:1}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="masthead">
+    <div>
+      <h1 id="mast-title">The Confederation Problem</h1>
+      <div class="sub" id="mast-sub">Delegation Portal</div>
+    </div>
+    <div class="row" id="mast-stats"></div>
+  </div>
+
+  <!-- ============ JOIN ============ -->
+  <section id="s-join">
+    <div class="card">
+      <h2>Join your Congress</h2>
+      <p class="lede">Two delegates share this screen. Put both names in.</p>
+      <div class="field">
+        <label for="names">Your names</label>
+        <input type="text" id="names" placeholder="e.g. Maya and Dev" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="code">Game code from the board</label>
+        <input type="text" id="code" placeholder="ABCD" maxlength="4"
+               style="text-transform:uppercase;letter-spacing:.3em;font-size:1.6rem;text-align:center"
+               autocomplete="off" autocapitalize="characters">
+      </div>
+      <button class="btn big wide" id="join-btn">Enter Congress</button>
+      <p id="join-err" style="color:#8a2019;font-weight:700;margin-top:10px"></p>
+    </div>
+  </section>
+
+  <!-- ============ CLAIM ============ -->
+  <section id="s-claim" class="hidden">
+    <div class="card">
+      <h2>Choose your state</h2>
+      <p class="lede">Read these carefully. The state you pick decides what you want and what you are afraid of.</p>
+      <div id="claim-list"></div>
+    </div>
+  </section>
+
+  <!-- ============ DOSSIER / WAITING ============ -->
+  <section id="s-dossier" class="hidden">
+    <div class="card">
+      <div class="eyebrow">Your delegation</div>
+      <h2 id="dos-name">—</h2>
+      <p class="lede" id="dos-bg"></p>
+      <div class="callout warn" style="margin-bottom:14px">
+        <div class="eyebrow">Secret objective — do not read this out loud</div>
+        <div id="dos-obj" style="font-size:1.1rem"></div>
+      </div>
+      <h3>The two of you do not agree</h3>
+      <p class="small muted">Your state is split. Settle it between yourselves before every vote.</p>
+      <div class="grid g2" id="dos-factions"></div>
+    </div>
+    <div class="card center">
+      <div class="waiting" id="dos-wait">Waiting for your teacher to begin<span class="dot">…</span></div>
+    </div>
+  </section>
+
+  <!-- ============ ROUND ============ -->
+  <section id="s-round" class="hidden">
+    <div class="card">
+      <div class="spread">
+        <div class="eyebrow" id="r-eyebrow">Resolution 1</div>
+        <span class="pill hot" id="r-rule">Needs 9 of 13</span>
+      </div>
+      <h2 id="r-title">—</h2>
+      <p class="lede" id="r-brief"></p>
+      <div class="inset" id="r-detail"></div>
+    </div>
+
+    <div class="card" id="cost-card">
+      <div class="eyebrow">What this costs your state</div>
+      <div id="cost-body"></div>
+    </div>
+
+    <div class="card">
+      <h3>The argument</h3>
+      <div class="grid g2">
+        <div class="inset" style="border-left:5px solid var(--yes)">
+          <div class="eyebrow" style="color:#1d5233">A reason to vote yes</div>
+          <div id="r-yes"></div>
+        </div>
+        <div class="inset" style="border-left:5px solid var(--no)">
+          <div class="eyebrow" style="color:#8a2019">A reason to vote no</div>
+          <div id="r-no"></div>
+        </div>
+      </div>
+      <div id="r-factions" class="grid g2" style="margin-top:14px"></div>
+    </div>
+
+    <!-- deals -->
+    <div class="card" id="deal-card">
+      <div class="spread">
+        <h3 style="margin:0">Make a deal</h3>
+        <span class="pill" id="deal-left">2 offers left</span>
+      </div>
+      <p class="small muted">Bot states will answer you. Student states you have to talk to in person.</p>
+      <div class="deal-form">
+        <div class="field" style="margin:0">
+          <label for="deal-target">Offer to</label>
+          <select id="deal-target"></select>
+        </div>
+        <div class="field" style="margin:0">
+          <label for="deal-offer">You offer</label>
+          <select id="deal-offer"></select>
+        </div>
+        <button class="btn" id="deal-send">Send</button>
+      </div>
+      <div class="ticker inset" id="deal-log" style="margin-top:12px"></div>
+    </div>
+
+    <!-- voting -->
+    <div class="card" id="vote-card">
+      <h3 class="center" id="vote-q">How does your delegation vote?</h3>
+      <div class="vote-row">
+        <button class="btn btn-yes" onclick="AOCVOTE('Yes')">YES</button>
+        <button class="btn btn-no" onclick="AOCVOTE('No')">NO</button>
+        <button class="btn btn-abstain" onclick="AOCVOTE('Abstain')">ABSTAIN</button>
+      </div>
+      <p class="small muted center" style="margin-top:10px">An abstention is not neutral. Nine <em>yes</em>
+      votes are needed, so abstaining helps the resolution fail.</p>
+    </div>
+
+    <div class="card hidden" id="voted-card">
+      <div class="waiting">Your vote is recorded: <strong id="voted-what"></strong><br>
+      <span class="small muted">Waiting for the other states<span class="dot">…</span></span></div>
+    </div>
+
+    <!-- compliance -->
+    <div class="card hidden" id="pay-card" style="border-color:var(--red);border-width:3px">
+      <div class="eyebrow" style="color:var(--red)">Congress said yes. Now decide for real.</div>
+      <h2>Are you actually going to send the money?</h2>
+      <p class="lede" id="pay-owed">—</p>
+      <div class="callout warn">
+        <p style="margin:0"><strong>Nobody can make you pay.</strong> There is no president to send after you
+        and no national court to take you to. If you refuse, the money simply never arrives, and nothing
+        happens to your state.</p>
+      </div>
+      <div class="vote-row" style="margin-top:14px">
+        <button class="btn btn-yes" onclick="AOCPAY('full')">PAY IN FULL</button>
+        <button class="btn gold" onclick="AOCPAY('half')">PAY HALF</button>
+        <button class="btn btn-no" onclick="AOCPAY('none')">PAY NOTHING</button>
+      </div>
+    </div>
+
+    <div class="card hidden" id="paid-card">
+      <div class="waiting">Your decision is recorded: <strong id="paid-what"></strong><br>
+      <span class="small muted">Waiting for the reveal<span class="dot">…</span></span></div>
+    </div>
+
+    <!-- result -->
+    <div class="card hidden" id="res-card">
+      <h2 id="res-head">—</h2>
+      <p class="lede" id="res-narr"></p>
+      <div id="res-money" class="hidden">
+        <div class="grid g3">
+          <div class="stat"><div class="k">Congress asked</div><div class="v" id="res-asked">$0</div></div>
+          <div class="stat"><div class="k">Congress got</div><div class="v" id="res-got">$0</div></div>
+          <div class="stat"><div class="k">That is</div><div class="v" id="res-pct">0%</div></div>
+        </div>
+      </div>
+      <div class="hist hidden" id="res-hist" style="margin-top:14px">
+        <div class="eyebrow">What actually happened</div>
+        <div id="res-hist-text"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="s-debrief" class="hidden"></section>
+</div>
+
+<script src="assets/game-data.js"></script>
+<script src="assets/engine.js"></script>
+<script src="assets/net.js"></script>
+<script src="assets/debrief.js"></script>
+<script>
+(function(){
+"use strict";
+var D = window.AOC, E = window.ENGINE;
+var $ = function(id){ return document.getElementById(id); };
+
+var CODE=null, NAMES=null, MINE=null, G=null, ME=null, ALL=[], lastPhase=null;
+
+function show(id){
+  ["s-join","s-claim","s-dossier","s-round","s-debrief"].forEach(function(x){
+    $(x).classList.toggle("hidden", x !== id);
+  });
+}
+function myData(){ return D.byName(MINE); }
+function res(){ return (G && G.round >= 0) ? D.RESOLUTIONS[G.round] : null; }
+
+/* ------------------------------------------------------------- joining */
+$("join-btn").addEventListener("click", function(){
+  var names = $("names").value.trim();
+  var code = $("code").value.trim().toUpperCase();
+  if (!names || code.length !== 4) { $("join-err").textContent = "Enter both names and the 4-letter code."; return; }
+  $("join-err").textContent = "Connecting…";
+  NET.findGame(code).then(function(g){
+    if (!g) { $("join-err").textContent = "No game with that code. Check the board."; return; }
+    CODE = code; NAMES = names; G = g;
+    $("join-err").textContent = "";
+    return NET.listStates(code).then(function(list){
+      ALL = list; renderClaims(); show("s-claim");
+      try{ localStorage.setItem("aoc_student", JSON.stringify({code:code,names:names})); }catch(e){}
+    });
+  }).catch(function(err){ $("join-err").textContent = "Could not connect: " + err.message; });
+});
+$("code").addEventListener("keydown", function(e){ if (e.key === "Enter") $("join-btn").click(); });
+
+function renderClaims(){
+  var slots = (G.studentStates||[]);
+  var list = $("claim-list"); list.innerHTML = "";
+  var open = ALL.filter(function(s){ return slots.indexOf(s.name) !== -1; });
+  if (!open.length) open = ALL;
+  open.sort(function(a,b){ return a.name.localeCompare(b.name); }).forEach(function(s){
+    var d = D.byName(s.name);
+    var taken = (s.players||[]).length > 0;
+    var b = document.createElement("button");
+    b.className = "claim"; b.disabled = taken;
+    b.innerHTML = '<div class="t">' + s.name + (taken ? ' — taken by ' + s.players.join(", ") : '') + '</div>' +
+                  '<div class="d">' + d.motto + '</div>';
+    b.addEventListener("click", function(){ claim(s.name); });
+    list.appendChild(b);
+  });
+}
+
+function claim(name){
+  MINE = name;
+  NET.claimState(CODE, name, [NAMES]).then(function(){
+    try{ localStorage.setItem("aoc_student", JSON.stringify({code:CODE,names:NAMES,state:name})); }catch(e){}
+    startListening();
+  });
+}
+
+function startListening(){
+  var d = myData();
+  $("mast-title").textContent = d.name;
+  $("mast-sub").textContent = "Delegates: " + NAMES;
+  $("dos-name").textContent = d.name;
+  $("dos-bg").textContent = d.background;
+  $("dos-obj").textContent = d.objective;
+  $("dos-factions").innerHTML = d.factions.map(function(f){
+    return '<div class="faction"><div class="who">' + f.name + '</div><div>' + f.wants + '</div></div>';
+  }).join("");
+  show("s-dossier");
+  NET.onGame(CODE, function(g){ G = g; render(); });
+  NET.onState(CODE, MINE, function(s){ ME = s; render(); });
+}
+
+/* -------------------------------------------------------------- render */
+function render(){
+  if (!G || !ME) return;
+  var d = myData();
+
+  $("mast-stats").innerHTML =
+    '<div class="stat"><div class="k">Treasury</div><div class="v">' + E.money(ME.treasuryNow) + '</div></div>' +
+    '<div class="stat"><div class="k">State interest</div><div class="v">' + Math.round(ME.interest) + '</div></div>' +
+    '<div class="stat"><div class="k">Nation</div><div class="v">' + Math.round(G.stability) + '</div></div>';
+
+  if (G.status === "ended") {
+    show("s-debrief");
+    NET.listStates(CODE).then(function(list){
+      window.DEBRIEF.render($("s-debrief"), G, list, { you: MINE });
+    });
+    return;
+  }
+  if (G.status === "lobby" || G.round < 0) { show("s-dossier"); return; }
+
+  var r = res(); if (!r) return;
+  show("s-round");
+
+  if ((G.absent||[]).indexOf(MINE) !== -1) {
+    $("dos-wait").textContent = "Your delegation is not present today.";
+  }
+
+  $("r-eyebrow").textContent = "Resolution " + r.number + " — " + r.subtitle;
+  $("r-rule").textContent = r.voteRule === "unanimous" ? "Needs ALL 13 states" : "Needs 9 of 13 states";
+  $("r-title").textContent = r.title;
+  $("r-brief").textContent = r.brief;
+  $("r-detail").innerHTML = r.detail.split("\n\n").map(function(p){ return "<p>"+p+"</p>"; }).join("");
+  $("r-yes").textContent = r.yesCase;
+  $("r-no").textContent = r.noCase;
+  $("r-factions").innerHTML = d.factions.map(function(f){
+    return '<div class="faction"><div class="who">' + f.name + '</div><div class="small">' + f.wants + '</div></div>';
+  }).join("");
+
+  // cost to this state
+  var owed = E.amountOwed(d, r);
+  if (owed > 0) {
+    $("cost-card").classList.remove("hidden");
+    var pctT = Math.round(owed / ME.treasuryNow * 100);
+    $("cost-body").innerHTML =
+      '<div class="bill"><span>Your share of ' + E.money(r.complianceTotal) + '</span>' +
+        '<strong>' + E.money(owed) + '</strong></div>' +
+      '<div class="bill"><span>Your treasury right now</span><strong>' + E.money(ME.treasuryNow) + '</strong></div>' +
+      '<div class="bill"><span>Paying in full would cost you</span><strong style="color:#8a2019">' +
+        pctT + '% of everything you have</strong></div>' +
+      '<p class="small muted" style="margin:9px 0 0">Your share is based on ' +
+        (r.complianceBasis === "popShare" ? "how many people live in your state" : "the value of your land") + '.</p>';
+  } else {
+    $("cost-card").classList.add("hidden");
+  }
+
+  var ph = G.phase;
+  var myVote = ME.votes && ME.votes[G.round];
+  var myPay  = ME.payments && ME.payments[G.round];
+
+  $("deal-card").classList.toggle("hidden", ph !== "caucus");
+  $("vote-card").classList.toggle("hidden", !(ph === "voting" && !myVote));
+  $("voted-card").classList.toggle("hidden", !(ph === "voting" && myVote));
+  if (myVote) $("voted-what").textContent = myVote.toUpperCase();
+
+  $("pay-card").classList.toggle("hidden", !(ph === "compliance" && !myPay));
+  $("paid-card").classList.toggle("hidden", !(ph === "compliance" && myPay));
+  if (myPay) $("paid-what").textContent =
+    ({full:"PAY IN FULL", half:"PAY HALF", none:"PAY NOTHING"})[myPay.choice];
+  if (ph === "compliance") {
+    $("pay-owed").innerHTML = "You owe <strong>" + E.money(owed) + "</strong>. " +
+      "Your treasury holds " + E.money(ME.treasuryNow) + ".";
+  }
+
+  // result
+  var showRes = (ph === "tally" || ph === "reveal" || ph === "done") && G.result;
+  $("res-card").classList.toggle("hidden", !showRes);
+  if (showRes) {
+    var R = G.result;
+    $("res-head").textContent = !R.quorum ? "No quorum — no vote could be held"
+      : (R.passed ? "PASSED  (" + R.yes + " yes)" : "FAILED  (" + R.yes + " yes, " + R.needed + " needed)");
+    $("res-head").style.color = R.passed ? "#1d5233" : "#8a2019";
+    $("res-narr").textContent = (ph === "tally" && r.compliance && R.passed) ? r.passText : (R.narrative || "");
+    var money = (ph === "reveal" || ph === "done") && R.requested > 0;
+    $("res-money").classList.toggle("hidden", !money);
+    if (money) {
+      $("res-asked").textContent = E.money(R.requested);
+      $("res-got").textContent = E.money(R.collected);
+      $("res-pct").textContent = Math.round(R.collected/R.requested*100) + "%";
+    }
+    var hn = (ph === "reveal" || ph === "done");
+    $("res-hist").classList.toggle("hidden", !hn);
+    if (hn) $("res-hist-text").textContent = D.HISTORY_NOTES[r.id] || "";
+  }
+
+  if (ph === "caucus") renderDealUI();
+  lastPhase = ph;
+}
+
+/* --------------------------------------------------------------- deals */
+function renderDealUI(){
+  var r = res();
+  var mine = (G.deals||[]).filter(function(x){ return x.round === G.round && x.from === MINE; });
+  var limit = (G.settings && G.settings.dealLimit) || 2;
+  var left = Math.max(0, limit - mine.length);
+  $("deal-left").textContent = left + " offer" + (left===1?"":"s") + " left";
+  $("deal-send").disabled = left === 0;
+
+  var t = $("deal-target");
+  if (t.options.length === 0 || t.dataset.round !== String(G.round)) {
+    t.innerHTML = ""; t.dataset.round = String(G.round);
+    D.STATES.filter(function(s){ return s.name !== MINE && (G.absent||[]).indexOf(s.name) === -1; })
+      .forEach(function(s){
+        var o = document.createElement("option"); o.value = s.name; o.textContent = s.name; t.appendChild(o);
+      });
+    var off = $("deal-offer"); off.innerHTML = "";
+    E.DEAL_OPTIONS.forEach(function(o){
+      var el = document.createElement("option"); el.value = o.id; el.textContent = o.label; off.appendChild(el);
+    });
+  }
+  $("deal-log").innerHTML = mine.length ? mine.slice().reverse().map(function(x){
+    return '<div class="line ' + (x.status==="accepted"?"ok":(x.status==="rejected"?"bad":"")) + '">' +
+      "<strong>To " + x.to + ":</strong> " + x.label +
+      (x.reply ? "<br>" + x.reply : ' <span class="muted">(waiting for an answer)</span>') + "</div>";
+  }).join("") : '<div class="line muted small">You have not made any offers this round.</div>';
+}
+
+$("deal-send").addEventListener("click", function(){
+  var to = $("deal-target").value, id = $("deal-offer").value;
+  var opt = E.DEAL_OPTIONS.filter(function(o){ return o.id === id; })[0];
+  $("deal-send").disabled = true;
+  NET.pushDeal(CODE, { from: MINE, to: to, id: id, label: opt.label,
+    round: G.round, status: "pending", ts: Date.now() });
+});
+
+/* --------------------------------------------------------- vote / pay */
+window.AOCVOTE = function(v){
+  $("vote-card").classList.add("hidden");
+  NET.castVote(CODE, MINE, G.round, v);
+};
+window.AOCPAY = function(choice){
+  var r = res(), owed = E.amountOwed(myData(), r);
+  var paid = choice === "full" ? owed : (choice === "half" ? Math.round(owed/2) : 0);
+  $("pay-card").classList.add("hidden");
+  NET.setPayment(CODE, MINE, G.round, choice, paid);
+};
+
+/* ------------------------------------------------------- reconnecting */
+try {
+  var saved = JSON.parse(localStorage.getItem("aoc_student") || "null");
+  if (saved && saved.code && saved.state) {
+    NET.findGame(saved.code).then(function(g){
+      if (!g) return;
+      CODE = saved.code; NAMES = saved.names; MINE = saved.state; G = g;
+      startListening();
+    });
+  } else if (saved && saved.names) {
+    $("names").value = saved.names;
+  }
+} catch(e){}
+})();
+</script>
+</body>
+</html>

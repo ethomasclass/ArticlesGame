@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Teacher Panel — The Confederation Problem</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%276%27 fill=%27%238a3324%27/%3E%3Ctext x=%2716%27 y=%2723%27 font-size=%2719%27 text-anchor=%27middle%27 fill=%27%23f5ecd8%27 font-family=%27Georgia,serif%27%3E13%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/styles.css">
+<style>
+  .ctl{position:sticky;top:18px}
+  .ctl .btn{margin-bottom:8px;width:100%}
+  .phase-flag{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.7rem;font-weight:700;
+    letter-spacing:.12em;text-transform:uppercase}
+  .pickgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px}
+  .pick{display:flex;gap:9px;align-items:flex-start;background:var(--parch-2);border:2px solid var(--line);
+    border-radius:8px;padding:9px;cursor:pointer;transition:.15s}
+  .pick:hover{border-color:var(--gold)}
+  .pick.on{background:#e9f0e6;border-color:var(--yes)}
+  .pick input{margin-top:3px;flex:0 0 auto;width:17px;height:17px;accent-color:#2f7d4f}
+  .pick .t{font-weight:700}
+  .pick .d{font-size:.74rem;color:var(--ink-faint);line-height:1.3}
+  .say{background:#2e2a25;color:#f0e6cf;border-radius:8px;padding:14px 16px;font-size:1.05rem;
+    border-left:5px solid var(--gold)}
+  .say .eyebrow{color:var(--gold)}
+</style>
+</head>
+<body>
+<div class="wrap-wide">
+
+  <div class="masthead">
+    <div>
+      <h1>The Confederation Problem</h1>
+      <div class="sub">Teacher Panel &amp; Projector View</div>
+    </div>
+    <div class="row">
+      <div id="code-box" class="hidden center">
+        <div class="eyebrow">Join code</div>
+        <div class="code-chip" id="game-code">----</div>
+      </div>
+      <div id="clock-box" class="hidden center">
+        <div class="eyebrow">Caucus</div>
+        <div class="timer" id="timer">2:00</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= SETUP ================= -->
+  <section id="setup">
+    <div class="card">
+      <div class="eyebrow">Step 1</div>
+      <h2>Pick the states your students will play</h2>
+      <p class="lede">Each checked state is one student group. Everything you leave unchecked is played by a bot.
+      Six student groups is the sweet spot for a 40&#8209;minute period.</p>
+      <div class="callout">
+        <strong>Leave Rhode Island unchecked.</strong> Rhode Island is the state that killed the national
+        import tax in real life, and Round 3 depends on someone doing that. A bot will do it without a
+        student taking the blame.
+      </div>
+      <hr class="rule">
+      <div class="row" style="margin-bottom:12px">
+        <button class="btn ghost sm" onclick="preset('recommended')">Recommended six</button>
+        <button class="btn ghost sm" onclick="preset('eight')">Eight groups</button>
+        <button class="btn ghost sm" onclick="preset('four')">Four groups</button>
+        <button class="btn ghost sm" onclick="preset('none')">Clear all</button>
+        <span class="pill" id="pick-count">0 student states</span>
+      </div>
+      <div class="pickgrid" id="pickgrid"></div>
+    </div>
+
+    <div class="card">
+      <div class="eyebrow">Step 2</div>
+      <h2>Set the pace</h2>
+      <div class="grid g3">
+        <div class="field">
+          <label for="caucus-len">Debate time per resolution</label>
+          <select id="caucus-len">
+            <option value="90">90 seconds — very tight</option>
+            <option value="120" selected>2 minutes — recommended</option>
+            <option value="180">3 minutes — roomy</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="deal-limit">Deal offers each group may send per round</label>
+          <select id="deal-limit">
+            <option value="1">1</option>
+            <option value="2" selected>2</option>
+            <option value="3">3</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="absences">Missing delegates</label>
+          <select id="absences">
+            <option value="on" selected>On — bots sometimes skip Congress</option>
+            <option value="off">Off — all 13 states always present</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn big" id="create-btn">Create the session</button>
+      <p class="small muted" style="margin-top:8px">You will get a 4&#8209;letter code to put on the board.</p>
+    </div>
+  </section>
+
+  <!-- ================= LOBBY ================= -->
+  <section id="lobby" class="hidden">
+    <div class="split">
+      <div>
+        <div class="card">
+          <div class="spread">
+            <h2 style="margin:0">Waiting for delegations</h2>
+            <span class="pill" id="joined-count">0 joined</span>
+          </div>
+          <p class="lede">Students go to the student page and enter the code above. Each group of two claims one state.</p>
+          <div class="seats" id="lobby-seats"></div>
+        </div>
+        <div class="card">
+          <h3>Read this out before you start</h3>
+          <div class="say">
+            <div class="eyebrow">Say to the class</div>
+            <p>You are delegates to the Confederation Congress. It is 1786. The war is won, and the country is
+            falling apart.</p>
+            <p>Three rules. <strong>One.</strong> Every state gets exactly one vote, whether you are Virginia
+            with 700,000 people or Delaware with 59,000. <strong>Two.</strong> Nine of the thirteen states must
+            agree to pass anything important. <strong>Three.</strong> There is no president and there are no
+            national courts. Nobody can force any state to do anything.</p>
+            <p>Your job is not to save the country. Your job is to protect your state. Read your secret
+            objective and play it honestly.</p>
+          </div>
+        </div>
+      </div>
+      <div class="ctl">
+        <div class="card tight">
+          <div class="eyebrow">Controls</div>
+          <button class="btn gold big" id="begin-btn">Begin Resolution 1</button>
+          <button class="btn ghost sm" id="fill-bots-btn">Turn unclaimed states into bots</button>
+          <hr class="rule">
+          <p class="small muted">You can start before every group joins. Any state nobody claimed is played by a bot.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= GAME ================= -->
+  <section id="game" class="hidden">
+    <div class="split">
+      <div>
+        <!-- national dashboard -->
+        <div class="card tight">
+          <div class="grid" style="grid-template-columns:2fr 1fr 1fr 1fr;gap:12px">
+            <div class="stat">
+              <div class="k">National stability</div>
+              <div class="v" id="stab-val">60</div>
+              <div class="meter" style="margin-top:5px"><div class="meter-bar m-stab" id="stab-bar" style="width:60%"></div></div>
+            </div>
+            <div class="stat"><div class="k">In the treasury</div><div class="v" id="nat-treasury">$0</div></div>
+            <div class="stat"><div class="k">States present</div><div class="v" id="present-count">13 / 13</div></div>
+            <div class="stat"><div class="k">Resolution</div><div class="v" id="round-label">1 of 4</div></div>
+          </div>
+        </div>
+
+        <!-- resolution -->
+        <div class="card" id="res-card">
+          <div class="spread">
+            <div class="eyebrow" id="res-eyebrow">Resolution 1</div>
+            <span class="pill hot" id="rule-pill">Needs 9 of 13</span>
+          </div>
+          <h2 id="res-title">—</h2>
+          <p class="lede" id="res-brief"></p>
+          <div class="inset" id="res-detail"></div>
+          <div class="hist" style="margin-top:14px" id="res-teaches">
+            <div class="eyebrow">What this shows</div>
+            <div id="teaches-text"></div>
+          </div>
+        </div>
+
+        <!-- seats -->
+        <div class="card">
+          <div class="spread">
+            <h3 style="margin:0" id="seats-heading">The thirteen states</h3>
+            <div class="row">
+              <span class="pill" id="votes-in">0 of 13 voted</span>
+              <span class="pill" id="tally-pill"></span>
+            </div>
+          </div>
+          <div class="seats" id="seats" style="margin-top:12px"></div>
+        </div>
+
+        <!-- result -->
+        <div class="card hidden" id="result-card">
+          <h2 id="result-headline">—</h2>
+          <p class="lede" id="result-narrative"></p>
+          <div id="result-money" class="hidden">
+            <hr class="rule">
+            <div class="grid g3">
+              <div class="stat"><div class="k">Congress asked for</div><div class="v" id="asked-val">$0</div></div>
+              <div class="stat"><div class="k">Congress received</div><div class="v" id="got-val">$0</div></div>
+              <div class="stat"><div class="k">That is</div><div class="v" id="pct-val">0%</div></div>
+            </div>
+            <div class="ticker inset" id="excuses" style="margin-top:12px"></div>
+          </div>
+          <div class="hist hidden" id="history-note" style="margin-top:14px">
+            <div class="eyebrow">What actually happened</div>
+            <div id="history-text"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ---------------- sidebar ---------------- -->
+      <div class="ctl">
+        <div class="card tight">
+          <div class="spread" style="margin-bottom:8px">
+            <span class="eyebrow" style="margin:0">Now</span>
+            <span class="phase-flag pill" id="phase-flag">Brief</span>
+          </div>
+          <button class="btn gold big" id="next-btn">Open debate</button>
+          <button class="btn ghost sm" id="add-time-btn">+30 seconds</button>
+          <button class="btn ghost sm" id="skip-btn">Skip to the vote</button>
+          <button class="btn gold hidden" id="force-btn">Congress tries again — force it through</button>
+          <hr class="rule">
+          <div class="eyebrow">Teacher extras</div>
+          <button class="btn ghost sm" id="walkout-btn">Send 3 delegations home</button>
+          <button class="btn ghost sm" id="end-btn">End game &amp; show debrief</button>
+        </div>
+
+        <div class="card tight">
+          <div class="eyebrow">Say to the class</div>
+          <div id="prompt-text" style="font-size:.95rem">—</div>
+        </div>
+
+        <div class="card tight">
+          <div class="spread"><span class="eyebrow" style="margin:0">Deals on the floor</span>
+            <span class="pill" id="deal-count">0</span></div>
+          <div class="ticker" id="deal-ticker"><div class="line muted small">No offers yet.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= DEBRIEF ================= -->
+  <section id="debrief" class="hidden"></section>
+</div>
+
+<script src="assets/game-data.js"></script>
+<script src="assets/engine.js"></script>
+<script src="assets/net.js"></script>
+<script src="assets/debrief.js"></script>
+<script>
+(function(){
+"use strict";
+var D = window.AOC, E = window.ENGINE;
+
+var CODE = null, G = null, STATES = [], TIMER = null, dealsSeen = 0, tickerCache = "";
+var $ = function(id){ return document.getElementById(id); };
+
+/* ---------------------------------------------------------------- setup */
+var PRESETS = {
+  recommended: ["Virginia","Massachusetts","New York","New Jersey","South Carolina","Georgia"],
+  eight: ["Virginia","Massachusetts","New York","New Jersey","South Carolina","Georgia","Maryland","Connecticut"],
+  four: ["Virginia","Massachusetts","New York","New Jersey"],
+  none: []
+};
+var picked = PRESETS.recommended.slice();
+
+function drawPicks(){
+  var g = $("pickgrid"); g.innerHTML = "";
+  D.STATES.forEach(function(s){
+    var on = picked.indexOf(s.name) !== -1;
+    var l = document.createElement("label");
+    l.className = "pick" + (on ? " on" : "");
+    l.innerHTML = '<input type="checkbox" ' + (on?"checked":"") + '>' +
+      '<span><span class="t">' + s.name + '</span><br><span class="d">' + s.motto + '</span></span>';
+    l.querySelector("input").addEventListener("change", function(e){
+      if (e.target.checked) { if (picked.indexOf(s.name)===-1) picked.push(s.name); }
+      else picked = picked.filter(function(n){ return n !== s.name; });
+      drawPicks();
+    });
+    g.appendChild(l);
+  });
+  $("pick-count").textContent = picked.length + " student state" + (picked.length===1?"":"s");
+}
+window.preset = function(k){ picked = PRESETS[k].slice(); drawPicks(); };
+drawPicks();
+
+$("create-btn").addEventListener("click", function(){
+  var b = $("create-btn"); b.disabled = true; b.textContent = "Creating…";
+  NET.createGame(picked, {
+    caucusLen: parseInt($("caucus-len").value,10),
+    dealLimit: parseInt($("deal-limit").value,10),
+    absences: $("absences").value === "on"
+  }).then(function(code){
+    CODE = code;
+    $("game-code").textContent = code;
+    $("code-box").classList.remove("hidden");
+    $("setup").classList.add("hidden");
+    $("lobby").classList.remove("hidden");
+    try { localStorage.setItem("aoc_teacher_code", code); } catch(e){}
+    subscribe();
+  }).catch(function(err){
+    b.disabled = false; b.textContent = "Create the session";
+    alert("Could not reach the server.\n\n" + err.message +
+      "\n\nIf your school blocks Firebase, use the Solo page instead — it needs no internet.");
+  });
+});
+
+function subscribe(){
+  NET.onGame(CODE, function(g){ G = g; render(); });
+  NET.onStates(CODE, function(list){
+    STATES = list.sort(function(a,b){ return a.name.localeCompare(b.name); });
+    render();
+  });
+}
+
+/* ------------------------------------------------------------- helpers */
+function res(){ return (G && G.round >= 0) ? D.RESOLUTIONS[G.round] : null; }
+function present(){ return STATES.filter(function(s){ return (G.absent||[]).indexOf(s.name) === -1; }); }
+function dataFor(n){ return D.byName(n); }
+
+function seatHTML(s, opts){
+  opts = opts || {};
+  var absent = (G.absent||[]).indexOf(s.name) !== -1;
+  var vote = s.votes ? s.votes[G.round] : null;
+  var cls = "seat";
+  if (absent) cls += " absent";
+  else if (opts.showVotes && vote) cls += " " + vote.toLowerCase();
+  else if (opts.showVotes) cls += " waiting";
+  var pay = "";
+  if (opts.showPay && s.payments && s.payments[G.round]) {
+    var p = s.payments[G.round];
+    var lbl = p.choice === "full" ? "PAID IN FULL" : (p.choice === "half" ? "PAID HALF" : "PAID NOTHING");
+    pay = '<div class="paid ' + p.choice + '">' + lbl + '</div>';
+  }
+  var tag = absent ? "" :
+    '<span class="tag ' + (s.isBot ? "bot" : "stu") + '">' + (s.isBot ? "bot" : "you") + '</span>';
+  var line = absent ? "no delegate" : (opts.showVotes && vote ? vote : (s.isBot ? "" : (s.players||[]).join(", ")));
+  return '<div class="' + cls + '">' + tag +
+    '<div class="ab">' + s.abbr + '</div>' +
+    '<div class="nm">' + s.name + '</div>' +
+    (line ? '<div class="vt">' + line + '</div>' : "") + pay + '</div>';
+}
+
+var PROMPTS = {
+  brief: "Read the resolution out loud. Tell groups to open their own screen and read what it costs their state.",
+  caucus: "Two minutes. Get out of your seats. Argue, threaten, and make deals. Watch the deal ticker — read good offers out loud.",
+  voting: "Silence. Every delegation votes now. Remind them nine of thirteen is the bar.",
+  tally: "Read the result. If it passed, do not celebrate yet — ask what happens next.",
+  compliance: "Now the real question. Congress said yes. Ask each group privately: are you actually going to send the money?",
+  reveal: "Read the numbers out loud, slowly. Then read what actually happened in history.",
+  done: "Move to the next resolution."
+};
+
+/* -------------------------------------------------------------- render */
+function render(){
+  if (!G || !STATES.length) return;
+
+  if (G.status === "ended") {
+    $("lobby").classList.add("hidden"); $("game").classList.add("hidden");
+    $("clock-box").classList.add("hidden");
+    $("debrief").classList.remove("hidden");
+    window.DEBRIEF.render($("debrief"), G, STATES, { teacher:true });
+    return;
+  }
+  if (G.status === "lobby") return renderLobby();
+
+  $("lobby").classList.add("hidden");
+  $("game").classList.remove("hidden");
+
+  var r = res(); if (!r) return;
+
+  $("stab-val").textContent = Math.round(G.stability);
+  $("stab-bar").style.width = E.clamp(G.stability,0,100) + "%";
+  $("nat-treasury").textContent = E.money(G.nationalTreasury || 0);
+  $("present-count").textContent = present().length + " / 13";
+  $("round-label").textContent = (G.round+1) + " of " + D.RESOLUTIONS.length;
+
+  $("res-eyebrow").textContent = "Resolution " + r.number + " — " + r.subtitle;
+  $("rule-pill").textContent = r.voteRule === "unanimous" ? "Needs ALL 13" : "Needs 9 of 13";
+  $("res-title").textContent = r.title;
+  $("res-brief").textContent = r.brief;
+  $("res-detail").innerHTML = r.detail.split("\n\n").map(function(p){ return "<p>"+p+"</p>"; }).join("");
+  $("teaches-text").textContent = r.teaches;
+
+  var ph = G.phase;
+  $("phase-flag").textContent = ({brief:"Brief",caucus:"Debate",voting:"Voting",tally:"Result",
+    compliance:"Payment",reveal:"Reveal",done:"Between rounds"})[ph] || ph;
+  $("prompt-text").textContent = PROMPTS[ph] || "";
+
+  var showVotes = (ph === "tally" || ph === "compliance" || ph === "reveal" || ph === "done");
+  var showPay = (ph === "reveal" || ph === "done");
+  $("seats").innerHTML = present().map(function(s){
+    return seatHTML(s, { showVotes: showVotes, showPay: showPay });
+  }).join("") + (G.absent||[]).map(function(n){
+    var s = STATES.filter(function(x){return x.name===n;})[0];
+    return s ? seatHTML(s, {}) : "";
+  }).join("");
+
+  var voted = present().filter(function(s){ return s.votes && s.votes[G.round]; }).length;
+  $("votes-in").textContent = voted + " of " + present().length + " voted";
+  $("votes-in").className = "pill" + (voted === present().length ? " good" : "");
+
+  $("seats-heading").textContent = ph === "compliance" ? "Who is actually going to pay?" : "The thirteen states";
+
+  // result
+  var rc = $("result-card");
+  if (G.result && (ph === "tally" || ph === "compliance" || ph === "reveal" || ph === "done")) {
+    rc.classList.remove("hidden");
+    var R = G.result;
+    $("tally-pill").textContent = R.yes + " yes · " + R.no + " no · " + R.abstain + " abstain";
+    $("result-headline").textContent = !R.quorum
+      ? "No quorum. Congress cannot vote at all."
+      : (R.forced ? "PASSED on a later attempt"
+        : (R.passed ? "PASSED — " + R.yes + " yes, " + R.needed + " needed"
+                    : "FAILED — " + R.yes + " yes, " + R.needed + " were needed"));
+    $("result-headline").style.color = R.passed ? "#1d5233" : "#8a2019";
+    $("result-narrative").textContent = (ph === "tally" && r.compliance && R.passed)
+      ? r.passText : (R.narrative || "");
+    var showMoney = (ph === "reveal" || ph === "done") && R.requested > 0;
+    $("result-money").classList.toggle("hidden", !showMoney);
+    if (showMoney) {
+      $("asked-val").textContent = E.money(R.requested);
+      $("got-val").textContent = E.money(R.collected);
+      $("pct-val").textContent = Math.round(R.collected / R.requested * 100) + "%";
+      $("excuses").innerHTML = (R.excuses||[]).map(function(x){
+        return '<div class="line ' + (x.choice==="full"?"ok":(x.choice==="none"?"bad":"")) + '">' + x.text + "</div>";
+      }).join("");
+    }
+    var hn = (ph === "reveal" || ph === "done");
+    $("history-note").classList.toggle("hidden", !hn);
+    if (hn) $("history-text").textContent = D.HISTORY_NOTES[r.id] || "";
+  } else {
+    rc.classList.add("hidden"); $("tally-pill").textContent = "";
+  }
+
+  renderDeals();
+  renderTimer();
+  renderNextButton();
+}
+
+function renderLobby(){
+  $("lobby").classList.remove("hidden");
+  var claimed = STATES.filter(function(s){ return (s.players||[]).length > 0; });
+  $("joined-count").textContent = claimed.length + " of " + (G.studentStates||[]).length + " groups joined";
+  $("lobby-seats").innerHTML = STATES.map(function(s){
+    var isStudentSlot = (G.studentStates||[]).indexOf(s.name) !== -1;
+    var has = (s.players||[]).length > 0;
+    return '<div class="seat' + (has ? " yes" : (isStudentSlot ? " waiting" : "")) + '">' +
+      '<span class="tag ' + (isStudentSlot ? "stu" : "bot") + '">' + (isStudentSlot ? "group" : "bot") + '</span>' +
+      '<div class="ab">' + s.abbr + '</div><div class="nm">' + s.name + '</div>' +
+      '<div class="vt">' + (has ? (s.players||[]).join(", ") : (isStudentSlot ? "open" : "")) + '</div></div>';
+  }).join("");
+}
+
+function renderDeals(){
+  var deals = (G.deals||[]).filter(function(d){ return d.round === G.round; });
+  $("deal-count").textContent = deals.length;
+  var html = deals.length ? deals.slice().reverse().map(function(d){
+    return '<div class="line ' + (d.status==="accepted"?"ok":(d.status==="rejected"?"bad":"")) + '">' +
+      "<strong>" + d.from + " → " + d.to + ":</strong> " + d.label +
+      (d.reply ? '<br><span class="muted">' + d.reply + "</span>" : ' <span class="muted">(waiting)</span>') +
+      "</div>";
+  }).join("") : '<div class="line muted small">No offers yet.</div>';
+  if (html !== tickerCache) { $("deal-ticker").innerHTML = html; tickerCache = html; }
+  processPendingDeals(deals);
+}
+
+function renderTimer(){
+  var show = G.phase === "caucus" && G.caucusEndsAt;
+  $("clock-box").classList.toggle("hidden", !show);
+  if (TIMER) { clearInterval(TIMER); TIMER = null; }
+  if (!show) return;
+  var tick = function(){
+    var left = Math.max(0, Math.round((G.caucusEndsAt - Date.now())/1000));
+    var m = Math.floor(left/60), s = left % 60;
+    $("timer").textContent = m + ":" + (s<10?"0":"") + s;
+    $("timer").classList.toggle("low", left <= 20);
+  };
+  tick(); TIMER = setInterval(tick, 250);
+}
+
+var FLOW = {
+  brief:      { label:"Open debate",              next:"caucus" },
+  caucus:     { label:"Close debate — open voting",next:"voting" },
+  voting:     { label:"Close voting — show result",next:"tally" },
+  tally:      { label:"Continue",                 next:"compliance" },
+  compliance: { label:"Reveal who actually paid", next:"reveal" },
+  reveal:     { label:"Next resolution",          next:"done" },
+  done:       { label:"Next resolution",          next:"done" }
+};
+
+function renderNextButton(){
+  var b = $("next-btn"), r = res(), ph = G.phase;
+  var f = FLOW[ph] || FLOW.brief;
+  var label = f.label;
+  if (ph === "tally") {
+    var needsPay = r.compliance && G.result && G.result.passed;
+    label = needsPay ? "Now ask them to pay" : ((G.round + 1 >= D.RESOLUTIONS.length) ? "Show the debrief" : "Next resolution");
+  }
+  if (ph === "reveal" && G.round + 1 >= D.RESOLUTIONS.length) label = "Show the debrief";
+  b.textContent = label;
+  var waitingOnVotes = ph === "voting" &&
+    present().filter(function(s){ return !s.isBot && !(s.votes && s.votes[G.round]); }).length > 0;
+  b.disabled = false;
+  $("add-time-btn").disabled = ph !== "caucus";
+  $("skip-btn").disabled = ph !== "caucus";
+  b.title = waitingOnVotes ? "Some groups have not voted yet — they will be recorded as abstaining." : "";
+
+  // Safety valve. If a money resolution is voted down, the class never reaches
+  // the payment step — which is the whole point of the lesson. Congress really
+  // did re-introduce failed requisitions year after year until one carried, so
+  // pushing it through is historically honest, not a cheat.
+  var canForce = ph === "tally" && r.compliance && G.result && !G.result.passed && G.result.quorum;
+  $("force-btn").classList.toggle("hidden", !canForce);
+}
+
+/* --------------------------------------------------------- deal replies
+   Students send offers; the teacher's machine is authoritative and writes
+   the bot's answer back so every screen sees the same reply.             */
+function processPendingDeals(deals){
+  var pending = deals.filter(function(d){ return d.status === "pending"; });
+  if (!pending.length) return;
+  var r = res(); if (!r) return;
+  var all = (G.deals||[]).slice();
+  var changed = false;
+  pending.forEach(function(d){
+    var target = dataFor(d.to); if (!target) return;
+    var offer = E.DEAL_OPTIONS.filter(function(o){ return o.id === d.id; })[0];
+    if (!offer) return;
+    var reply = E.botDealReply(target, { id:offer.id, weight:offer.weight, from:d.from }, r, CODE, G.round);
+    for (var i=0;i<all.length;i++){
+      if (all[i].from===d.from && all[i].to===d.to && all[i].id===d.id && all[i].ts===d.ts){
+        all[i] = Object.assign({}, all[i], { status: reply.status, reply: reply.text,
+          weight: reply.status === "accepted" ? offer.weight : 0 });
+        changed = true;
+      }
+    }
+  });
+  if (changed) NET.updateGame(CODE, { deals: all });
+}
+
+/* ---------------------------------------------------------- transitions */
+$("next-btn").addEventListener("click", function(){
+  var ph = G.phase, r = res();
+  if (ph === "brief")        return goCaucus();
+  if (ph === "caucus")       return NET.updateGame(CODE, { phase:"voting", caucusEndsAt:null });
+  if (ph === "voting")       return doTally();
+  if (ph === "tally") {
+    if (r.compliance && G.result && G.result.passed) return NET.updateGame(CODE, { phase:"compliance" });
+    return finishRound();
+  }
+  if (ph === "compliance")   return doCompliance();
+  if (ph === "reveal" || ph === "done") return nextRound();
+});
+
+function goCaucus(){
+  var len = (G.settings && G.settings.caucusLen) || 120;
+  NET.updateGame(CODE, { phase:"caucus", caucusEndsAt: Date.now() + len*1000 });
+}
+$("add-time-btn").addEventListener("click", function(){
+  NET.updateGame(CODE, { caucusEndsAt: (G.caucusEndsAt||Date.now()) + 30000 });
+});
+$("skip-btn").addEventListener("click", function(){
+  NET.updateGame(CODE, { phase:"voting", caucusEndsAt:null });
+});
+$("force-btn").addEventListener("click", function(){
+  if (!confirm("Treat this as a later session of Congress that finally approved the request?\n\n" +
+    "The class moves on to the payment step, where states decide whether they will actually pay.")) return;
+  var forced = Object.assign({}, G.result, {
+    passed: true, forced: true,
+    narrative: "Congress brought this back and finally approved it. Now the states decide whether to pay."
+  });
+  NET.updateGame(CODE, { result: forced, phase: "compliance" });
+});
+
+$("walkout-btn").addEventListener("click", function(){
+  if (!confirm("Send three bot delegations home? If fewer than nine states are present, no vote can be held.")) return;
+  var bots = present().filter(function(s){ return s.isBot; }).map(function(s){ return s.name; });
+  NET.updateGame(CODE, { absent: (G.absent||[]).concat(bots.slice(0,3)) });
+});
+$("end-btn").addEventListener("click", function(){
+  if (confirm("End the game now and show the debrief?")) NET.endGame(CODE);
+});
+$("fill-bots-btn").addEventListener("click", function(){
+  var ups = STATES.filter(function(s){ return (s.players||[]).length === 0 && !s.isBot; })
+    .map(function(s){ return { name:s.name, patch:{ isBot:true } }; });
+  if (ups.length) NET.batchStates(CODE, ups);
+});
+$("begin-btn").addEventListener("click", function(){ startRound(0); });
+
+// Any state slot nobody actually claimed is played by a bot. Without this a
+// no-show group silently abstains every round, and abstentions sink a vote
+// that needs nine YES.
+function autoBotUnclaimed(){
+  var ups = STATES.filter(function(s){ return !s.isBot && (s.players||[]).length === 0; })
+    .map(function(s){ s.isBot = true; return { name:s.name, patch:{ isBot:true } }; });
+  return ups.length ? NET.batchStates(CODE, ups) : Promise.resolve();
+}
+
+function absentFor(idx){
+  var absent = [];
+  if (G.settings && G.settings.absences) {
+    STATES.forEach(function(s){
+      if (!s.isBot) return;
+      var d = dataFor(s.name);
+      if (d && !E.botAttends(d, CODE, idx+1)) absent.push(s.name);
+    });
+  }
+  // Keep at least 11 states in the room. Random absences are flavor; with a
+  // 9-yes bar, three or four no-shows quietly turns every vote into a
+  // unanimity requirement. Breaking quorum is the teacher's deliberate move
+  // ("Send 3 delegations home"), not something the dice should do.
+  while (13 - absent.length < 11) absent.pop();
+  return absent;
+}
+
+function startRound(idx){
+  return autoBotUnclaimed().then(function(){
+    return NET.updateGame(CODE, {
+      status:"running", round: idx, phase:"brief",
+      absent: absentFor(idx), result: null, caucusEndsAt: null
+    });
+  });
+}
+
+function doTally(){
+  var r = res();
+  var pres = present();
+  var deals = (G.deals||[]).filter(function(d){ return d.round === G.round && d.status === "accepted"; });
+  var votes = {}, botPatches = [];
+  pres.forEach(function(s){
+    if (s.isBot) {
+      var bv = E.botVote(dataFor(s.name), r, deals, CODE, G.round+1);
+      votes[s.name] = bv.vote;
+      var p = {}; p["votes."+G.round] = bv.vote;
+      botPatches.push({ name:s.name, patch:p });
+    } else {
+      votes[s.name] = (s.votes && s.votes[G.round]) || "Abstain";
+      if (!(s.votes && s.votes[G.round])) {
+        var q = {}; q["votes."+G.round] = "Abstain";
+        botPatches.push({ name:s.name, patch:q });
+      }
+    }
+  });
+  var t = E.tally(votes, r, pres.map(function(s){ return s.name; }));
+  var result = {
+    yes:t.yes, no:t.no, abstain:t.abstain, present:t.present, needed:t.needed,
+    quorum:t.quorum, passed:t.passed, votes:votes,
+    requested:0, collected:0, excuses:[],
+    narrative: t.quorum ? "" : "Fewer than nine states sent delegates. Congress is legally unable to decide anything today."
+  };
+  if (!t.passed) result.narrative = E.outcomeNarrative(r, t, 0, 0);
+  NET.batchStates(CODE, botPatches).then(function(){
+    return NET.updateGame(CODE, { phase:"tally", result: result });
+  });
+}
+
+function doCompliance(){
+  var r = res(), R = G.result;
+  var requested = 0, collected = 0, excuses = [], patches = [];
+  STATES.forEach(function(s){
+    var d = dataFor(s.name);
+    var owed = E.amountOwed(d, r);
+    requested += owed;
+    var choice, paid;
+    if (s.isBot || (G.absent||[]).indexOf(s.name) !== -1) {
+      var sd = Object.assign({}, d, { treasuryNow: s.treasuryNow });
+      var c = E.botCompliance(sd, r, R.votes[s.name] === "Yes", CODE, G.round+1);
+      choice = c.choice; paid = c.paid;
+      var p = {}; p["payments."+G.round] = { choice:choice, paid:paid };
+      patches.push({ name:s.name, patch:p });
+    } else {
+      var pay = (s.payments && s.payments[G.round]) || { choice:"none", paid:0 };
+      choice = pay.choice; paid = pay.paid || 0;
+    }
+    collected += paid;
+    excuses.push({ choice: choice, text: E.complianceExcuse(d, choice, CODE, G.round+1) });
+    var np = {};
+    np.treasuryNow = (s.treasuryNow || d.treasury) - paid;
+    np.interest = (s.interest || 50) + E.stateInterestFromCompliance(choice);
+    var existing = patches.filter(function(x){ return x.name === s.name; })[0];
+    if (existing) Object.assign(existing.patch, np);
+    else patches.push({ name:s.name, patch:np });
+  });
+  var frac = requested > 0 ? collected/requested : 0;
+  var result = Object.assign({}, R, {
+    requested: requested, collected: collected, excuses: excuses,
+    narrative: E.outcomeNarrative(r, R, collected, requested)
+  });
+  NET.batchStates(CODE, patches).then(function(){
+    return NET.updateGame(CODE, {
+      phase:"reveal", result: result,
+      nationalTreasury: (G.nationalTreasury||0) + collected,
+      stability: E.clamp(G.stability + E.nationalStabilityChange(r, R, frac), 0, 100)
+    });
+  });
+}
+
+/* Ends a round that had no payment step (failed, or no requisition). */
+function finishRound(){
+  var r = res(), R = G.result;
+  var patches = STATES.map(function(s){
+    var d = dataFor(s.name);
+    var v = R.votes[s.name];
+    return { name:s.name, patch:{ interest: (s.interest||50) + E.stateInterestFromVote(d, r, v) } };
+  });
+  NET.batchStates(CODE, patches).then(function(){
+    return NET.updateGame(CODE, {
+      phase:"reveal",
+      result: Object.assign({}, R, { narrative: E.outcomeNarrative(r, R, 0, 0) }),
+      stability: E.clamp(G.stability + E.nationalStabilityChange(r, R, 0), 0, 100)
+    });
+  });
+}
+
+function nextRound(){
+  var r = res(), R = G.result;
+  var entry = { id:r.id, title:r.title, passed:!!(R&&R.passed), yes:R?R.yes:0, no:R?R.no:0,
+    abstain:R?R.abstain:0, requested:R?R.requested:0, collected:R?R.collected:0,
+    quorum:R?R.quorum:true, stabilityAfter: Math.round(G.stability) };
+  var hist = (G.history||[]).concat([entry]);
+  // Vote-based interest was already applied for non-payment rounds; apply it
+  // here for rounds that went through the payment step.
+  var applyVotes = r.compliance && R && R.passed;
+  var patches = applyVotes ? STATES.map(function(s){
+    var d = dataFor(s.name);
+    return { name:s.name, patch:{ interest: (s.interest||50) + E.stateInterestFromVote(d, r, R.votes[s.name]) } };
+  }) : [];
+  var after = function(){
+    if (G.round + 1 >= D.RESOLUTIONS.length) {
+      return NET.updateGame(CODE, { history: hist, status:"ended", phase:"debrief" });
+    }
+    var idx = G.round + 1;
+    return autoBotUnclaimed().then(function(){
+      return NET.updateGame(CODE, { history: hist, round: idx, phase:"brief",
+        absent: absentFor(idx), result: null, caucusEndsAt: null });
+    });
+  };
+  (patches.length ? NET.batchStates(CODE, patches) : Promise.resolve()).then(after);
+}
+
+/* Recover the session if the teacher's tab reloads mid-class. */
+try {
+  var saved = localStorage.getItem("aoc_teacher_code");
+  if (saved) {
+    NET.findGame(saved).then(function(g){
+      if (!g) return;
+      if (!confirm("Resume your session " + saved + "?")) return;
+      CODE = saved;
+      $("game-code").textContent = saved;
+      $("code-box").classList.remove("hidden");
+      $("setup").classList.add("hidden");
+      subscribe();
+    });
+  }
+} catch(e){}
+})();
+</script>
+</body>
+</html>

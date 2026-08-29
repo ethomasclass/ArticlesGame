@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Solo Congress — The Confederation Problem</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%276%27 fill=%27%238a3324%27/%3E%3Ctext x=%2716%27 y=%2723%27 font-size=%2719%27 text-anchor=%27middle%27 fill=%27%23f5ecd8%27 font-family=%27Georgia,serif%27%3E13%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/styles.css">
+<style>
+  .vote-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  .vote-row .btn{font-size:1.3rem;padding:1em .5em;width:100%}
+  @media(max-width:600px){.vote-row{grid-template-columns:1fr}}
+  .claim{display:block;width:100%;text-align:left;background:var(--parch-2);border:2px solid var(--line);
+    border-radius:9px;padding:11px 13px;cursor:pointer;font-family:inherit;font-size:1rem;margin-bottom:9px;transition:.15s}
+  .claim:hover{border-color:var(--gold);background:var(--parch-3)}
+  .claim .t{font-weight:700;font-size:1.1rem}
+  .claim .d{font-size:.8rem;color:var(--ink-faint);line-height:1.35}
+  .faction{background:var(--parch-2);border:1px solid var(--line);border-left:5px solid var(--gold-dk);
+    border-radius:0 8px 8px 0;padding:11px 14px}
+  .bill{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed var(--line)}
+  .bill:last-child{border:0}
+  .deal-form{display:grid;grid-template-columns:1fr 1fr auto;gap:9px;align-items:end}
+  @media(max-width:700px){.deal-form{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="masthead">
+    <div>
+      <h1 id="mast">The Confederation Problem</h1>
+      <div class="sub" id="sub">Solo Congress — you against twelve bot states. No internet needed.</div>
+    </div>
+    <div class="row" id="stats"></div>
+  </div>
+
+  <section id="s-pick">
+    <div class="card">
+      <h2>Choose the state you will represent</h2>
+      <p class="lede">It is 1786. The war is won and the country is coming apart. You are one delegate out of
+      thirteen, and every state gets exactly one vote — Virginia and Delaware count the same.</p>
+      <div class="callout"><strong>How to win:</strong> protect your own state. That is the only thing your
+      score measures. Keep an eye on the country too, though.</div>
+      <div id="pick-list" style="margin-top:14px"></div>
+    </div>
+  </section>
+
+  <section id="s-play" class="hidden">
+    <div class="card" id="dossier">
+      <div class="eyebrow">Your state</div>
+      <h2 id="d-name"></h2>
+      <p id="d-bg"></p>
+      <div class="callout warn"><div class="eyebrow">Your objective</div><div id="d-obj" style="font-size:1.05rem"></div></div>
+      <div class="grid g2" id="d-fac" style="margin-top:12px"></div>
+    </div>
+
+    <div class="card">
+      <div class="spread">
+        <div class="eyebrow" id="r-eye">Resolution 1</div>
+        <span class="pill hot" id="r-rule"></span>
+      </div>
+      <h2 id="r-title"></h2>
+      <p class="lede" id="r-brief"></p>
+      <div class="inset" id="r-detail"></div>
+    </div>
+
+    <div class="card hidden" id="cost-card">
+      <div class="eyebrow">What this costs you</div>
+      <div id="cost-body"></div>
+    </div>
+
+    <div class="card">
+      <h3>The argument</h3>
+      <div class="grid g2">
+        <div class="inset" style="border-left:5px solid var(--yes)">
+          <div class="eyebrow" style="color:#1d5233">A reason to vote yes</div><div id="r-yes"></div></div>
+        <div class="inset" style="border-left:5px solid var(--no)">
+          <div class="eyebrow" style="color:#8a2019">A reason to vote no</div><div id="r-no"></div></div>
+      </div>
+    </div>
+
+    <div class="card" id="deal-card">
+      <div class="spread"><h3 style="margin:0">Work the room</h3><span class="pill" id="deal-left"></span></div>
+      <p class="small muted">You need nine states. You cannot get there alone — go buy some votes.</p>
+      <div class="deal-form">
+        <div class="field" style="margin:0"><label for="dt">Offer to</label><select id="dt"></select></div>
+        <div class="field" style="margin:0"><label for="do">You offer</label><select id="do"></select></div>
+        <button class="btn" id="dsend">Send</button>
+      </div>
+      <div class="ticker inset" id="dlog" style="margin-top:12px"></div>
+      <hr class="rule">
+      <div class="eyebrow">Where the room stands right now</div>
+      <div class="seats" id="lean"></div>
+      <p class="small muted" style="margin-top:8px">This is your read of the room. Bots can still surprise you.</p>
+    </div>
+
+    <div class="card" id="vote-card">
+      <h3 class="center">How does <span id="vote-state"></span> vote?</h3>
+      <div class="vote-row">
+        <button class="btn btn-yes" onclick="SV('Yes')">YES</button>
+        <button class="btn btn-no" onclick="SV('No')">NO</button>
+        <button class="btn btn-abstain" onclick="SV('Abstain')">ABSTAIN</button>
+      </div>
+    </div>
+
+    <div class="card hidden" id="seat-card">
+      <div class="spread"><h3 style="margin:0" id="seat-head">The vote</h3><span class="pill" id="seat-pill"></span></div>
+      <div class="seats" id="seats" style="margin-top:12px"></div>
+    </div>
+
+    <div class="card hidden" id="pay-card" style="border-color:var(--red);border-width:3px">
+      <div class="eyebrow" style="color:var(--red)">Congress said yes. Now decide for real.</div>
+      <h2>Are you actually going to send the money?</h2>
+      <p class="lede" id="pay-owed"></p>
+      <div class="callout warn"><p style="margin:0"><strong>Nobody can make you pay.</strong> There is no
+      president to enforce this and no national court to take you to. Refuse, and nothing happens to you.</p></div>
+      <div class="vote-row" style="margin-top:14px">
+        <button class="btn btn-yes" onclick="SP('full')">PAY IN FULL</button>
+        <button class="btn gold" onclick="SP('half')">PAY HALF</button>
+        <button class="btn btn-no" onclick="SP('none')">PAY NOTHING</button>
+      </div>
+    </div>
+
+    <div class="card hidden" id="out-card">
+      <h2 id="out-head"></h2>
+      <p class="lede" id="out-narr"></p>
+      <div id="out-money" class="hidden">
+        <div class="grid g3">
+          <div class="stat"><div class="k">Congress asked</div><div class="v" id="o-ask"></div></div>
+          <div class="stat"><div class="k">Congress got</div><div class="v" id="o-got"></div></div>
+          <div class="stat"><div class="k">That is</div><div class="v" id="o-pct"></div></div>
+        </div>
+        <div class="ticker inset" id="o-excuses" style="margin-top:12px"></div>
+      </div>
+      <div class="hist" style="margin-top:14px"><div class="eyebrow">What actually happened</div>
+        <div id="o-hist"></div></div>
+      <button class="btn big wide" id="next-btn" style="margin-top:16px">Continue</button>
+    </div>
+  </section>
+
+  <section id="s-end" class="hidden"></section>
+</div>
+
+<script src="assets/game-data.js"></script>
+<script src="assets/engine.js"></script>
+<script src="assets/debrief.js"></script>
+<script>
+(function(){
+"use strict";
+var D = window.AOC, E = window.ENGINE;
+var $ = function(i){ return document.getElementById(i); };
+
+var SEED = "SOLO" + Math.floor(Math.random()*100000);
+var MINE=null, ROUND=0, PHASE="deal", S=[], STAB=60, TREAS=0, HIST=[], DEALS=[], RESULT=null;
+var DEAL_LIMIT = 3;
+
+function show(id){ ["s-pick","s-play","s-end"].forEach(function(x){ $(x).classList.toggle("hidden", x!==id); }); }
+function me(){ return S.filter(function(x){ return x.name===MINE; })[0]; }
+function res(){ return D.RESOLUTIONS[ROUND]; }
+
+/* ------------------------------------------------------------- pick */
+(function(){
+  var l = $("pick-list");
+  D.STATES.slice().sort(function(a,b){ return a.name.localeCompare(b.name); }).forEach(function(s){
+    var b = document.createElement("button");
+    b.className = "claim";
+    b.innerHTML = '<div class="t">' + s.name + '</div><div class="d">' + s.motto + '</div>';
+    b.addEventListener("click", function(){ begin(s.name); });
+    l.appendChild(b);
+  });
+})();
+
+function begin(name){
+  MINE = name;
+  S = D.STATES.map(function(s){
+    return { name:s.name, abbr:s.abbr, isBot: s.name !== name, interest:50,
+             treasuryNow:s.treasury, vote:null, pay:null };
+  });
+  var d = D.byName(name);
+  $("mast").textContent = d.name;
+  $("sub").textContent = "Solo Congress · you are one vote out of thirteen";
+  $("d-name").textContent = d.name;
+  $("d-bg").textContent = d.background;
+  $("d-obj").textContent = d.objective;
+  $("d-fac").innerHTML = d.factions.map(function(f){
+    return '<div class="faction"><div style="font-weight:700">' + f.name + '</div><div class="small">' + f.wants + '</div></div>';
+  }).join("");
+  show("s-play");
+  startRound();
+}
+
+/* ------------------------------------------------------------ round */
+function startRound(){
+  PHASE = "deal"; DEALS = []; RESULT = null;
+  S.forEach(function(s){ s.vote = null; s.pay = null; s.absent = false; });
+  // Cap absences at two: with a 9-of-13 bar, more than that silently turns the
+  // vote into a unanimity requirement among whoever bothered to show up.
+  var skipped = 0;
+  S.forEach(function(s){
+    if (s.isBot && skipped < 2 && !E.botAttends(D.byName(s.name), SEED, ROUND+1)) {
+      s.absent = true; skipped++;
+    }
+  });
+  var r = res();
+  $("r-eye").textContent = "Resolution " + r.number + " of " + D.RESOLUTIONS.length + " — " + r.subtitle;
+  $("r-rule").textContent = r.voteRule === "unanimous" ? "Needs ALL 13 states" : "Needs 9 of 13 states";
+  $("r-title").textContent = r.title;
+  $("r-brief").textContent = r.brief;
+  $("r-detail").innerHTML = r.detail.split("\n\n").map(function(p){ return "<p>"+p+"</p>"; }).join("");
+  $("r-yes").textContent = r.yesCase;
+  $("r-no").textContent = r.noCase;
+  $("vote-state").textContent = MINE;
+
+  var owed = E.amountOwed(D.byName(MINE), r);
+  $("cost-card").classList.toggle("hidden", owed === 0);
+  if (owed) {
+    $("cost-body").innerHTML =
+      '<div class="bill"><span>Your share of ' + E.money(r.complianceTotal) + '</span><strong>' + E.money(owed) + '</strong></div>' +
+      '<div class="bill"><span>Your treasury</span><strong>' + E.money(me().treasuryNow) + '</strong></div>' +
+      '<div class="bill"><span>Paying in full costs you</span><strong style="color:#8a2019">' +
+        Math.round(owed/me().treasuryNow*100) + '% of everything you have</strong></div>';
+  }
+
+  var t = $("dt"); t.innerHTML = "";
+  S.filter(function(s){ return s.name !== MINE && !s.absent; }).forEach(function(s){
+    var o = document.createElement("option"); o.value = s.name; o.textContent = s.name; t.appendChild(o);
+  });
+  var off = $("do"); off.innerHTML = "";
+  E.DEAL_OPTIONS.forEach(function(o){
+    var el = document.createElement("option"); el.value = o.id; el.textContent = o.label; off.appendChild(el);
+  });
+
+  $("deal-card").classList.remove("hidden");
+  $("vote-card").classList.remove("hidden");
+  $("seat-card").classList.add("hidden");
+  $("pay-card").classList.add("hidden");
+  $("out-card").classList.add("hidden");
+  refresh();
+}
+
+function refresh(){
+  var m = me();
+  $("stats").innerHTML =
+    '<div class="stat"><div class="k">Treasury</div><div class="v">' + E.money(m.treasuryNow) + '</div></div>' +
+    '<div class="stat"><div class="k">Your interest</div><div class="v">' + Math.round(m.interest) + '</div></div>' +
+    '<div class="stat"><div class="k">Nation</div><div class="v">' + Math.round(STAB) + '</div></div>';
+  var left = DEAL_LIMIT - DEALS.length;
+  $("deal-left").textContent = left + " offer" + (left===1?"":"s") + " left";
+  $("dsend").disabled = left <= 0;
+  $("dlog").innerHTML = DEALS.length ? DEALS.slice().reverse().map(function(x){
+    return '<div class="line ' + (x.status==="accepted"?"ok":"bad") + '"><strong>To ' + x.to + ':</strong> ' +
+      x.label + "<br>" + x.reply + "</div>";
+  }).join("") : '<div class="line muted small">No offers yet.</div>';
+  renderLean();
+}
+
+/* A read of the room: shows which way each bot is leaning, so the player
+   learns to spend offers on states that are actually persuadable. */
+function renderLean(){
+  var r = res();
+  $("lean").innerHTML = S.map(function(s){
+    if (s.name === MINE) return '<div class="seat you"><div class="ab">' + s.abbr +
+      '</div><div class="nm">' + s.name + '</div><div class="vt">you</div></div>';
+    if (s.absent) return '<div class="seat absent"><div class="ab">' + s.abbr +
+      '</div><div class="nm">' + s.name + '</div><div class="vt">no delegate</div></div>';
+    var sc = E.botVoteScore(D.byName(s.name), r, DEALS.filter(function(d){ return d.status==="accepted"; }));
+    var v = sc.total + (r.isAmendment ? 0 : 2.6);
+    var cls = v > 1.2 ? "yes" : (v < -1.2 ? "no" : "abstain");
+    var lbl = v > 1.2 ? "leaning yes" : (v < -1.2 ? "leaning no" : "undecided");
+    return '<div class="seat ' + cls + '"><div class="ab">' + s.abbr + '</div><div class="nm">' +
+      s.name + '</div><div class="vt">' + lbl + '</div></div>';
+  }).join("");
+}
+
+$("dsend").addEventListener("click", function(){
+  var to = $("dt").value, id = $("do").value;
+  var opt = E.DEAL_OPTIONS.filter(function(o){ return o.id===id; })[0];
+  var reply = E.botDealReply(D.byName(to), { id:id, weight:opt.weight, from:MINE }, res(), SEED+DEALS.length, ROUND);
+  DEALS.push({ to:to, id:id, label:opt.label, status:reply.status, reply:reply.text, weight: reply.status==="accepted"?opt.weight:0 });
+  if (reply.status === "accepted" && opt.cost) {
+    var m = me(); m.treasuryNow = Math.max(0, m.treasuryNow - opt.cost);
+  }
+  refresh();
+});
+
+window.SV = function(v){
+  var r = res();
+  me().vote = v;
+  var accepted = DEALS.filter(function(d){ return d.status==="accepted"; });
+  S.forEach(function(s){
+    if (!s.isBot || s.absent) return;
+    s.vote = E.botVote(D.byName(s.name), r, accepted, SEED, ROUND+1).vote;
+  });
+  var pres = S.filter(function(s){ return !s.absent; });
+  var votes = {}; pres.forEach(function(s){ votes[s.name] = s.vote; });
+  var t = E.tally(votes, r, pres.map(function(s){ return s.name; }));
+  RESULT = t; RESULT.votes = votes;
+
+  $("deal-card").classList.add("hidden");
+  $("vote-card").classList.add("hidden");
+  $("seat-card").classList.remove("hidden");
+  $("seat-pill").textContent = t.yes + " yes · " + t.no + " no · " + t.abstain + " abstain";
+  $("seat-head").textContent = !t.quorum ? "Fewer than nine states came. No vote is possible."
+    : (t.passed ? "PASSED" : "FAILED — " + t.needed + " yes votes were needed");
+  $("seats").innerHTML = S.map(function(s){
+    if (s.absent) return '<div class="seat absent"><div class="ab">' + s.abbr + '</div><div class="nm">' +
+      s.name + '</div><div class="vt">no delegate</div></div>';
+    return '<div class="seat ' + (s.vote||"").toLowerCase() + (s.name===MINE?" you":"") + '">' +
+      '<div class="ab">' + s.abbr + '</div><div class="nm">' + s.name + '</div>' +
+      '<div class="vt">' + s.vote + '</div></div>';
+  }).join("");
+
+  if (t.passed && r.compliance) {
+    $("pay-card").classList.remove("hidden");
+    var owed = E.amountOwed(D.byName(MINE), r);
+    $("pay-owed").innerHTML = "You owe <strong>" + E.money(owed) + "</strong>. Your treasury holds " +
+      E.money(me().treasuryNow) + ".";
+  } else {
+    finish(0, 0, []);
+  }
+};
+
+window.SP = function(choice){
+  var r = res(), requested = 0, collected = 0, excuses = [];
+  S.forEach(function(s){
+    var d = D.byName(s.name);
+    var owed = E.amountOwed(d, r); requested += owed;
+    var c;
+    if (s.name === MINE) {
+      c = { choice: choice, paid: choice==="full"?owed:(choice==="half"?Math.round(owed/2):0) };
+    } else {
+      c = E.botCompliance(Object.assign({}, d, {treasuryNow:s.treasuryNow}), r,
+        RESULT.votes[s.name]==="Yes", SEED, ROUND+1);
+    }
+    s.pay = c; collected += c.paid;
+    s.treasuryNow -= c.paid;
+    s.interest += E.stateInterestFromCompliance(c.choice);
+    excuses.push({ choice:c.choice, text: s.name===MINE
+      ? ("You " + ({full:"paid in full.",half:"paid half and promised the rest later.",none:"sent nothing."})[c.choice])
+      : E.complianceExcuse(d, c.choice, SEED, ROUND+1) });
+  });
+  $("pay-card").classList.add("hidden");
+  finish(requested, collected, excuses);
+};
+
+function finish(requested, collected, excuses){
+  var r = res();
+  S.forEach(function(s){
+    if (s.absent) return;
+    s.interest += E.stateInterestFromVote(D.byName(s.name), r, s.vote);
+  });
+  var frac = requested > 0 ? collected/requested : 0;
+  STAB = E.clamp(STAB + E.nationalStabilityChange(r, RESULT, frac), 0, 100);
+  TREAS += collected;
+
+  $("out-card").classList.remove("hidden");
+  $("out-head").textContent = !RESULT.quorum ? "Congress could not meet"
+    : (RESULT.passed ? "Resolution passed" : "Resolution failed");
+  $("out-head").style.color = RESULT.passed ? "#1d5233" : "#8a2019";
+  $("out-narr").textContent = E.outcomeNarrative(r, RESULT, collected, requested);
+  $("out-money").classList.toggle("hidden", requested === 0);
+  if (requested) {
+    $("o-ask").textContent = E.money(requested);
+    $("o-got").textContent = E.money(collected);
+    $("o-pct").textContent = Math.round(collected/requested*100) + "%";
+    $("o-excuses").innerHTML = excuses.map(function(x){
+      return '<div class="line ' + (x.choice==="full"?"ok":(x.choice==="none"?"bad":"")) + '">' + x.text + "</div>";
+    }).join("");
+  }
+  $("o-hist").textContent = D.HISTORY_NOTES[r.id] || "";
+  HIST.push({ id:r.id, title:r.title, passed:RESULT.passed, yes:RESULT.yes, no:RESULT.no,
+    abstain:RESULT.abstain, quorum:RESULT.quorum, requested:requested, collected:collected,
+    stabilityAfter: Math.round(STAB) });
+  $("next-btn").textContent = (ROUND + 1 >= D.RESOLUTIONS.length) ? "See how it all ended" : "Next resolution";
+  refresh();
+  $("out-card").scrollIntoView({ behavior:"smooth", block:"start" });
+}
+
+$("next-btn").addEventListener("click", function(){
+  if (ROUND + 1 >= D.RESOLUTIONS.length) {
+    show("s-end");
+    window.DEBRIEF.render($("s-end"), { stability: STAB, history: HIST }, S, { you: MINE });
+    window.scrollTo({ top:0, behavior:"smooth" });
+    return;
+  }
+  ROUND++; startRound();
+  window.scrollTo({ top:0, behavior:"smooth" });
+});
+})();
+</script>
+</body>
+</html>
