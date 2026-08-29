@@ -1,0 +1,2255 @@
+<title>The Confederation Problem</title>
+
+<style>
+/* ============================================================
+   THE CONFEDERATION PROBLEM — shared styles
+   Built for a classroom projector: heavy weights, high contrast,
+   nothing smaller than 15px on a shared screen.
+   ============================================================ */
+:root{
+  --ink:#1c1815; --ink-soft:#4a413a; --ink-faint:#7a6e63;
+  --parch:#f5ecd8; --parch-2:#ebdfc4; --parch-3:#e0d0ad;
+  --line:#cbb896;
+  --slate:#221f1c; --slate-2:#2e2a25;
+  --red:#8a3324; --red-dk:#5f2117; --red-lt:#b8503c;
+  --gold:#c8912f; --gold-dk:#8f6413;
+  --yes:#2f7d4f; --no:#a3342a; --abst:#5c6b7d;
+  --shadow:0 2px 0 rgba(0,0,0,.18), 0 8px 24px rgba(0,0,0,.22);
+  --r:10px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--slate);
+  color:var(--ink);
+  font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+  font-size:17px; line-height:1.5;
+  -webkit-text-size-adjust:100%;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:18px}
+.wrap-wide{max-width:1560px;margin:0 auto;padding:18px}
+
+/* ---------- surfaces ---------- */
+.card{
+  background:var(--parch); border:2px solid var(--line);
+  border-radius:var(--r); box-shadow:var(--shadow); padding:22px; margin-bottom:18px;
+}
+.card.tight{padding:14px 16px}
+.card.dark{background:var(--slate-2);border-color:#453d34;color:var(--parch)}
+.inset{background:var(--parch-2);border:1px dashed var(--line);border-radius:8px;padding:14px}
+
+/* ---------- type ---------- */
+h1,h2,h3{margin:0 0 .4em;line-height:1.15;font-weight:700}
+h1{font-size:2.5rem;color:var(--red-dk);letter-spacing:-.01em}
+h2{font-size:1.7rem;color:var(--red-dk)}
+h3{font-size:1.2rem;color:var(--ink)}
+p{margin:0 0 .7em}
+.lede{font-size:1.15rem}
+.small{font-size:.88rem}
+.muted{color:var(--ink-faint)}
+.eyebrow{
+  font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-faint);margin-bottom:.35em
+}
+.serif-num{font-variant-numeric:tabular-nums}
+.center{text-align:center}
+mark.gloss{
+  background:linear-gradient(transparent 62%, #e6cf94 62%);
+  cursor:help;border-bottom:1px dotted var(--gold-dk);padding:0 1px
+}
+
+/* ---------- buttons ---------- */
+.btn{
+  font-family:inherit;font-size:1rem;font-weight:700;
+  background:var(--red);color:var(--parch);
+  border:2px solid var(--red-dk);border-radius:8px;
+  padding:.6em 1.1em;cursor:pointer;transition:.15s;
+  box-shadow:0 2px 0 var(--red-dk);
+}
+.btn:hover:not(:disabled){background:var(--red-dk);transform:translateY(-1px);box-shadow:0 3px 0 #3d150e}
+.btn:active:not(:disabled){transform:translateY(1px);box-shadow:none}
+.btn:disabled{opacity:.42;cursor:not-allowed;box-shadow:none}
+.btn.ghost{background:transparent;color:var(--red-dk);box-shadow:none}
+.btn.ghost:hover:not(:disabled){background:rgba(138,51,36,.1);transform:none}
+.btn.gold{background:var(--gold);border-color:var(--gold-dk);color:#2b1f06;box-shadow:0 2px 0 var(--gold-dk)}
+.btn.gold:hover:not(:disabled){background:var(--gold-dk);color:var(--parch)}
+.btn.big{font-size:1.3rem;padding:.8em 1.6em}
+.btn.wide{width:100%}
+.btn.sm{font-size:.85rem;padding:.4em .7em}
+.btn-yes{background:var(--yes);border-color:#1d5233;box-shadow:0 2px 0 #1d5233}
+.btn-yes:hover:not(:disabled){background:#1d5233}
+.btn-no{background:var(--no);border-color:#6e1f17;box-shadow:0 2px 0 #6e1f17}
+.btn-no:hover:not(:disabled){background:#6e1f17}
+.btn-abstain{background:var(--abst);border-color:#3a4552;box-shadow:0 2px 0 #3a4552}
+.btn-abstain:hover:not(:disabled){background:#3a4552}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap}
+
+/* ---------- forms ---------- */
+input[type=text],select{
+  font-family:inherit;font-size:1.05rem;width:100%;
+  background:var(--parch-2);border:2px solid var(--line);border-radius:7px;padding:.55em .8em;color:var(--ink)
+}
+input[type=text]:focus,select:focus{outline:3px solid var(--gold);outline-offset:1px}
+label{display:block;font-weight:700;margin-bottom:.25em;font-size:.9rem}
+.field{margin-bottom:14px}
+
+/* ---------- layout helpers ---------- */
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:1fr 1fr}
+.g3{grid-template-columns:repeat(3,1fr)}
+.split{display:grid;grid-template-columns:1fr 340px;gap:18px;align-items:start}
+@media (max-width:900px){.g2,.g3,.split{grid-template-columns:1fr}}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.spread{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.hidden{display:none !important}
+
+/* ---------- masthead ---------- */
+.masthead{
+  background:var(--parch);border:2px solid var(--line);border-radius:var(--r);
+  box-shadow:var(--shadow);padding:14px 22px;margin-bottom:18px;
+  display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap
+}
+.masthead h1{font-size:1.6rem;margin:0}
+.masthead .sub{font-size:.9rem;color:var(--ink-faint)}
+.code-chip{
+  font-family:ui-monospace,Menlo,Consolas,monospace;font-size:1.5rem;font-weight:700;
+  letter-spacing:.22em;background:var(--slate);color:var(--gold);
+  padding:.25em .6em;border-radius:8px
+}
+
+/* ---------- meters ---------- */
+.meter{background:var(--parch-3);border:1px solid var(--line);border-radius:6px;padding:2px;overflow:hidden}
+.meter-bar{height:14px;border-radius:4px;transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.m-stab{background:linear-gradient(90deg,#a3342a,#c8912f 45%,#2f7d4f)}
+.m-interest{background:#4a3f8b}
+.stat{background:var(--parch-2);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.stat .k{font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-faint);font-weight:700;
+  font-family:ui-sans-serif,system-ui,sans-serif}
+.stat .v{font-size:1.5rem;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
+
+/* ---------- the 13 seats ---------- */
+.seats{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px}
+.seat{
+  background:var(--parch-2);border:2px solid var(--line);border-radius:9px;
+  padding:9px 8px;text-align:center;transition:.25s;position:relative;overflow:hidden
+}
+.seat .ab{font-size:1.5rem;font-weight:700;line-height:1}
+.seat .nm{font-size:.63rem;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.02em;
+  font-family:ui-sans-serif,system-ui,sans-serif;font-weight:700;margin-top:2px;
+  overflow-wrap:anywhere;hyphens:auto;line-height:1.2}
+.seat .vt{font-size:.78rem;font-weight:700;margin-top:5px;
+  font-family:ui-sans-serif,system-ui,sans-serif;text-transform:uppercase;letter-spacing:.06em}
+.seat.yes{background:#d8ead9;border-color:var(--yes);color:#17452b}
+.seat.no{background:#f2d9d4;border-color:var(--no);color:#6e1f17}
+.seat.abstain{background:#dee3ea;border-color:var(--abst);color:#333f4d}
+.seat.waiting{opacity:.55}
+.seat.absent{background:#3a342d;border-color:#241f1a;color:#8d8378}
+.seat.absent .nm{color:#6f665c}
+.seat.you{outline:4px solid var(--gold);outline-offset:2px}
+.seat .tag{
+  position:absolute;top:0;right:0;font-size:.55rem;font-weight:700;letter-spacing:.06em;
+  padding:2px 5px;border-bottom-left-radius:7px;
+  font-family:ui-sans-serif,system-ui,sans-serif;text-transform:uppercase
+}
+.seat .tag.bot{background:var(--slate);color:var(--parch-3)}
+.seat .tag.stu{background:var(--gold);color:#2b1f06}
+.seat .paid{font-size:.7rem;font-weight:700;font-family:ui-sans-serif,system-ui,sans-serif;margin-top:3px}
+.seat .paid.full{color:#17452b}.seat .paid.half{color:#8f6413}.seat .paid.none{color:#8a2019}
+
+/* ---------- timer ---------- */
+.timer{
+  font-family:ui-monospace,Menlo,Consolas,monospace;font-size:3rem;font-weight:700;
+  font-variant-numeric:tabular-nums;line-height:1;color:var(--ink)
+}
+.timer.low{color:var(--red);animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.45}}
+
+/* ---------- ticker ---------- */
+.ticker{max-height:230px;overflow-y:auto;font-size:.92rem}
+.ticker .line{padding:6px 9px;border-bottom:1px dashed var(--line)}
+.ticker .line:last-child{border-bottom:0}
+.ticker .line.ok{background:rgba(47,125,79,.11)}
+.ticker .line.bad{background:rgba(163,52,42,.11)}
+
+/* ---------- modal ---------- */
+.overlay{
+  position:fixed;inset:0;background:rgba(15,12,10,.82);z-index:900;
+  display:flex;align-items:center;justify-content:center;padding:20px
+}
+.modal{max-width:820px;width:100%;max-height:92vh;overflow-y:auto}
+
+/* ---------- misc ---------- */
+.pill{
+  display:inline-block;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.7rem;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:99px;
+  background:var(--parch-3);border:1px solid var(--line);color:var(--ink-soft)
+}
+.pill.hot{background:var(--red);color:var(--parch);border-color:var(--red-dk)}
+.pill.good{background:var(--yes);color:#fff;border-color:#1d5233}
+.rule{border:0;border-top:2px dashed var(--line);margin:16px 0}
+.callout{border-left:5px solid var(--gold);background:var(--parch-2);padding:12px 15px;border-radius:0 8px 8px 0}
+.callout.warn{border-left-color:var(--red)}
+.hist{
+  background:#efe3c7;border:1px solid var(--line);border-left:5px solid var(--gold-dk);
+  border-radius:0 8px 8px 0;padding:13px 16px;font-size:.95rem
+}
+.hist .eyebrow{color:var(--gold-dk)}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--line)}
+th{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.72rem;text-transform:uppercase;
+  letter-spacing:.09em;color:var(--ink-faint)}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+ul.clean{list-style:none;padding:0;margin:0}
+ul.clean li{padding:5px 0 5px 22px;position:relative}
+ul.clean li::before{content:"—";position:absolute;left:0;color:var(--gold-dk);font-weight:700}
+.scroll-y{overflow-y:auto}
+
+/* ============================================================
+   THE MAP BOARD
+   ============================================================ */
+.map-wrap{background:#c3d6e0;border:2px solid var(--line);border-radius:var(--r);
+  padding:8px;position:relative;overflow:hidden}
+.map-wrap.dim{background:#a9c2d0}
+.aoc-map{display:block;width:100%;height:auto;max-height:76vh}
+
+.aoc-map .shape{fill:var(--parch);stroke:#6b4a2f;stroke-width:1.3;stroke-linejoin:round;
+  transition:fill .45s ease, stroke .45s ease}
+.aoc-map .st.neutral .shape{fill:#b9b2a6;stroke:#8c8378}
+.aoc-map .st.pending .shape{fill:#efe4cb}
+.aoc-map .st.sealed  .shape{fill:#8d7f6b;stroke:#5d5344}
+.aoc-map .st.absent  .shape{fill:#4a423a;stroke:#2f2924}
+.aoc-map .st.v-yes     .shape{fill:#3f9160;stroke:#1d5233}
+.aoc-map .st.v-no      .shape{fill:#b8483a;stroke:#6e1f17}
+.aoc-map .st.v-abstain .shape{fill:#8794a3;stroke:#4a5563}
+.aoc-map .st.p-full .shape{fill:#3f9160;stroke:#1d5233}
+.aoc-map .st.p-half .shape{fill:url(#hatch);stroke:#8f6413}
+.aoc-map .st.p-none .shape{fill:#7d2019;stroke:#4a0f0b}
+.aoc-map .st.you .shape{stroke:var(--gold);stroke-width:3.5}
+
+.aoc-map .landing .shape{animation:landflash .6s ease}
+@keyframes landflash{0%{filter:brightness(2.3)}100%{filter:brightness(1)}}
+.aoc-map .landing .ab,.aoc-map .landing .nm,.aoc-map .landing .vt{animation:landpop .6s ease}
+@keyframes landpop{0%{opacity:0;transform:translateY(-6px)}60%{opacity:1}100%{opacity:1;transform:none}}
+.aoc-map .landing .chipbg{animation:landflash .6s ease}
+
+/* text on the map */
+.aoc-map text{font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  paint-order:stroke fill;pointer-events:none}
+.aoc-map .inlabel .ab{font-size:31px;font-weight:800;text-anchor:middle;fill:var(--ink);
+  stroke:rgba(255,255,255,.6);stroke-width:3.5px;letter-spacing:.02em}
+.aoc-map .inlabel .vt{font-size:15px;font-weight:800;text-anchor:middle;fill:var(--ink-soft);
+  stroke:rgba(255,255,255,.55);stroke-width:3px;letter-spacing:.08em}
+.aoc-map .inlabel .sub{font-size:13px;font-weight:700;text-anchor:middle;fill:#5f5850;
+  stroke:rgba(255,255,255,.45);stroke-width:2.5px}
+.aoc-map .inlabel.v-yes .ab,.aoc-map .inlabel.v-yes .vt,
+.aoc-map .inlabel.p-full .ab,.aoc-map .inlabel.p-full .vt{fill:#0f3d22;stroke:rgba(255,255,255,.75)}
+.aoc-map .inlabel.v-no .ab,.aoc-map .inlabel.v-no .vt,
+.aoc-map .inlabel.p-none .ab,.aoc-map .inlabel.p-none .vt{fill:#fff;stroke:rgba(0,0,0,.35)}
+.aoc-map .inlabel.absent .ab,.aoc-map .inlabel.absent .vt{fill:#cdc3b6;stroke:rgba(0,0,0,.5)}
+.aoc-map .inlabel.v-abstain .ab,.aoc-map .inlabel.v-abstain .vt{fill:#1d242c;stroke:rgba(255,255,255,.6)}
+
+/* chips out in the Atlantic */
+.aoc-map .leader{stroke:#5d7b8c;stroke-width:1.6;stroke-dasharray:4 4}
+.aoc-map .chipbg{fill:var(--parch);stroke:#6b4a2f;stroke-width:1.6;transition:fill .45s ease}
+.aoc-map .chip .ab{font-size:23px;font-weight:800;fill:var(--ink)}
+.aoc-map .chip .nm{font-size:13px;font-weight:700;fill:var(--ink-soft);letter-spacing:.03em}
+.aoc-map .chip .vt{font-size:14px;font-weight:800;fill:var(--ink-soft);letter-spacing:.09em}
+.aoc-map .chip.pending .chipbg{fill:#efe4cb}
+.aoc-map .chip.sealed  .chipbg{fill:#8d7f6b}
+.aoc-map .chip.absent  .chipbg{fill:#4a423a}
+.aoc-map .chip.v-yes     .chipbg{fill:#3f9160;stroke:#1d5233}
+.aoc-map .chip.v-no      .chipbg{fill:#b8483a;stroke:#6e1f17}
+.aoc-map .chip.v-abstain .chipbg{fill:#8794a3;stroke:#4a5563}
+.aoc-map .chip.p-full .chipbg{fill:#3f9160;stroke:#1d5233}
+.aoc-map .chip.p-half .chipbg{fill:url(#hatch);stroke:#8f6413}
+.aoc-map .chip.p-none .chipbg{fill:#7d2019;stroke:#4a0f0b}
+.aoc-map .chip.you .chipbg{stroke:var(--gold);stroke-width:3.5}
+.aoc-map .chip.v-yes .ab,.aoc-map .chip.v-yes .nm,.aoc-map .chip.v-yes .vt,
+.aoc-map .chip.p-full .ab,.aoc-map .chip.p-full .nm,.aoc-map .chip.p-full .vt{fill:#eafaf0}
+.aoc-map .chip.v-no .ab,.aoc-map .chip.v-no .nm,.aoc-map .chip.v-no .vt,
+.aoc-map .chip.p-none .ab,.aoc-map .chip.p-none .nm,.aoc-map .chip.p-none .vt,
+.aoc-map .chip.absent .ab,.aoc-map .chip.absent .nm,.aoc-map .chip.absent .vt,
+.aoc-map .chip.sealed .ab,.aoc-map .chip.sealed .nm,.aoc-map .chip.sealed .vt{fill:#fdf6e6}
+.aoc-map .chip.v-abstain .ab,.aoc-map .chip.v-abstain .nm,.aoc-map .chip.v-abstain .vt{fill:#141a20}
+
+/* the running tally that sits over the map */
+.tallybar{display:flex;align-items:center;gap:14px;background:var(--slate);color:var(--parch);
+  border-radius:9px;padding:10px 15px;margin-bottom:8px;flex-wrap:wrap}
+.tallybar .big{font-size:2.1rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
+.tallybar .lab{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.66rem;font-weight:700;
+  letter-spacing:.13em;text-transform:uppercase;color:#b3a795}
+.tallybar .grp{text-align:center;min-width:56px}
+.tallybar .grp.yes .big{color:#6ed296}
+.tallybar .grp.no .big{color:#f0897a}
+.tallybar .grp.ab .big{color:#b9c4d1}
+.tallybar .track{flex:1;min-width:170px;height:20px;background:#3d3730;border-radius:99px;
+  position:relative;overflow:hidden;border:1px solid #52493f}
+.tallybar .fill{height:100%;background:linear-gradient(90deg,#2f7d4f,#5fbf87);
+  width:0;transition:width .4s cubic-bezier(.2,.8,.2,1)}
+.tallybar .need{position:absolute;top:-3px;bottom:-3px;width:3px;background:var(--gold);
+  box-shadow:0 0 0 1px rgba(0,0,0,.4)}
+.tallybar .verdict{font-size:1.5rem;font-weight:800;letter-spacing:.04em}
+.tallybar .verdict.pass{color:#6ed296}
+.tallybar .verdict.fail{color:#f0897a}
+
+/* map legend */
+.maplegend{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:8px;
+  font-family:ui-sans-serif,system-ui,sans-serif;font-size:.72rem;font-weight:700;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint)}
+.maplegend span{display:flex;align-items:center;gap:6px}
+.maplegend i{width:15px;height:15px;border-radius:4px;border:1px solid var(--line);display:inline-block}
+
+.viewtabs{display:inline-flex;border:2px solid var(--line);border-radius:8px;overflow:hidden}
+.viewtabs button{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.76rem;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;padding:.45em .9em;border:0;cursor:pointer;
+  background:var(--parch-2);color:var(--ink-soft)}
+.viewtabs button.on{background:var(--red);color:var(--parch)}
+.tallybar .moneybar{text-align:right;padding-left:16px;border-left:2px solid #4a423a;min-width:150px}
+.tallybar .moneybar .big{font-size:1.6rem;color:#f0c97a;font-variant-numeric:tabular-nums}
+.tallybar .moneybar .lab{color:#b3a795}
+
+/* what a resolution touches for your state (student + solo) */
+.touch{display:flex;align-items:center;gap:9px;padding:5px 0;font-size:.95rem}
+.touch .arrow{font-weight:800;font-size:1rem;width:15px;text-align:center;flex:0 0 auto}
+.touch.pos .arrow{color:#1d5233}
+.touch.neg .arrow{color:#9e2f24}
+.touch .txt{flex:1}
+.touch .mag{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.66rem;font-weight:700;
+  letter-spacing:.07em;text-transform:uppercase;color:var(--ink-faint);white-space:nowrap}
+
+/* ============================================================
+   THE READ-ALOUD  — the teacher performs this to open a round
+   ============================================================ */
+.dispatch{
+  background:#211d19;color:#f2e8d4;border:2px solid #4a4137;border-left:8px solid var(--gold);
+  border-radius:var(--r);padding:22px 26px;margin-bottom:18px;box-shadow:var(--shadow);
+  position:relative
+}
+.dispatch .cuehead{display:flex;justify-content:space-between;align-items:center;gap:14px;
+  flex-wrap:wrap;margin-bottom:14px;padding-bottom:10px;border-bottom:1px dashed #4a4137}
+.dispatch .dateline{font-family:ui-sans-serif,system-ui,-apple-system,sans-serif;
+  font-size:.78rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+.dispatch .badge{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.66rem;font-weight:800;
+  letter-spacing:.13em;text-transform:uppercase;color:#a39683;white-space:nowrap}
+.dispatch p{font-size:1.28rem;line-height:1.62;margin:0 0 .82em;color:#f2e8d4;
+  text-wrap:pretty;max-width:62ch}
+.dispatch p:last-child{margin-bottom:0}
+.dispatch p:last-child{color:var(--gold);font-style:italic}
+.dispatch .tools{margin-top:14px;padding-top:12px;border-top:1px dashed #4a4137;
+  display:flex;gap:9px;flex-wrap:wrap}
+.dispatch .tools .btn{background:#3a332b;border-color:#574d41;color:#f2e8d4;box-shadow:none}
+.dispatch .tools .btn:hover:not(:disabled){background:#4a4137;transform:none}
+
+/* presenter mode: bigger for the back row */
+.dispatch.big p{font-size:1.72rem;line-height:1.55;max-width:none}
+.dispatch.big .dateline{font-size:.95rem}
+
+/* students follow along while the teacher reads */
+.dispatch.follow{border-left-color:#8c7a5c}
+.dispatch.follow p{font-size:1.12rem}
+
+.replay-narr{margin-bottom:14px}
+
+/* ============================================================
+   THE QUESTION + WHAT EACH OUTCOME DOES
+   Students must be able to say, before voting, exactly what
+   they are deciding and what either answer actually causes.
+   ============================================================ */
+.thequestion{background:var(--slate);color:var(--parch);border-radius:10px;
+  padding:14px 18px;margin:14px 0}
+.thequestion .lab{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.66rem;font-weight:800;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:5px}
+.thequestion .q{font-size:1.32rem;font-weight:700;line-height:1.35}
+
+.outcomes{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+@media(max-width:760px){.outcomes{grid-template-columns:1fr}}
+.outcome{border-radius:9px;padding:12px 14px;border:2px solid}
+.outcome.pass{background:#e4efe6;border-color:#2f7d4f}
+.outcome.fail{background:#f6e0da;border-color:#a3342a}
+.outcome .h{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.7rem;font-weight:800;
+  letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px}
+.outcome.pass .h{color:#1d5233}
+.outcome.fail .h{color:#8a2019}
+.outcome p{margin:0;font-size:.98rem;line-height:1.45}
+.nocost{font-size:.9rem;color:var(--ink-soft);line-height:1.45}
+
+</style>
+
+<style>
+
+  .vote-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  .vote-row .btn{font-size:1.3rem;padding:1em .5em;width:100%}
+  @media(max-width:600px){.vote-row{grid-template-columns:1fr}}
+  .claim{display:block;width:100%;text-align:left;background:var(--parch-2);border:2px solid var(--line);
+    border-radius:9px;padding:11px 13px;cursor:pointer;font-family:inherit;font-size:1rem;margin-bottom:9px;transition:.15s}
+  .claim:hover{border-color:var(--gold);background:var(--parch-3)}
+  .claim .t{font-weight:700;font-size:1.1rem}
+  .claim .d{font-size:.8rem;color:var(--ink-faint);line-height:1.35}
+  .faction{background:var(--parch-2);border:1px solid var(--line);border-left:5px solid var(--gold-dk);
+    border-radius:0 8px 8px 0;padding:11px 14px}
+  .bill{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed var(--line)}
+  .bill:last-child{border:0}
+  .deal-form{display:grid;grid-template-columns:1fr 1fr auto;gap:9px;align-items:end}
+  @media(max-width:700px){.deal-form{grid-template-columns:1fr}}
+
+</style>
+
+
+<div class="wrap">
+  <div class="masthead">
+    <div>
+      <h1 id="mast">The Confederation Problem</h1>
+      <div class="sub" id="sub">Solo Congress — you against twelve bot states. No internet needed.</div>
+    </div>
+    <div class="row" id="stats"></div>
+  </div>
+
+  <section id="s-pick">
+    <div class="card">
+      <h2>Choose the state you will represent</h2>
+      <p class="lede">It is 1786. The war is won and the country is coming apart. You are one delegate out of
+      thirteen, and every state gets exactly one vote — Virginia and Delaware count the same.</p>
+      <div class="callout"><strong>How to win:</strong> protect your own state. That is the only thing your
+      score measures. Keep an eye on the country too, though.</div>
+      <div id="pick-list" style="margin-top:14px"></div>
+    </div>
+  </section>
+
+  <section id="s-play" class="hidden">
+    <div class="card" id="dossier">
+      <div class="eyebrow">Your state</div>
+      <h2 id="d-name"></h2>
+      <p id="d-bg"></p>
+      <div class="callout warn"><div class="eyebrow">Your objective</div><div id="d-obj" style="font-size:1.05rem"></div></div>
+      <div class="grid g2" id="d-fac" style="margin-top:12px"></div>
+    </div>
+
+    <div class="dispatch" id="dispatch">
+      <div class="cuehead">
+        <span class="dateline" id="dsp-dateline"></span>
+        <span class="badge">Read this before you decide</span>
+      </div>
+      <div id="dsp-body"></div>
+    </div>
+
+    <div class="card">
+      <div class="spread">
+        <div class="eyebrow" id="r-eye">Resolution 1</div>
+        <span class="pill hot" id="r-rule"></span>
+      </div>
+      <h2 id="r-title"></h2>
+      <p class="lede" id="r-brief"></p>
+      <div class="inset" id="r-detail"></div>
+
+      <div class="thequestion">
+        <div class="lab">You are voting on this</div>
+        <div class="q" id="r-question">—</div>
+      </div>
+
+      <div class="outcomes">
+        <div class="outcome pass"><div class="h">If it passes</div><p id="r-ifpass"></p></div>
+        <div class="outcome fail"><div class="h">If it fails</div><p id="r-iffail"></p></div>
+      </div>
+    </div>
+
+    <div class="card" id="cost-card">
+      <div class="grid g2">
+        <div id="cost-wrap">
+          <div class="eyebrow">What this costs you</div>
+          <div id="cost-body"></div>
+        </div>
+        <div>
+          <div class="eyebrow">What this touches for your state</div>
+          <div id="touch-body"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>The argument</h3>
+      <div class="grid g2">
+        <div class="inset" style="border-left:5px solid var(--yes)">
+          <div class="eyebrow" style="color:#1d5233">A reason to vote yes</div><div id="r-yes"></div></div>
+        <div class="inset" style="border-left:5px solid var(--no)">
+          <div class="eyebrow" style="color:#8a2019">A reason to vote no</div><div id="r-no"></div></div>
+      </div>
+    </div>
+
+    <div class="card" id="deal-card">
+      <div class="spread"><h3 style="margin:0">Work the room</h3><span class="pill" id="deal-left"></span></div>
+      <p class="small muted">You need nine states. You cannot get there alone — go buy some votes.</p>
+      <div class="deal-form">
+        <div class="field" style="margin:0"><label for="dt">Offer to</label><select id="dt"></select></div>
+        <div class="field" style="margin:0"><label for="do">You offer</label><select id="do"></select></div>
+        <button class="btn" id="dsend">Send</button>
+      </div>
+      <div class="ticker inset" id="dlog" style="margin-top:12px"></div>
+      <hr class="rule">
+      <div class="eyebrow">Where the room stands right now</div>
+      <div class="seats" id="lean"></div>
+      <p class="small muted" style="margin-top:8px">This is your read of the room. Bots can still surprise you.</p>
+    </div>
+
+    <div class="card" id="vote-card">
+      <h3 class="center">How does <span id="vote-state"></span> vote?</h3>
+      <div class="vote-row">
+        <button class="btn btn-yes" onclick="SV('Yes')">YES</button>
+        <button class="btn btn-no" onclick="SV('No')">NO</button>
+        <button class="btn btn-abstain" onclick="SV('Abstain')">ABSTAIN</button>
+      </div>
+    </div>
+
+    <div class="card hidden" id="seat-card">
+      <div class="spread"><h3 style="margin:0" id="seat-head">The vote</h3>
+        <div class="row">
+          <span class="pill" id="seat-pill"></span>
+          <button class="btn ghost sm" id="replay-btn">Replay the roll call</button>
+        </div>
+      </div>
+      <div class="tallybar" id="tallybar">
+        <div class="grp yes"><div class="big" id="t-yes">0</div><div class="lab">Yes</div></div>
+        <div class="grp no"><div class="big" id="t-no">0</div><div class="lab">No</div></div>
+        <div class="grp ab"><div class="big" id="t-ab">0</div><div class="lab">Abstain</div></div>
+        <div class="track"><div class="fill" id="t-fill"></div><div class="need" id="t-need"></div></div>
+        <div class="verdict" id="t-verdict"></div>
+        <div class="moneybar hidden" id="t-money">
+          <div class="lab">Money actually arriving</div>
+          <div class="big" id="t-money-val">$0</div>
+          <div class="lab" id="t-money-of">of $0</div>
+        </div>
+      </div>
+      <div class="map-wrap" id="map-view"></div>
+      <div class="maplegend" id="map-legend"></div>
+    </div>
+
+    <div class="card hidden" id="pay-card" style="border-color:var(--red);border-width:3px">
+      <div class="eyebrow" style="color:var(--red)">Congress said yes. Now decide for real.</div>
+      <h2>Are you actually going to send the money?</h2>
+      <p class="lede" id="pay-owed"></p>
+      <div class="callout warn"><p style="margin:0"><strong>Nobody can make you pay.</strong> There is no
+      president to enforce this and no national court to take you to. Refuse, and nothing happens to you.</p></div>
+      <div class="vote-row" style="margin-top:14px">
+        <button class="btn btn-yes" onclick="SP('full')">PAY IN FULL</button>
+        <button class="btn gold" onclick="SP('half')">PAY HALF</button>
+        <button class="btn btn-no" onclick="SP('none')">PAY NOTHING</button>
+      </div>
+    </div>
+
+    <div class="card hidden" id="out-card">
+      <h2 id="out-head"></h2>
+      <p class="lede" id="out-narr"></p>
+      <div id="out-money" class="hidden">
+        <div class="grid g3">
+          <div class="stat"><div class="k">Congress asked</div><div class="v" id="o-ask"></div></div>
+          <div class="stat"><div class="k">Congress got</div><div class="v" id="o-got"></div></div>
+          <div class="stat"><div class="k">That is</div><div class="v" id="o-pct"></div></div>
+        </div>
+        <div class="ticker inset" id="o-excuses" style="margin-top:12px"></div>
+      </div>
+      <div class="hist" style="margin-top:14px"><div class="eyebrow">What actually happened</div>
+        <div id="o-hist"></div></div>
+      <button class="btn big wide" id="next-btn" style="margin-top:16px">Continue</button>
+    </div>
+  </section>
+
+  <section id="s-end" class="hidden"></section>
+</div>
+
+<script>
+/* =========================================================================
+   THE CONFEDERATION PROBLEM  —  Shared Game Data
+   Classic script (no modules) so it also works from a local file:// copy.
+   Everything hangs off window.AOC.
+   ========================================================================= */
+(function () {
+  "use strict";
+
+  /* ----------------------------------------------------------------------
+     TAGS
+     Every resolution is tagged. Every bot state has an opinion about every
+     tag. A bot's vote is the dot product of the two. This keeps bot behavior
+     predictable enough that students can learn to negotiate with them.
+     ---------------------------------------------------------------------- */
+  var TAGS = [
+    "taxation",         // does this take money out of state pockets?
+    "national_power",   // does this make Congress stronger?
+    "state_sovereignty",// does this protect a state's right to decide for itself?
+    "trade_regulation", // does this touch who controls trade?
+    "military",         // does this pay for soldiers or defense?
+    "debt_honor",       // does this pay what we already promised?
+    "north_economy",    // helps northern shipping/manufacturing
+    "south_economy",    // helps southern farming/plantations
+    "small_state",      // helps states with little land or few people
+    "west_expansion"    // touches western land claims
+  ];
+
+  /* ----------------------------------------------------------------------
+     THE THIRTEEN STATES
+     share      = percent of a land-value requisition (Resolution 1)
+     popShare   = percent of a population requisition (Resolution 4)
+     treasury   = starting money
+     motto      = the one line shown on the projector so students can read
+                  a bot's personality before they negotiate with it
+     ---------------------------------------------------------------------- */
+  var STATES = [
+    {
+      name: "Virginia", abbr: "VA", region: "South", size: "Large",
+      share: 16, popShare: 19, treasury: 400000,
+      motto: "The biggest state. Owns huge western land claims and does not want to give them up.",
+      background: "You are the largest and richest state. Your land claims stretch west past the Ohio River. Because you are big, every tax based on land or people costs you the most. Other states are jealous of your power and suspicious of your western claims.",
+      objective: "Protect your western land. Look like a leader, but do not let the small states drain your treasury.",
+      factions: [
+        { name: "Tidewater Planters", wants: "Keep taxes low. We already carry the heaviest load." },
+        { name: "Western Settlers", wants: "Defend the frontier and keep the Mississippi River open." }
+      ],
+      bot: {
+        weights: { taxation: -4, national_power: 2, state_sovereignty: 5, trade_regulation: 1, military: 3, debt_honor: 5, north_economy: 0, south_economy: 6, small_state: -3, west_expansion: 8 },
+        stubbornness: 0.7, absenceChance: 0.02, prideInNation: 0.55
+      }
+    },
+    {
+      name: "Massachusetts", abbr: "MA", region: "North", size: "Large",
+      share: 13, popShare: 12, treasury: 325000,
+      motto: "Shipping and trade. Already taxing its own farmers hard to pay off war debt.",
+      background: "Your merchants and ships are the heart of your economy. You borrowed heavily during the war, and you are taxing your own farmers hard to pay it back. Those farmers are angry, and some of them are veterans who still have not been paid.",
+      objective: "Protect trade and shipping. Keep your farmers from exploding.",
+      factions: [
+        { name: "Boston Merchants", wants: "Free trade between states and a country that pays its debts." },
+        { name: "Western Farmers", wants: "Stop taxing us. We are losing our farms to the courts." }
+      ],
+      bot: {
+        weights: { taxation: -2, national_power: 3, state_sovereignty: 2, trade_regulation: 6, military: 4, debt_honor: 7, north_economy: 7, south_economy: -1, small_state: -1, west_expansion: 0 },
+        stubbornness: 0.5, absenceChance: 0.03, prideInNation: 0.7
+      }
+    },
+    {
+      name: "Pennsylvania", abbr: "PA", region: "Middle", size: "Large",
+      share: 12, popShare: 11, treasury: 300000,
+      motto: "Philadelphia is the nation's biggest city. Wants a country that actually works.",
+      background: "Philadelphia is the largest city in the country and the home of Congress. Your merchants, farmers, and ironworkers all depend on trade moving smoothly. You are one of the few states that usually pays what Congress asks.",
+      objective: "Keep the country together and keep trade flowing through your city.",
+      factions: [
+        { name: "Philadelphia Merchants", wants: "A stable country with good credit and open roads." },
+        { name: "Frontier Farmers", wants: "Protection from raids and lower taxes." }
+      ],
+      bot: {
+        weights: { taxation: -2, national_power: 5, state_sovereignty: 1, trade_regulation: 6, military: 3, debt_honor: 6, north_economy: 6, south_economy: 1, small_state: 0, west_expansion: 2 },
+        stubbornness: 0.4, absenceChance: 0.03, prideInNation: 0.8
+      }
+    },
+    {
+      name: "New York", abbr: "NY", region: "Middle", size: "Large",
+      share: 9, popShare: 8, treasury: 225000,
+      motto: "Controls the best port in America and taxes everything that passes through it.",
+      background: "You control the finest harbor on the continent. Almost everything shipped to New Jersey and Connecticut passes through your port, and you tax all of it. That tax money pays your bills. If Congress ever got the power to tax imports, you would lose your best source of income.",
+      objective: "Protect your port income. Never let Congress take over trade taxes.",
+      factions: [
+        { name: "Port Officials", wants: "Keep our tariffs. They pay for our whole government." },
+        { name: "Hudson Valley Landowners", wants: "Stay out of other people's wars and debts." }
+      ],
+      bot: {
+        weights: { taxation: -5, national_power: -3, state_sovereignty: 7, trade_regulation: -8, military: 1, debt_honor: 4, north_economy: 5, south_economy: 0, small_state: -4, west_expansion: 1 },
+        stubbornness: 0.85, absenceChance: 0.02, prideInNation: 0.35,
+        redLines: ["import_tax"]
+      }
+    },
+    {
+      name: "Maryland", abbr: "MD", region: "Middle", size: "Medium",
+      share: 8, popShare: 8, treasury: 200000,
+      motto: "Has no western land. Furious that Virginia claims an empire out west.",
+      background: "Your borders are fixed. You cannot grow west, but Virginia claims land all the way to the Mississippi. You refused to sign the Articles of Confederation for years over exactly this. You believe western land was won by everyone's soldiers and should belong to everyone.",
+      objective: "Stop the big states from building western empires.",
+      factions: [
+        { name: "Chesapeake Traders", wants: "Fair trade rules and a working country." },
+        { name: "Land Company Investors", wants: "Force Virginia to give up the west." }
+      ],
+      bot: {
+        weights: { taxation: -3, national_power: 4, state_sovereignty: 2, trade_regulation: 4, military: 2, debt_honor: 4, north_economy: 2, south_economy: 3, small_state: 6, west_expansion: -9 },
+        stubbornness: 0.6, absenceChance: 0.05, prideInNation: 0.6
+      }
+    },
+    {
+      name: "Connecticut", abbr: "CT", region: "North", size: "Medium",
+      share: 8, popShare: 7, treasury: 200000,
+      motto: "Getting squeezed by New York's port taxes and tired of it.",
+      background: "Your farmers and traders have to send goods through New York, and New York taxes them every time. You are losing money to a neighbor. You also have a violent land dispute with Pennsylvania in the Wyoming Valley.",
+      objective: "Break New York's grip on trade without handing your power to Congress.",
+      factions: [
+        { name: "River Merchants", wants: "End New York's tariffs. They are robbing us." },
+        { name: "Town Meetings", wants: "No new taxes from anybody, including Congress." }
+      ],
+      bot: {
+        weights: { taxation: -4, national_power: 1, state_sovereignty: 5, trade_regulation: 7, military: 2, debt_honor: 4, north_economy: 5, south_economy: 0, small_state: 4, west_expansion: 2 },
+        stubbornness: 0.6, absenceChance: 0.05, prideInNation: 0.5
+      }
+    },
+    {
+      name: "North Carolina", abbr: "NC", region: "South", size: "Medium",
+      share: 8, popShare: 10, treasury: 200000,
+      motto: "Rural, spread out, and deeply suspicious of any government far away.",
+      background: "Your state is mostly small farms spread over a long distance. You have very little cash money. Settlers in your western territory have already tried to break away and form their own state. You do not trust distant governments, and Congress feels very distant.",
+      objective: "Pay as little as possible. Keep control of your own territory.",
+      factions: [
+        { name: "Backcountry Farmers", wants: "No taxes. We barely have coins to begin with." },
+        { name: "Coastal Planters", wants: "Protect our exports and our land claims." }
+      ],
+      bot: {
+        weights: { taxation: -6, national_power: -3, state_sovereignty: 7, trade_regulation: 1, military: 2, debt_honor: 2, north_economy: -2, south_economy: 6, small_state: 1, west_expansion: 4 },
+        stubbornness: 0.75, absenceChance: 0.10, prideInNation: 0.3
+      }
+    },
+    {
+      name: "South Carolina", abbr: "SC", region: "South", size: "Medium",
+      share: 7, popShare: 6, treasury: 175000,
+      motto: "Rice and indigo exports. Sees every northern plan as a trick to take southern money.",
+      background: "Your wealth comes from rice and indigo grown on plantations and shipped overseas. Anything that raises the cost of shipping or of imported goods hurts you directly. You are convinced the northern states use Congress to move southern money north.",
+      objective: "Block northern economic schemes. Protect your export trade.",
+      factions: [
+        { name: "Lowcountry Planters", wants: "Free export trade and no interference." },
+        { name: "Charleston Merchants", wants: "Cheap imported goods and open ports." }
+      ],
+      bot: {
+        weights: { taxation: -7, national_power: -4, state_sovereignty: 8, trade_regulation: -2, military: 3, debt_honor: 2, north_economy: -4, south_economy: 8, small_state: 0, west_expansion: 2 },
+        stubbornness: 0.8, absenceChance: 0.06, prideInNation: 0.3
+      }
+    },
+    {
+      name: "New Jersey", abbr: "NJ", region: "Middle", size: "Small",
+      share: 6, popShare: 6, treasury: 150000,
+      motto: "Trapped between two port cities that both tax it. Calls itself a barrel tapped at both ends.",
+      background: "You have no major port of your own. Goods coming to you pass through New York or Philadelphia, and both of them tax you on the way. People call your state a barrel tapped at both ends. You are desperate for national trade rules because you cannot win this fight alone.",
+      objective: "Get national trade rules. You are being strangled by your neighbors.",
+      factions: [
+        { name: "Farmers", wants: "Stop the tariffs that eat our profits." },
+        { name: "Assembly Leaders", wants: "Any national rule that stops New York." }
+      ],
+      bot: {
+        weights: { taxation: -3, national_power: 5, state_sovereignty: 0, trade_regulation: 9, military: 1, debt_honor: 3, north_economy: 3, south_economy: 0, small_state: 7, west_expansion: 0 },
+        stubbornness: 0.35, absenceChance: 0.05, prideInNation: 0.65
+      }
+    },
+    {
+      name: "New Hampshire", abbr: "NH", region: "North", size: "Small",
+      share: 4, popShare: 4, treasury: 100000,
+      motto: "Small, poor, and far from Philadelphia. Its delegates often just do not show up.",
+      background: "You are a small northern state with timber, fishing, and not much cash. Philadelphia is a long, expensive trip. Your state legislature does not always bother to send delegates, and sometimes cannot afford to pay them.",
+      objective: "Survive. Do not spend money you do not have.",
+      factions: [
+        { name: "Timber and Fishing Interests", wants: "Protect our coast and our trade." },
+        { name: "Town Farmers", wants: "Keep our money at home." }
+      ],
+      bot: {
+        weights: { taxation: -5, national_power: 0, state_sovereignty: 4, trade_regulation: 3, military: 1, debt_honor: 3, north_economy: 4, south_economy: 0, small_state: 5, west_expansion: 0 },
+        stubbornness: 0.5, absenceChance: 0.28, prideInNation: 0.45
+      }
+    },
+    {
+      name: "Georgia", abbr: "GA", region: "South", size: "Small",
+      share: 3, popShare: 3, treasury: 75000,
+      motto: "The frontier state. Wants soldiers, not roads, and will trade its vote for defense.",
+      background: "You are the newest, smallest, and most exposed state. Spain holds Florida on your southern border and disputes your western boundary. You face constant conflict on your frontier. You need soldiers far more than you need anything else Congress talks about.",
+      objective: "Get military help for your frontier. Vote for anyone who protects you.",
+      factions: [
+        { name: "Frontier Militia", wants: "Soldiers and forts, right now." },
+        { name: "Savannah Planters", wants: "Low taxes and open export trade." }
+      ],
+      bot: {
+        weights: { taxation: -5, national_power: -1, state_sovereignty: 5, trade_regulation: 0, military: 10, debt_honor: 1, north_economy: -2, south_economy: 5, small_state: 4, west_expansion: 3 },
+        stubbornness: 0.45, absenceChance: 0.12, prideInNation: 0.35
+      }
+    },
+    {
+      name: "Rhode Island", abbr: "RI", region: "North", size: "Small",
+      share: 3, popShare: 3, treasury: 75000,
+      motto: "Will not give up the power to tax. Killed the national import tax in real life in 1782.",
+      background: "You are the smallest state, and you guard your independence fiercely. You make real money from your own port taxes. In 1782 your state, alone, blocked a national import tax that all twelve other states had approved. You did not blink then and you will not blink now.",
+      objective: "Never let Congress get the power to tax. You are the last line of defense.",
+      factions: [
+        { name: "Newport Merchants", wants: "Keep our own port taxes. They fund everything." },
+        { name: "Country Party", wants: "No outside government touches our money. Ever." }
+      ],
+      bot: {
+        weights: { taxation: -10, national_power: -10, state_sovereignty: 10, trade_regulation: -6, military: -1, debt_honor: 0, north_economy: 3, south_economy: 0, small_state: 6, west_expansion: 0 },
+        stubbornness: 0.97, absenceChance: 0.04, prideInNation: 0.15,
+        redLines: ["import_tax", "amendment"]
+      }
+    },
+    {
+      name: "Delaware", abbr: "DE", region: "Middle", size: "Small",
+      share: 3, popShare: 3, treasury: 75000,
+      motto: "Tiny, with one equal vote. Knows its vote is worth more than its size and will sell it.",
+      background: "You are one of the smallest states in the country, but under the Articles you get exactly one vote, the same as Virginia. That vote is the most valuable thing you own. You have learned to trade it for whatever your state needs.",
+      objective: "Use your one vote to get the best deal you can. Equal voting is everything.",
+      factions: [
+        { name: "Wilmington Traders", wants: "Whatever keeps goods cheap and moving." },
+        { name: "Assembly", wants: "Protect equal voting for small states, at all costs." }
+      ],
+      bot: {
+        weights: { taxation: -3, national_power: 1, state_sovereignty: 3, trade_regulation: 4, military: 1, debt_honor: 3, north_economy: 2, south_economy: 1, small_state: 9, west_expansion: -4 },
+        stubbornness: 0.18, absenceChance: 0.06, prideInNation: 0.5
+      }
+    }
+  ];
+
+  /* ----------------------------------------------------------------------
+     THE FOUR RESOLUTIONS
+     Each one isolates a different structural weakness, and they build on
+     each other. Round 4's crisis is paid for out of the treasury that
+     Round 1's broken promises drained.
+     ---------------------------------------------------------------------- */
+  var RESOLUTIONS = [
+    {
+      id: "debt",
+      ifPasses: "Congress sends the request out to all thirteen states. Then every state decides on its own whether to actually send the money. No court can make them and no president can collect it.",
+      ifFails: "Congress does not even ask. France is told that no payment is coming. American credit in Europe collapses, and every merchant here who borrows from abroad pays for it.",
+      narration: {
+        dateline: "Philadelphia \u00b7 January 1786",
+        lines: [
+          "The letter from Paris came this morning. It is extremely polite, and it is a threat.",
+          "France lent us millions to win our war. French ships sealed the bay at Yorktown. French soldiers died in our fields. The loan came due two years ago, and we have not sent them one dollar.",
+          "You are the Congress of the United States. Look around the room. There is no president in it. There is no court. There is no treasury with money in it. There are thirteen delegations and a bill nobody here can pay.",
+          "Congress may ask the states for money. Congress may not make them send it.",
+          "The floor is open."
+        ]
+      },
+      number: 1,
+      title: "Paying the War Debt",
+      subtitle: "A requisition of $1,000,000",
+      voteRule: "nine",         // 9 of 13 needed
+      compliance: true,          // states privately decide whether to actually pay
+      complianceBasis: "share",  // apportioned by land value
+      complianceTotal: 1000000,
+      civicBias: 4.4,
+      teaches: "Congress had no power to tax.",
+      // Plain-language framing for students
+      brief: "The war is over, but the bills are not paid. We borrowed millions from France and Spain to win our independence. Now they want their money back, and Congress does not have it.",
+      detail: "Congress cannot tax anybody. The only thing it can do is ask the states for money. That request is called a requisition. Each state's share is based on the value of its land. Congress is asking for $1,000,000 total.\n\nHere is the important part: a requisition is a request, not a bill. There is no national court to sue you and no president to send anyone after you. If your state votes yes and then does not pay, nothing happens to you.",
+      question: "Should Congress send this requisition to the states?",
+      yesCase: "If we do not pay, no country in the world will ever lend to us again. Our word is worthless. Our merchants lose credit everywhere.",
+      noCase: "This share is unfair to my state. Let the states that borrowed the most pay the most. My people have already given enough.",
+      glossary: ["requisition", "credit"],
+      tags: { taxation: 4, national_power: 3, debt_honor: 9, state_sovereignty: -2, north_economy: 2, south_economy: 0, small_state: 0, military: 0, trade_regulation: 0, west_expansion: 0 },
+      failText: "Congress does not even send the request. France is told there will be no payment at all this year.",
+      passText: "The requisition is approved. Now each state decides, on its own, whether to actually send the money."
+    },
+    {
+      id: "trade",
+      ifPasses: "Congress sends every state a polite request to drop its tariffs on other states. New York does not have to listen, and Congress has no way to make it. The trade war does not actually stop.",
+      ifFails: "The trade war spreads. More states start taxing their neighbors' goods to get even, prices rise everywhere, and states begin treating each other like foreign countries.",
+      narration: {
+        dateline: "New York Harbor \u00b7 March 1786",
+        lines: [
+          "A farmer in New Jersey loaded a wagon with grain and drove it to the docks. New York taxed him for crossing. He paid, sold his grain for less than it cost him to grow, and went home angry.",
+          "New Jersey struck back last week. There is a lighthouse out on Sandy Hook that New York built and New York owns, and it stands on Jersey sand. New Jersey has started taxing it.",
+          "Understand what you are looking at. This is not two countries fighting. These are two American states, and they are doing this to each other on purpose, and the men who did it were cheered at home.",
+          "Congress may ask them to stop. Asking is the entire power Congress has here.",
+          "The floor is open."
+        ]
+      },
+      number: 2,
+      title: "The Trade War",
+      subtitle: "A resolution asking states to stop taxing each other",
+      voteRule: "nine",
+      compliance: false,
+      teaches: "Congress had no power to regulate trade between states.",
+      brief: "The states are treating each other like foreign countries. New York taxes every shipment that passes through its port on the way to New Jersey and Connecticut. New Jersey struck back by taxing a lighthouse New York owns on the Jersey shore.",
+      detail: "Trade between states is breaking down. States are putting taxes, called tariffs, on each other's goods. Prices are rising and merchants are furious.\n\nCongress has no power over trade at all. It cannot order New York to stop. The most it can do is pass a resolution politely asking every state to drop its tariffs on other states.\n\nEven if this passes with all thirteen votes, it is still only a request.",
+      question: "Should Congress ask the states to stop taxing each other's goods?",
+      yesCase: "We are supposed to be one country. If we keep taxing each other, we will all be poor together.",
+      noCase: "Our port is our property. The taxes we collect there pay for our government. No outside body tells us what to do with our own harbor.",
+      glossary: ["tariff", "resolution"],
+      tags: { taxation: -1, national_power: 4, trade_regulation: 9, state_sovereignty: -4, north_economy: 3, south_economy: 1, small_state: 5, debt_honor: 0, military: 0, west_expansion: 0 },
+      failText: "The trade war continues and gets worse. More states begin taxing their neighbors.",
+      passText: "The resolution passes. It is a polite request, and Congress cannot enforce it."
+    },
+    {
+      id: "impost",
+      ifPasses: "The Articles are amended. Congress collects its own money for the first time and stops depending on the states. In real life this never happened.",
+      ifFails: "Nothing changes. Congress stays broke and goes on begging. Any single state that wants to block a fix can keep blocking it forever.",
+      narration: {
+        dateline: "Philadelphia \u00b7 July 1786",
+        lines: [
+          "Five years of asking. Five years of writing to the states for money and watching most of it never arrive.",
+          "There is one way out and every delegate in this room already knows it. Give Congress a tax of its own. Five dollars on every hundred dollars of foreign goods that crosses a dock. Small, steady, and ours \u2014 so that we never have to beg again.",
+          "But this changes the Articles themselves, and Article Thirteen is not vague about what that costs.",
+          "Not nine states. Not twelve.",
+          "All thirteen. Every delegation in this room. Any one of you can end this by folding your arms and saying nothing.",
+          "Look around and decide who that is going to be."
+        ]
+      },
+      number: 3,
+      title: "The Import Tax Amendment",
+      subtitle: "A 5% tax on imported goods — requires all 13 states",
+      voteRule: "unanimous",     // 13 of 13
+      compliance: false,
+      teaches: "Changing the Articles required all thirteen states to agree.",
+      brief: "Begging the states for money has failed. There is one real fix: give Congress its own source of income. The proposal is a 5% tax on goods imported from other countries, collected by Congress.",
+      detail: "This would finally give Congress money of its own. It would not have to ask anymore. Debts could be paid, soldiers could be supplied, and the country would have real credit.\n\nBut this changes the Articles of Confederation themselves. Under Article XIII, an amendment requires the agreement of every single state. Not nine. All thirteen.\n\nOne state voting no kills it. That is not a rule of this game. That is how it actually worked.",
+      question: "Should the Articles be amended to give Congress a 5% import tax?",
+      yesCase: "Asking has failed for six straight years. This is the only plan that has ever been proposed that would actually work.",
+      noCase: "We just fought a war against a government that taxed us from far away. Give Congress the power to tax and we will have traded one master for another.",
+      glossary: ["amendment", "impost", "credit"],
+      special: "import_tax",     // triggers red lines on NY and RI
+      isAmendment: true,
+      tags: { taxation: 8, national_power: 9, trade_regulation: 6, state_sovereignty: -9, debt_honor: 6, north_economy: 2, south_economy: -1, small_state: 2, military: 2, west_expansion: 0 },
+      failText: "The amendment fails. Congress will remain without money of its own.",
+      passText: "Against every expectation, all thirteen states agreed. This did not happen in real life."
+    },
+    {
+      id: "shays",
+      ifPasses: "Congress asks the states for money and volunteers. Then each state decides whether to actually send them. The rebels are not waiting for anyone to make up their mind.",
+      ifFails: "Congress does nothing at all. The rebels reach the arsenal at Springfield, and every state government in the country watches to see whether armed men can simply walk in and take one.",
+      narration: {
+        dateline: "Springfield, Massachusetts \u00b7 January 1787",
+        lines: [
+          "Daniel Shays fought at Bunker Hill. He fought at Saratoga. He was wounded, he was decorated, and he was never paid.",
+          "He came home to a farm and a stack of debts. When the courts started taking farms from men like him, he stopped asking politely. Tonight he is marching on Springfield with more than a thousand armed men, and they are going for the guns inside the federal arsenal.",
+          "Massachusetts cannot stop him. Massachusetts has no money left.",
+          "Congress has no army. Congress cannot draft a single soldier. All Congress can do is ask you, again, for money and men.",
+          "Before you answer, look at what is actually in the national treasury tonight: {treasury}.",
+          "The floor is open."
+        ]
+      },
+      number: 4,
+      title: "Shays' Rebellion",
+      subtitle: "An emergency: $500,000 and troops",
+      voteRule: "nine",
+      compliance: true,
+      complianceBasis: "popShare",
+      complianceTotal: 500000,
+      civicBias: 4.0,
+      teaches: "Congress had no army and no president to act in an emergency.",
+      brief: "Armed farmers in western Massachusetts have shut down the courts. They are led by Daniel Shays, a captain who fought at Bunker Hill and was never paid. Thousands of them are now marching on the federal arsenal at Springfield to seize its weapons.",
+      detail: "Massachusetts cannot stop them. The state has no money left. Congress has no standing army and no power to draft one. There is no president to give an order.\n\nAll Congress can do is ask the states for $500,000 and volunteer soldiers, split up by population. And then ask again that they actually send it.\n\nCheck the national treasury before you vote. Whatever the states did not pay in Resolution 1 is not there now.",
+      question: "Should Congress request emergency money and troops?",
+      yesCase: "If armed men can shut down a state government and nobody stops them, then no government here is safe. Yours is next.",
+      noCase: "This is Massachusetts's problem. Those farmers were pushed into it by their own state's taxes. Why should our people bleed and pay for it?",
+      glossary: ["arsenal", "standing army"],
+      tags: { taxation: 5, national_power: 6, military: 9, state_sovereignty: -3, debt_honor: 3, north_economy: 3, south_economy: -1, small_state: 0, trade_regulation: 0, west_expansion: 0 },
+      failText: "Congress does nothing. The rebellion is put down only because private Boston merchants pay for an army out of their own pockets.",
+      passText: "The request is approved. Now the states decide whether to actually send money and men."
+    }
+  ];
+
+  /* ----------------------------------------------------------------------
+     GLOSSARY — plain definitions, shown on tap
+     ---------------------------------------------------------------------- */
+  var GLOSSARY = {
+    requisition: "A formal request for money from Congress to the states. Not a tax. States could ignore it, and usually did.",
+    credit: "Your reputation for paying back what you borrow. Bad credit means nobody will lend to you again.",
+    tariff: "A tax on goods coming in from somewhere else. Under the Articles, states put tariffs on each other.",
+    resolution: "A formal decision by Congress. Under the Articles, most resolutions were requests, because Congress had no way to enforce them.",
+    amendment: "A change to the Articles of Confederation. Article XIII required all thirteen states to approve one.",
+    impost: "An old word for a tax on imported goods. The failed import tax plans of 1781 and 1783 were both called the impost.",
+    arsenal: "A storehouse of guns and gunpowder.",
+    "standing army": "A permanent army kept ready in peacetime. Congress was not allowed to have one.",
+    quorum: "The minimum number of states that must be present for Congress to do business. Under the Articles, nine states had to be present to decide anything important.",
+    sovereignty: "The right to rule yourself without anyone above you. Article II said each state kept its sovereignty."
+  };
+
+  /* ----------------------------------------------------------------------
+     THE SIX WEAKNESSES — used in the debrief
+     ---------------------------------------------------------------------- */
+  var WEAKNESSES = [
+    { key: "tax",       title: "Congress could not tax",            text: "Congress could only ask states for money. States paid about one-sixth of what was asked between 1781 and 1786." },
+    { key: "trade",     title: "Congress could not control trade",  text: "States taxed each other's goods like foreign countries. Congress could not stop them." },
+    { key: "executive", title: "There was no president",            text: "Nobody had the job of carrying out the laws Congress passed. A vote was the end of the process, not the beginning." },
+    { key: "courts",    title: "There were no national courts",     text: "When two states fought, there was no judge who could settle it. Pennsylvania and Connecticut shot at each other over the Wyoming Valley." },
+    { key: "amend",     title: "Amendments needed all 13 states",   text: "Any single state could block any fix. Rhode Island alone killed the import tax in 1782. New York alone killed it again in 1786." },
+    { key: "army",      title: "Congress had no army",              text: "Congress could not draft soldiers. During Shays' Rebellion it authorized troops and then could not pay for a single one." }
+  ];
+
+  /* ----------------------------------------------------------------------
+     REAL-HISTORY FOOTNOTES — shown after each round, so students learn
+     that the outcome they just produced is the outcome that happened.
+     ---------------------------------------------------------------------- */
+  var HISTORY_NOTES = {
+    debt: "In real life, Congress asked the states for about $15 million between 1781 and 1786. It received about $2.5 million — roughly one dollar for every six requested. The United States defaulted on its loans from France.\n\nThere was a second cost. Britain had promised in 1783 to leave its forts on American soil — Detroit, Niagara, Oswego, Michilimackinac. It refused to go, pointing out that Americans were not paying the pre-war debts they owed British merchants either. Congress could not make the states pay, so it could not make Britain leave.",
+    trade: "In real life, New York really did tax goods bound for New Jersey and Connecticut, and New Jersey really did tax the New York lighthouse at Sandy Hook. Congress asked the states to stop. They did not stop.\n\nIt went further than taxes. Spain closed the Mississippi River to American boats in 1784, cutting off every farmer west of the mountains. In 1786 John Jay negotiated a treaty that would have given up the river for 25 years in exchange for trade deals that helped northern merchants. The South was furious. Congress split along North and South lines and the treaty died. This chaos is a direct reason the Constitutional Convention was called.",
+    impost: "In real life this was tried twice. In 1782, twelve states approved the import tax and Rhode Island alone rejected it. In 1786, the plan was tried again and New York alone rejected it. Both times, one state out of thirteen was enough.",
+    shays: "In real life, Congress authorized 1,340 troops in October 1786 and asked the states to pay for them. The states sent almost nothing.\n\nOn January 25, 1787, Shays led about 1,200 men against the Springfield arsenal, planning to march on Boston afterward. The militia opened fire. Four farmers were killed and the rest scattered. The rebellion was put down not by Congress but by a private army of 4,000 paid for by Boston merchants and led by General Benjamin Lincoln.\n\nThree months later, the Constitutional Convention opened in Philadelphia."
+  };
+
+  var WHAT_WORKED = {
+    title: "One thing the Articles got right",
+    body: "Congress under the Articles did do something lasting. The Land Ordinance of 1785 " +
+          "surveyed the western territory into a grid of townships that could be sold off in " +
+          "orderly pieces. Then the Northwest Ordinance of 1787 set the rules for governing that " +
+          "land: once a territory reached 60,000 people it could apply to become a state, equal " +
+          "to the original thirteen — not a colony of them. And it banned slavery in the whole " +
+          "Northwest Territory.\n\n" +
+          "That is a real achievement, passed by the same broke, powerless Congress you have been " +
+          "playing. It is worth asking why this one worked when nothing else did. One answer: it " +
+          "cost the states nothing and took nothing away from them.\n\n" +
+          "It is also worth knowing that Thomas Jefferson had tried this three years earlier. His " +
+          "1784 plan would have banned slavery in every western territory after 1800. It lost by a " +
+          "single vote, because one delegate from New Jersey was too sick to come to the chamber " +
+          "that day. Jefferson later wrote that the fate of millions was determined by the absence " +
+          "of one man.",
+    note: "The land these laws organised was not empty. It was home to the Shawnee, Miami, " +
+          "Delaware, and many other nations, who had not agreed to any of it."
+  };
+
+  /* Two men look at the same rebellion and see opposite things. Good for the
+     last five minutes of class. */
+  var VOICES = [
+    {
+      who: "General Henry Knox",
+      role: "Washington's close aide, writing after Shays' Rebellion",
+      quote: "What is to afford us our security against the violence of lawless men? Our government " +
+             "must be braced, changed, or altered to secure our lives and property.",
+      gloss: "Knox is frightened. To him the rebellion proves the government is too weak and must be rebuilt."
+    },
+    {
+      who: "Thomas Jefferson",
+      role: "writing from Paris, November 1787",
+      quote: "What country before ever existed a century and a half without a rebellion? … The tree " +
+             "of liberty must be refreshed from time to time with the blood of patriots and tyrants.",
+      gloss: "Jefferson is 3,000 miles away and unbothered. To him an occasional rebellion is healthy — " +
+             "it warns rulers that people are still paying attention. He thought the Convention was " +
+             "overreacting."
+    }
+  ];
+
+  window.AOC = {
+    WHAT_WORKED: WHAT_WORKED,
+    VOICES: VOICES,
+    TAGS: TAGS,
+    STATES: STATES,
+    RESOLUTIONS: RESOLUTIONS,
+    GLOSSARY: GLOSSARY,
+    WEAKNESSES: WEAKNESSES,
+    HISTORY_NOTES: HISTORY_NOTES,
+    byName: function (n) { for (var i = 0; i < STATES.length; i++) if (STATES[i].name === n) return STATES[i]; return null; },
+    resolutionById: function (id) { for (var i = 0; i < RESOLUTIONS.length; i++) if (RESOLUTIONS[i].id === id) return RESOLUTIONS[i]; return null; }
+  };
+})();
+
+</script>
+
+<script>
+/* =========================================================================
+   THE CONFEDERATION PROBLEM  —  Rules Engine
+   Pure functions. No DOM, no network. Shared by teacher, student, and solo.
+   ========================================================================= */
+(function () {
+  "use strict";
+
+  var D = window.AOC;
+
+  /* ---------------------------------------------------------------- utils */
+  function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+  function money(n) {
+    return "$" + Math.round(n).toLocaleString("en-US");
+  }
+
+  // Deterministic pseudo-random so a game can be replayed from a seed.
+  // Teacher panel and every student panel must agree on bot behavior, so
+  // bot rolls are seeded from (gameCode + round + stateName).
+  function seededRandom(seed) {
+    var h = 2166136261 >>> 0;
+    for (var i = 0; i < seed.length; i++) {
+      h ^= seed.charCodeAt(i);
+      h = Math.imul(h, 16777619) >>> 0;
+    }
+    return function () {
+      h += 0x6D2B79F5;
+      var t = h;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  /* ------------------------------------------------------- apportionment */
+  function amountOwed(state, resolution) {
+    if (!resolution.compliance) return 0;
+    var basis = resolution.complianceBasis === "popShare" ? state.popShare : state.share;
+    return Math.round(resolution.complianceTotal * (basis / 100));
+  }
+
+  /* -------------------------------------------------------- bot: attend?
+     New Hampshire and the far southern states genuinely failed to send
+     delegates. If fewer than 9 states are present, no important vote can
+     legally be held — students have to notice and react.                   */
+  function botAttends(state, gameCode, round) {
+    if (!state.bot) return true;
+    var rnd = seededRandom(gameCode + "|attend|" + round + "|" + state.name);
+    return rnd() > (state.bot.absenceChance || 0);
+  }
+
+  /* ------------------------------------------------------------ bot: vote
+     Score = dot product of the resolution's tags and this state's weights,
+     plus anything students have promised it in a deal. Red lines are the
+     historical hard noes (Rhode Island and New York on the import tax).   */
+  function botVoteScore(state, resolution, deals) {
+    var w = state.bot.weights, score = 0;
+    for (var tag in resolution.tags) {
+      if (w[tag] !== undefined) score += resolution.tags[tag] * w[tag];
+    }
+    score = score / 10; // keep numbers human-sized
+
+    var dealValue = 0;
+    (deals || []).forEach(function (d) {
+      if (d.to === state.name && d.status === "accepted") dealValue += d.weight || 0;
+    });
+    return { base: score, deals: dealValue, total: score + dealValue };
+  }
+
+  function botVote(state, resolution, deals, gameCode, round) {
+    if (!state.bot) return null;
+    var rnd = seededRandom(gameCode + "|vote|" + round + "|" + state.name);
+    var s = botVoteScore(state, resolution, deals);
+    var redLines = state.bot.redLines || [];
+    var hitsRedLine =
+      (resolution.special && redLines.indexOf(resolution.special) !== -1) ||
+      (resolution.isAmendment && redLines.indexOf("amendment") !== -1);
+
+    if (hitsRedLine) {
+      // Only an enormous, explicit payoff moves them, and Rhode Island is
+      // nearly immovable by design. This is possible but should almost never
+      // happen — which is the lesson.
+      var priceToBreak = 40 * (state.bot.stubbornness || 0.5);
+      if (s.deals < priceToBreak) {
+        return { vote: "No", reason: redLineReason(state, resolution), locked: true };
+      }
+      return { vote: "Yes", reason: state.abbr + " sets aside its objection because the offer is too large to refuse.", flipped: true };
+    }
+
+    // THE CENTRAL HISTORICAL FACT OF THIS GAME.
+    // In Philadelphia, delegates postured as patriots and voted yes. Congress
+    // really did approve requisitions in 1781, '82, '83, '84, '85 and '86, and
+    // really did authorize troops against Shays. Almost none of it was ever
+    // funded. So bots are generous with their VOTE (civicBias below) and
+    // stingy with their MONEY (prideInNation, used in botCompliance).
+    // The gap between those two numbers is the lesson.
+    // Amendments get no civic bias: a permanent surrender of the taxing power
+    // triggered a different, deeper fear that posturing could not overcome.
+    // Per-resolution, because these were not equally controversial. Paying
+    // France back and answering an armed rebellion were easy yes votes in
+    // Congress; both really did pass. Handing Congress a permanent taxing
+    // power was not, and never passed at all.
+    var civicBias = resolution.isAmendment ? 0
+      : (resolution.civicBias !== undefined ? resolution.civicBias : 2.6);
+
+    // Stubborn states need a clearer case before they move off their instinct.
+    var threshold = (state.bot.stubbornness || 0.5) * 1.0;
+    var noise = (rnd() - 0.5) * 1.2;
+    var v = s.total + civicBias + noise;
+
+    if (v > threshold) return { vote: "Yes", reason: reasonFor(state, resolution, "Yes") };
+    if (v < -threshold) return { vote: "No", reason: reasonFor(state, resolution, "No") };
+    // Genuinely torn states abstain — and abstentions still count against
+    // a resolution that needs nine yes votes.
+    return { vote: "Abstain", reason: state.abbr + " is divided and will not commit either way." };
+  }
+
+  function redLineReason(state, resolution) {
+    if (state.name === "Rhode Island") {
+      return "Rhode Island will not give Congress the power to tax. It blocked this exact plan in 1782 and it will block it now.";
+    }
+    if (state.name === "New York") {
+      return "New York collects its own import taxes at its port. Handing that money to Congress would bankrupt the state.";
+    }
+    return state.name + " refuses on principle.";
+  }
+
+  function reasonFor(state, resolution, vote) {
+    var w = state.bot.weights, best = null, bestVal = 0;
+    for (var tag in resolution.tags) {
+      var contribution = resolution.tags[tag] * (w[tag] || 0);
+      if (vote === "No") contribution = -contribution;
+      if (contribution > bestVal) { bestVal = contribution; best = tag; }
+    }
+    var phrases = {
+      taxation: "the cost to its treasury",
+      national_power: "what it does to the power of Congress",
+      state_sovereignty: "its right to govern itself",
+      trade_regulation: "who controls trade",
+      military: "its need for soldiers",
+      debt_honor: "the debts already owed",
+      north_economy: "its shipping and manufacturing",
+      south_economy: "its farms and exports",
+      small_state: "the interests of small states",
+      west_expansion: "its western land claims"
+    };
+    var why = phrases[best] || "its own interests";
+    return state.name + " votes " + vote.toLowerCase() + " because of " + why + ".";
+  }
+
+  /* ------------------------------------------------------- bot: deal reply
+     Students offer money or a future favor. Bots answer in one line, on the
+     projector, so the whole room sees horse-trading happen.                */
+  var DEAL_OPTIONS = [
+    { id: "pay25",  label: "We will pay $25,000 of your share",  weight: 2.0, cost: 25000 },
+    { id: "pay50",  label: "We will pay $50,000 of your share",  weight: 3.8, cost: 50000 },
+    { id: "payall", label: "We will pay your ENTIRE share",      weight: 6.5, cost: null },
+    { id: "future", label: "We will vote your way next round",   weight: 2.6, cost: 0 },
+    { id: "public", label: "We will publicly back your position",weight: 1.1, cost: 0 }
+  ];
+
+  function botDealReply(state, offer, resolution, gameCode, round) {
+    var rnd = seededRandom(gameCode + "|deal|" + round + "|" + state.name + "|" + offer.id + "|" + offer.from);
+    var stub = state.bot.stubbornness || 0.5;
+    var s = botVoteScore(state, resolution, []);
+    var redLines = state.bot.redLines || [];
+    var hitsRedLine =
+      (resolution.special && redLines.indexOf(resolution.special) !== -1) ||
+      (resolution.isAmendment && redLines.indexOf("amendment") !== -1);
+
+    if (hitsRedLine && offer.weight < 4.0) {
+      return {
+        status: "rejected",
+        text: state.abbr + ": \"You cannot buy this vote. Some things are not for sale.\""
+      };
+    }
+    // How badly does the bot already want to move in the offered direction?
+    var need = -s.base;                 // positive = it currently leans no
+    var value = offer.weight * (1.6 - stub);
+    var accept = value + (rnd() - 0.4) > Math.max(0.3, need * 0.35);
+
+    if (accept) {
+      return {
+        status: "accepted",
+        weight: offer.weight,
+        text: state.abbr + ": \"Agreed. " + acceptLine(state) + "\""
+      };
+    }
+    return {
+      status: "rejected",
+      text: state.abbr + ": \"Not enough. " + rejectLine(state) + "\""
+    };
+  }
+
+  function acceptLine(state) {
+    var lines = {
+      "Delaware": "Our vote counts the same as Virginia's. Use it well.",
+      "Georgia": "Send us the soldiers and you have our vote.",
+      "New Jersey": "Finally, someone treats us as an equal.",
+      "New Hampshire": "We will send a delegate for this one.",
+      "Maryland": "Remember this when the western lands come up.",
+      "Connecticut": "We will hold you to it.",
+      "North Carolina": "Do not expect this twice."
+    };
+    return lines[state.name] || "We will vote with you.";
+  }
+
+  function rejectLine(state) {
+    var lines = {
+      "Rhode Island": "We have been alone before and we are comfortable there.",
+      "South Carolina": "The South does not sell itself so cheaply.",
+      "New York": "Our port earns more than that in a week.",
+      "Virginia": "We are the largest state here. Offer accordingly.",
+      "North Carolina": "Our farmers cannot eat promises."
+    };
+    return lines[state.name] || "Come back with a better offer.";
+  }
+
+  /* --------------------------------------------------- what this touches
+     The same dot product the bots use, broken out so a student can see WHY
+     a resolution is good or bad for their state. Deliberately shows the
+     pull in both directions without announcing a verdict — the point is to
+     make them weigh it, not to vote for them.                             */
+  var TAG_LABELS = {
+    taxation:          "money out of your treasury",
+    national_power:    "a stronger Congress",
+    state_sovereignty: "your right to govern yourselves",
+    trade_regulation:  "who controls trade",
+    military:          "soldiers and defense",
+    debt_honor:        "debts you already owe",
+    north_economy:     "your shipping and manufacturing",
+    south_economy:     "your farms and exports",
+    small_state:       "the interests of small states",
+    west_expansion:    "your western land"
+  };
+
+  function interestBreakdown(state, resolution) {
+    var w = state.bot ? state.bot.weights : null;
+    if (!w) return [];
+    var out = [];
+    for (var tag in resolution.tags) {
+      var v = resolution.tags[tag] * (w[tag] || 0);
+      if (!v) continue;
+      out.push({
+        tag: tag,
+        label: TAG_LABELS[tag] || tag,
+        value: v,
+        toward: v > 0 ? "Yes" : "No",
+        strength: Math.abs(v) >= 40 ? "strongly" : (Math.abs(v) >= 15 ? "" : "slightly")
+      });
+    }
+    out.sort(function (a, b) { return Math.abs(b.value) - Math.abs(a.value); });
+    return out;
+  }
+
+  /* -------------------------------------------------------- vote counting */
+  function tally(votes, resolution, presentStates) {
+    var yes = 0, no = 0, abstain = 0;
+    presentStates.forEach(function (n) {
+      var v = votes[n];
+      if (v === "Yes") yes++;
+      else if (v === "No") no++;
+      else abstain++;
+    });
+    var needed = resolution.voteRule === "unanimous" ? 13 : 9;
+    var quorum = presentStates.length >= 9;
+    var passed = quorum && yes >= needed;
+    return {
+      yes: yes, no: no, abstain: abstain,
+      present: presentStates.length,
+      needed: needed,
+      quorum: quorum,
+      passed: passed,
+      unanimousRule: resolution.voteRule === "unanimous"
+    };
+  }
+
+  /* ------------------------------------------------- bot: pay or don't pay
+     THE HEART OF THE GAME. A state can vote yes in Philadelphia and then
+     quietly send nothing. Nobody can make it pay. Even yes-voters default
+     often, because in real life they did.                                  */
+  function botCompliance(state, resolution, votedYes, gameCode, round) {
+    var rnd = seededRandom(gameCode + "|pay|" + round + "|" + state.name);
+    var owed = amountOwed(state, resolution);
+    var pressure = owed / Math.max(1, state.treasuryNow !== undefined ? state.treasuryNow : state.treasury);
+    var pride = state.bot.prideInNation || 0.5;
+
+    // Chance the state simply refuses to send anything.
+    var refuse = 0.45 + (pressure * 0.45) - (pride * 0.40) - (votedYes ? 0.12 : -0.10);
+    refuse = clamp(refuse, 0.05, 0.92);
+    // Chance it sends a partial payment instead of nothing.
+    var partial = clamp(0.30 + (pride * 0.15), 0.1, 0.5);
+
+    var roll = rnd();
+    if (roll < refuse) return { choice: "none", paid: 0, owed: owed };
+    if (roll < refuse + partial) return { choice: "half", paid: Math.round(owed / 2), owed: owed };
+    return { choice: "full", paid: owed, owed: owed };
+  }
+
+  var COMPLIANCE_EXCUSES = {
+    none: [
+      "has no hard money in its treasury and sends nothing.",
+      "says its own citizens come first this year.",
+      "sends a polite letter instead of money.",
+      "says it already paid more than its share during the war.",
+      "simply never answers Congress at all."
+    ],
+    half: [
+      "sends part of what it owes and promises the rest later.",
+      "sends half, in paper money of doubtful value.",
+      "pays what it can and asks for patience."
+    ],
+    full: [
+      "pays in full.",
+      "sends the entire amount, and expects to be remembered for it.",
+      "pays every dollar owed."
+    ]
+  };
+
+  function complianceExcuse(state, choice, gameCode, round) {
+    var list = COMPLIANCE_EXCUSES[choice];
+    var rnd = seededRandom(gameCode + "|excuse|" + round + "|" + state.name);
+    return state.name + " " + list[Math.floor(rnd() * list.length)];
+  }
+
+  /* --------------------------------------------------------------- scoring
+     Two numbers pull against each other:
+       State Interest    — private, rewards looking after yourself
+       National Stability — shared, falls when the country cannot act
+     At the end, if National Stability is too low, EVERY state loses points.
+     Playing selfishly is individually correct and collectively fatal.      */
+
+  function stateInterestFromVote(state, resolution, vote) {
+    if (vote === "Abstain" || !vote) return 0;
+    var s = 0, w = state.bot ? state.bot.weights : null;
+    if (!w) return 0;
+    for (var tag in resolution.tags) s += resolution.tags[tag] * (w[tag] || 0);
+    s = s / 10;
+    var aligned = (vote === "Yes" && s > 0) || (vote === "No" && s < 0);
+    var strength = Math.min(3, Math.abs(s));
+    return aligned ? Math.round(3 + strength) : -Math.round(2 + strength);
+  }
+
+  function stateInterestFromCompliance(choice) {
+    if (choice === "none") return 8;   // you kept your money and paid no price
+    if (choice === "half") return 2;
+    return -6;                          // paying in full is expensive
+  }
+
+  function nationalStabilityChange(resolution, result, collectedFraction) {
+    if (resolution.id === "debt") {
+      if (!result.passed) return -18;
+      return Math.round(-20 + 30 * collectedFraction);
+    }
+    if (resolution.id === "trade") {
+      // Passing barely helps: Congress cannot enforce it. That IS the point.
+      return result.passed ? -3 : -9;
+    }
+    if (resolution.id === "impost") {
+      return result.passed ? 28 : -14;
+    }
+    if (resolution.id === "shays") {
+      if (!result.passed) return -28;
+      return Math.round(-25 + 42 * collectedFraction);
+    }
+    return 0;
+  }
+
+  /* Outcome text the teacher reads aloud after the reveal. */
+  function outcomeNarrative(resolution, result, collected, requested) {
+    var f = requested > 0 ? collected / requested : 0;
+    if (resolution.id === "debt") {
+      if (!result.passed) return "Congress cannot even agree to ask. France is informed that no payment is coming. American credit in Europe collapses.";
+      if (f >= 0.85) return "The states actually paid. This is the single most successful requisition in the history of the Confederation — and it did not happen in real life.";
+      if (f >= 0.5) return "About half the money arrived. Congress makes a partial payment to France and asks for more time. American credit is damaged but alive.";
+      if (f >= 0.2) return "Congress voted yes. Far fewer states actually paid. Congress cannot cover the interest, let alone the loan. This is almost exactly what happened in real life.";
+      return "Congress voted yes and collected almost nothing. The United States defaults on its loans. No European bank will lend to it again.";
+    }
+    if (resolution.id === "trade") {
+      if (result.passed) return "The resolution passes. Congress sends a polite request to every state. New York keeps its tariffs anyway, because Congress has no power to make it stop. Nothing changes.";
+      return "Congress cannot even agree to ask. The trade war spreads. More states begin taxing their neighbors' goods.";
+    }
+    if (resolution.id === "impost") {
+      if (result.passed) return "All thirteen states agreed. Congress will have its own money for the first time. This never happened in real life — twelve states agreed in 1782 and Rhode Island refused.";
+      return "Twelve states can agree and it still means nothing. One state is enough to stop any change to the Articles. Congress will stay broke.";
+    }
+    if (resolution.id === "shays") {
+      if (!result.passed) return "Congress does nothing. The rebels take the arsenal at Springfield. Governments across the country wonder if they are next.";
+      if (f >= 0.7) return "Enough money and men arrive to stop the rebellion. Congress acted — barely, slowly, and only because the states chose to let it.";
+      if (f >= 0.3) return "Some money arrives, but too little and too late. Private Boston merchants pay for the rest of the army out of their own pockets. That is how it really ended.";
+      return "Congress approved an army and could not pay for a single soldier. The states sent almost nothing. Congress is revealed to the whole world as powerless.";
+    }
+    return "";
+  }
+
+  /* ---------------------------------------------------- the read-aloud
+     Each resolution opens with a short piece the teacher performs to the
+     class. Tokens let one line carry live game state, so Round 4 can read
+     the real treasury balance out loud and the room hears the consequence
+     of what it did in Round 1.                                           */
+  function narration(resolution, ctx) {
+    var n = resolution.narration;
+    if (!n) return null;
+    ctx = ctx || {};
+    var lines = n.lines.map(function (l) {
+      return l.replace(/\{treasury\}/g, money(ctx.treasury || 0));
+    });
+    var words = lines.join(" ").split(/\s+/).length;
+    return {
+      dateline: n.dateline,
+      lines: lines,
+      seconds: Math.round(words / 2.6)   // ~155 words a minute, read slowly
+    };
+  }
+
+  /* ------------------------------------------------------------- endgame */
+  function finalReport(states, nationalStability, history) {
+    var COLLAPSE = 30;
+    var penalty = nationalStability < COLLAPSE ? -20 : 0;
+    var ranked = states.map(function (s) {
+      return {
+        name: s.name,
+        abbr: s.abbr,
+        isBot: !!s.isBot,
+        players: s.players || [],
+        rawInterest: Math.round(s.interest),
+        penalty: penalty,
+        finalInterest: Math.round(s.interest + penalty),
+        treasury: Math.round(s.treasuryNow !== undefined ? s.treasuryNow : s.treasury)
+      };
+    }).sort(function (a, b) { return b.finalInterest - a.finalInterest; });
+
+    var totalRequested = 0, totalCollected = 0, passedCount = 0;
+    (history || []).forEach(function (h) {
+      totalRequested += h.requested || 0;
+      totalCollected += h.collected || 0;
+      if (h.passed) passedCount++;
+    });
+
+    return {
+      ranked: ranked,
+      collapsed: nationalStability < COLLAPSE,
+      penaltyApplied: penalty,
+      stability: Math.round(nationalStability),
+      passedCount: passedCount,
+      totalResolutions: (history || []).length,
+      totalRequested: totalRequested,
+      totalCollected: totalCollected,
+      collectionRate: totalRequested > 0 ? totalCollected / totalRequested : 0
+    };
+  }
+
+  window.ENGINE = {
+    clamp: clamp,
+    money: money,
+    seededRandom: seededRandom,
+    amountOwed: amountOwed,
+    botAttends: botAttends,
+    botVote: botVote,
+    botVoteScore: botVoteScore,
+    botDealReply: botDealReply,
+    botCompliance: botCompliance,
+    complianceExcuse: complianceExcuse,
+    DEAL_OPTIONS: DEAL_OPTIONS,
+    tally: tally,
+    TAG_LABELS: TAG_LABELS,
+    interestBreakdown: interestBreakdown,
+    stateInterestFromVote: stateInterestFromVote,
+    stateInterestFromCompliance: stateInterestFromCompliance,
+    nationalStabilityChange: nationalStabilityChange,
+    outcomeNarrative: outcomeNarrative,
+    narration: narration,
+    finalReport: finalReport
+  };
+})();
+
+</script>
+
+<script>
+/* Generated from us-atlas (US Census cartographic boundaries), projected with
+   d3-geo conic conformal. 1786 borders: Maine is part of Massachusetts and
+   West Virginia is part of Virginia. Vermont is drawn but was not a state.
+   Regenerate with tools/build-map.js. */
+window.AOC_MAP = {"viewBox":"10 64 910 822","width":910,"height":822,"states":{"New Hampshire":{"d":"M536.7,196.3L537,193.6L539,190.9L538.6,190.4L539.7,187.3L538.1,186L540.2,185.4L540.6,184.4L543.1,182.6L545,184.9L548.3,184.9L549.7,182L553.1,212.2L556.3,246.5L556.5,250L557.8,262.4L558.6,263.3L558,266.9L558.5,267.2L557.8,271.3L559,273.4L564.3,278.2L563.6,279.9L563.8,282.6L568.2,285.6L565,292.8L564.8,294.5L563.9,295.1L562,294L557.7,295.5L556.7,298.1L554.4,297.5L552.6,299L552.9,301.5L550.3,301.6L549.2,303.5L533.7,303.8L509.4,303.9L508.2,301.9L507.5,302.3L505.8,298.3L506.8,295.3L506.9,293.1L508.4,292.6L509.3,290.8L508.5,288.7L509.6,287.4L508.9,284.8L509.1,279.3L510.5,276.7L509.7,274.3L510.7,268.9L510,267.5L510.5,264.5L512.3,263.1L512.8,258.8L513.8,257L516,255.2L516.7,253.4L516.4,250.8L518.6,248.1L518.5,244.7L519.8,242.9L521.2,240L521.1,238.2L519.8,235.5L520.4,233.2L519.6,231.9L520.7,229.4L524.8,227.9L526,228.4L527.9,227.5L528.4,225.4L531.2,224.7L532.8,223L533.6,221.2L535.4,220.2L534.6,217.9L535.9,217.3L536,214.4L534.7,212.9L533.2,208.9L534.9,206.8L535.2,204.2L537.2,201.1L535.5,197.6L536.7,196.3Z","ax":533.4,"ay":273.4,"room":23,"neutral":false,"chipX":720,"chipY":114},"Massachusetts":{"d":"M587.8,365.7L589.5,366.6L593.1,366.1L595.3,365.3L596.6,362.4L598.9,366.5L598.8,367.7L597.6,368.4L593.5,368.5L588.2,366.4L587.8,365.7ZM568.3,364.9L570.6,364.7L572.8,361L576,358.4L577.4,359L578.4,361.7L580.3,362.7L581.5,361L581.6,364.3L576.5,364.6L572.6,365.2L570.5,367.2L568.3,364.9ZM482,304L509.4,303.9L533.7,303.8L549.2,303.5L550.3,301.6L552.9,301.5L552.6,299L554.4,297.5L556.7,298.1L557.7,295.5L562,294L563.9,295.1L564.8,294.5L565.2,297.4L566.6,302.7L569.8,304.4L571.2,302.7L573,303.9L571.2,307.6L568.4,308.1L563.9,309.7L565.4,311.6L563.3,313.7L562.5,313.4L562,315.8L561.4,314.2L560.2,316.4L561.7,319.3L560.1,318.9L559.5,320.1L560.6,321.1L560,322.2L561.7,322.6L562.4,321.2L564.1,320.8L565.3,322.6L568.3,323.5L569.9,325.1L570.3,326.9L573.1,330.5L573.1,332.4L572.3,334.1L570.8,334.3L571.2,335.3L574,337.1L575.4,336.7L576.5,337.6L577.7,340.9L577.2,342.9L578.9,344.7L581.8,345.9L586.1,346.1L587.2,347L589.5,345.1L591.8,344.6L595.1,343.1L595.7,342L595.4,338.9L594.5,336.5L593,337.9L592.7,334L592,331.9L590,330.6L588.9,331L588.4,332.6L586.9,330.3L588.5,329.8L591.1,330.3L594.1,332.5L596.7,337.2L598.1,341.8L598.7,347.3L597.2,352.5L597.1,354.3L596.2,354L597.4,349.4L596.4,348.6L593.2,349L588,350.9L584.2,350.8L583.4,352L581.3,352.4L579.6,355L575.6,355.6L571.5,358.5L569.6,360.5L567,361.8L564.2,362.5L564.9,361.4L569.2,359.8L571.1,357.9L573.9,355.7L574.5,354.1L573.9,349.5L574.6,347.8L571.3,347L571.4,349.3L570.5,348.8L570.2,350.8L568.4,350.8L568.7,352L564.9,352.7L564.2,354.7L564.5,356.4L563.8,357.6L560.8,358.7L559.2,358.1L558,358.7L557.2,351.3L555,350.7L553.9,349.1L552.5,347.2L550.1,346L549.4,343.8L549.5,340.6L548,340.9L547.7,335.1L533.4,336.3L533.2,335.6L508.3,336.1L505.6,336.4L500.4,336.3L500,337.9L498.3,338.2L498.4,336.4L491.7,336.5L477.1,336.4L475.3,336.5L474.5,334.8L478.2,319L482,304ZM638.6,229.4L639.1,226L640,227.3L642.4,229.3L640.8,231.3L640.1,230L638.6,229.4ZM623.9,232.8L624.8,231.1L627.6,229.1L629.1,231L628,231.4L630,234.3L628.8,236L626.7,236.7L625.1,235.8L625.7,234.8L625.1,232.8L623.9,232.8ZM622.7,226.4L624.1,223.6L624.1,221L625.1,219.9L625.9,220.9L624.9,222.4L625.2,223.8L624.4,226.7L623.3,227.9L622.7,226.4ZM568.2,285.6L563.8,282.6L563.6,279.9L564.3,278.2L559,273.4L557.8,271.3L558.5,267.2L558,266.9L558.6,263.3L557.8,262.4L556.5,250L556.3,246.5L553.1,212.2L549.7,182L552.1,181.3L552.1,180L555.1,181.5L555,183L556,184.7L557.3,185.2L558.6,181.7L558.7,178.3L557.9,177.2L559.2,175.7L560.2,175.7L561.7,177.4L564.2,177.6L564.2,176.1L561.2,172.9L561,171.6L563.3,167.2L564.9,166L566.1,164.2L567,164.2L568.7,162.5L571.4,160.8L570.1,158L572.4,155.2L575,153.2L575.4,151L574.5,149.9L572.9,150L572.7,147.4L573.8,145.8L572.8,145.3L574.5,143.1L574.9,141.2L573.1,139.6L574.6,134.9L575.5,134.1L575.3,132.6L577.2,131.2L578.6,128.7L579.9,128.3L581,115.2L603,77.8L604.5,77.8L607.7,79.1L608.9,78.9L608.7,81.2L609.3,86.9L609.8,87.6L614.2,90.2L616.9,88.2L619.8,86.8L623,86.4L624,84.3L627.4,83.5L630.3,83.8L630.1,81.3L631.8,80.2L634.7,80.2L637.4,81.4L638,82.7L642,85.1L646.5,90L646.6,90.6L650,92.3L651.9,114.1L654.8,141.8L654.9,144.6L656.1,145.7L654.5,147.5L656.4,150.1L654.7,151.6L655.3,157L658.1,157.5L658.4,156.7L659.7,158.8L662.1,159.8L665.6,160.3L667.2,159.4L668.4,161.8L668.7,164L667.1,163.9L665.9,164.9L667,167.5L669.1,169.8L668.3,172.8L667.3,174.6L670.5,179L670.5,179.9L672.8,181.3L674.2,180L674.2,178.2L676.4,179.1L678.6,179L680.4,181.1L681.3,183.1L680.4,183.7L681.7,184.9L683.5,188.7L685.4,190L686,194.7L684.8,196.8L683.6,196.8L683.2,198.2L679.9,203L677.2,204.3L677.7,205.1L676,205.6L676.5,203.9L675.7,200.5L672.7,202L674.3,204.2L673,206.1L671.7,205.7L670.4,208.1L668.8,207.6L667.6,208.1L668,209.5L670,210.9L667.6,213.4L665.9,211.7L665,209.5L663.5,210.1L663.3,211.6L662.3,211.6L661.3,209.3L660.7,211.9L659.6,212.5L659,215.6L658.1,214.9L657.5,216.8L656.9,215.2L654.7,217.5L654,216.4L652.9,220.2L650.9,218.8L650.7,217.4L649.6,218.3L648.3,218.1L648.8,220.7L647.1,223.7L648.5,224.9L644.4,225.9L641.6,224.8L639.3,220.7L639.9,219.5L642.4,218.2L641.2,216.5L639.8,218.1L639.9,216.3L638.7,216.5L639,219.2L638.4,219.2L638.2,216.7L635.6,219.2L636.3,220.5L635.7,222.3L637.6,224.8L637.4,226.6L634.9,229.9L636,230.3L634.7,231.6L636.2,233.7L635.8,236.5L633.9,237.1L633.3,233.7L634,233.5L633.4,231.4L631.3,229.7L630.6,227.2L632.2,225.1L629.8,223.6L630.5,222.5L629.2,222.2L627.2,223.3L626.9,218.7L628.1,216.9L628,214.9L627.2,214.4L626.5,216.3L624.9,218L623.5,216.8L622.8,218.1L621,218.4L622.9,221.5L622.7,223.5L621.4,224.5L620.4,227.4L620.1,230.3L618.8,233.6L621.2,234.6L619.7,235.8L621.1,238L620,239.6L616.8,239.7L615.4,242.7L613.6,242.8L613.6,245.2L612.3,245.6L612.1,243.5L612.9,242L611.7,241.5L611.5,242.7L610.1,243.3L610.5,240.7L608.3,241.2L608.6,243.3L606.8,244.9L606.3,246.9L604.8,245L604.6,246.9L602.9,248.3L601.4,247.4L601.2,250L599.5,248.1L598.2,251.9L595.5,253.1L595,253.9L594.2,250.7L592.2,250.6L590.5,252.4L590,254L587.6,254L586.9,256L584.5,256L583.4,258L583.2,260L583.9,261.1L583,262.5L581.3,261.4L578.8,262.8L577.8,264.7L578.7,267.3L577.8,269.1L576.6,269.8L577.1,271.1L575.5,272.1L573.7,272.1L572.6,273.1L571.5,277.1L572.2,277.8L570.6,281.1L570.8,282L569.3,285L568.2,285.6Z","ax":543.8,"ay":319,"room":15,"neutral":false,"chipX":720,"chipY":232},"Rhode Island":{"d":"M555,350.7L557.2,351.3L558,358.7L555.6,360.7L554.7,356.7L554.8,354.1L553.5,353.3L554.1,359.6L551.9,359.7L551.8,361.1L550.5,361.4L550.3,359.2L552.1,355.4L553,352.6L555,350.7ZM532.8,368.3L533.7,367.1L533.2,364L534.7,363.7L534.7,355.3L534.4,349.4L533.6,340.5L533.4,336.3L547.7,335.1L548,340.9L549.5,340.6L549.4,343.8L550.1,346L552.5,347.2L553.9,349.1L553.6,350.9L552,352.6L551.1,351L551.5,349.6L549.1,347.5L548,346L548.9,351.1L546.1,350.6L547.7,352L548,355L546.5,355.5L547.6,357.6L547.7,360.4L546.6,362.3L545.7,365.2L544.2,365.1L540.9,366L537.6,367.5L532.9,368.9L532.8,368.3Z","ax":541.3,"ay":343.6,"room":7,"neutral":false,"chipX":720,"chipY":351},"Connecticut":{"d":"M475.3,336.5L477.1,336.4L491.7,336.5L498.4,336.4L498.3,338.2L500,337.9L500.4,336.3L505.6,336.4L508.3,336.1L533.2,335.6L533.4,336.3L533.6,340.5L534.4,349.4L534.7,355.3L534.7,363.7L533.2,364L533.7,367.1L532.8,368.3L531.8,367.5L529.7,367.6L527.1,368.6L524.9,368.6L523.3,369.6L521.3,368.6L520.6,370.1L514.5,371.7L514.1,371L512.2,371L508.9,372.5L508.1,371.7L504.9,371.8L504,372.8L501.8,372L496.8,373.2L496.3,370.9L495.2,371.6L493,374.9L491.5,375L488.8,378L487.2,377.1L484.2,379.5L483.3,379L480.5,380.2L481.1,381.1L479.9,382.4L476.3,382.9L473.6,385.1L472.5,384.6L470.6,386L470.7,384.7L468.1,380.7L476.5,375.3L474,371.5L474.3,365.1L474.6,353.3L475.3,336.5Z","ax":507.8,"ay":354,"room":18,"neutral":false,"chipX":720,"chipY":469},"New York":{"d":"M456.5,401.3L457.2,404L456.1,405.6L451.3,408.8L450,408.8L450.3,406.8L451.4,406.2L451.9,402.8L456.5,401.3ZM259.6,324.8L263.7,322.9L270.4,318.7L274.1,315.2L277.9,313.4L281.1,312.5L282.5,309.7L284.2,308.4L284.7,306.3L289.2,304.2L291.6,302.1L291.2,298.9L289.7,297.3L290,295.6L289.2,294.1L286.4,292.6L286.7,288.9L284.5,288.3L285.7,285.2L285.2,280.2L284.9,279.7L288.3,278.9L293,277.4L299.8,275.7L304.7,275.1L308.7,275.1L313.3,275.6L317.7,275.4L328,277.3L330.8,278.1L332.6,280L335.4,281.9L336.8,282.3L341.7,280.4L345.9,280.4L351.2,280L353.7,280.8L356.5,280.9L358.2,279.9L361.8,279.1L364,277.6L365.1,277.5L367.5,274.4L371.1,271.8L372.3,271.5L374.6,269.4L376.3,269.2L378.7,269.8L380.8,269L381.9,266.9L382.1,263.4L381.1,256.3L378.7,254.7L380,252.7L381.7,252.2L381.9,253.5L384.4,251.9L384.1,250.2L381.8,248.3L379.2,248.9L379.8,247.7L378,245.7L376.2,245.7L376.3,242.5L378.2,237.9L380.5,237.7L383.3,236L383.3,234.1L385.4,233.2L388.6,231L389.7,231.2L391.6,230.1L394.6,227.1L395.1,225.2L396.5,223.2L401.4,218.3L405,214.3L411.6,208.6L411.5,208.2L419.5,203.7L422.6,201.2L424.7,201.2L427.3,199.7L430.5,200.8L432.7,200.4L443.5,200.5L449.7,200.4L462.4,199.6L465.2,199.5L476.2,198.8L476.4,203.2L475.6,204.4L475.2,207L476.8,209.2L475.7,211.4L475.6,215.1L475.2,216.4L475.7,219.1L478.1,222.6L478.6,225.3L477.3,228.6L478.3,233.1L477.8,234.5L475.6,237.1L475.1,240.7L474.3,243.9L475.4,244.9L475.4,249L476.6,251.7L476.1,254.3L477.6,256.5L475.8,260.4L475.1,265L476.3,266L477.1,263.3L479.4,263.3L479.7,265.4L481.3,266.5L481.5,280.2L481.3,297L481.3,300L480.9,301.4L482,304L478.2,319L474.5,334.8L475.3,336.5L474.6,353.3L474.3,365.1L474,371.5L476.5,375.3L468.1,380.7L470.7,384.7L470.6,386L469.8,387.7L467.2,389.4L467,392.6L465.4,392.5L466.6,394.9L468.7,391.4L470.1,391.9L471.3,390.2L474,389.1L476.2,389L476.7,387.6L479.5,388.7L479.7,387.1L480.8,388.2L483.4,388.4L485.7,389.3L488.5,388.1L488.7,386.4L490.8,386L492.1,386.4L501.5,386L506.4,385L508.1,384.2L511.8,381.6L512.8,379.9L514.3,379.4L515.9,377.3L518.5,376.4L520,376.4L517.8,378.5L516.7,378.8L518.6,380L519.3,381.7L521.5,382.1L522.8,381L524.9,383.8L526.8,383.1L529.6,381L529.8,379.9L531.9,379.4L533.4,379.8L532.8,380.6L524.6,384.8L515,390L508.8,392.8L498.7,396.8L492.2,400.1L486.8,401.9L483.4,402.5L482.6,402L474.6,404.6L466.9,404.4L461.2,406.7L461.5,405.2L458.6,405.3L459,404.3L457.5,402.8L458.4,401.4L457.3,400L458.1,399.1L458.5,396.5L460,393.9L462.3,386.4L461.9,385.6L445.2,376.2L434.1,369.5L432.4,367.3L432.5,366.1L430.6,366.4L430.2,365.6L427.1,365.7L427.3,365L425.4,363.7L424,363.9L423.9,362.6L420.7,358.1L421.7,357.6L421.4,351.3L419.7,350.5L420.6,349.2L419.4,347.3L416,345.9L414.2,346.1L413.1,342.1L412.5,342.3L410.8,340L397.5,340.1L376.6,340.1L362.9,339.8L349.9,339.8L319.9,339.3L299.2,338.7L289.7,338.6L259.2,337.4L259.6,324.8Z","ax":433.2,"ay":290.8,"room":48,"neutral":false},"New Jersey":{"d":"M404.4,449.8L406.2,447.2L407.3,445.9L407.9,443.5L409.5,441.8L411.6,440L416.5,439L419.6,437.2L419.6,434.4L421.6,433.4L422.5,432.1L426.8,429.2L429.1,428.5L430.6,426.5L431.9,426.8L434,425.2L432.2,422.4L429.6,420.8L428.7,418.8L426,416.6L425.1,414L421.9,413.2L421.4,411.4L421.6,407.7L420.3,406.2L418.2,406.4L417.1,405.9L416.8,402.6L417.6,401.4L416.6,400.5L417.7,396.5L419.1,396.7L422,392.2L418.9,387.4L420.5,385.5L422.8,384.3L424.7,382.1L424.2,381.1L426.3,379.7L427.7,377.7L429.4,372.8L432.1,370L434.1,369.5L445.2,376.2L461.9,385.6L462.3,386.4L460,393.9L458.5,396.5L458.1,399.1L457.3,400L456.5,401.3L451.9,402.8L451.4,406.2L450.3,406.8L450,408.8L450,410.5L452.4,411.6L454.4,410.9L457.5,412.5L459.3,412.9L459.7,411.1L460.3,414.7L460,418.9L458.4,426.2L457,436.1L456.5,443L451.6,452.7L450.2,454.6L449,455L449.4,456.2L448.2,458.5L445.7,461L445.6,461.8L441.6,464L437.6,468.4L434.9,473.1L432.2,479.1L429.6,481.5L427.2,482.1L425.7,481.5L426.5,478L428.4,474.1L428.7,471.4L426,470L423.7,469.8L422.9,468.8L420.6,469L419.7,470.4L418.5,469.5L418.2,467.6L415.9,466.2L415.5,465L414.2,465.5L412.3,462.8L411.4,463.1L409.1,460.8L407.8,458.6L405.3,457.6L406.1,452L404.5,450.9L404.4,449.8Z","ax":432.2,"ay":449.6,"room":17,"neutral":false,"chipX":720,"chipY":588},"Pennsylvania":{"d":"M232.9,337.2L239,335L244.7,332.3L245.8,331.4L247.2,329.1L248.8,329.1L249.1,330.2L253.7,327.5L259.6,324.8L259.1,337.3L289.7,338.6L299.2,338.7L319.9,339.3L349.9,339.8L362.9,339.8L376.6,340.1L397.5,340.1L410.8,340L412.5,342.3L413.1,342.1L414.2,346.1L416,345.9L419.4,347.3L420.6,349.2L419.7,350.5L421.4,351.3L421.7,357.6L420.7,358.1L423.9,362.6L424,363.9L425.4,363.7L427.3,365L427.1,365.7L430.2,365.6L430.6,366.4L432.5,366.1L432.4,367.3L434.1,369.5L432.1,370L429.4,372.8L427.7,377.7L426.3,379.7L424.2,381.1L424.7,382.1L422.8,384.3L420.5,385.5L418.9,387.4L422,392.2L419.1,396.7L417.7,396.5L416.6,400.5L417.6,401.4L416.8,402.6L417.1,405.9L418.2,406.4L420.3,406.2L421.6,407.7L421.4,411.4L421.9,413.2L425.1,414L426,416.6L428.7,418.8L429.6,420.8L432.2,422.4L434,425.2L431.9,426.8L430.6,426.5L429.1,428.5L426.8,429.2L422.5,432.1L421.6,433.4L419.6,434.4L419.6,437.2L416.5,439L411.6,440L409.5,441.8L406.5,440.3L403.7,440.1L400.6,440.9L398.7,442.3L396.2,445.5L368.4,445.5L353.4,445.4L334.1,445.2L303.9,444.4L264.9,443.2L243.6,442.3L227.7,441.6L229.9,399.1L232.9,337.2Z","ax":326.9,"ay":392.1,"room":53,"neutral":false},"Delaware":{"d":"M396.2,445.5L398.7,442.3L400.6,440.9L403.7,440.1L406.5,440.3L409.5,441.8L407.9,443.5L407.3,445.9L406.2,447.2L405.4,446.9L402.6,450.1L402.9,451.7L404.3,452.9L404.4,454.9L403.4,456L403.4,457.6L405.2,459.7L406.1,462L408.8,464.4L410.1,467.1L410.5,469.4L409.9,470.8L410.2,475.8L412.3,477.7L413.2,479.4L413.5,482.4L417.9,487.8L420,488.9L421.3,488L421.8,489.4L422.5,494.5L423.1,504.2L409.5,504.3L399.8,504L399.6,501.1L396.2,449L396.2,445.5Z","ax":409.1,"ay":493.2,"room":10,"neutral":false,"chipX":720,"chipY":825},"Maryland":{"d":"M388.9,527.5L387.1,527.5L386.9,524.6L388,523.5L389.4,525.1L388.9,527.5ZM385.2,519.5L385.5,516.4L386.9,515.8L387.9,517L388.5,521.7L386.5,520.9L387.1,519.8L385.2,519.5ZM264.9,443.2L303.9,444.4L334.1,445.2L353.4,445.4L368.4,445.5L396.2,445.5L396.2,449L399.6,501.1L399.8,504L409.5,504.3L423.1,504.2L423,505.9L421.9,510.1L421.2,510.7L418.7,519.1L416.4,523.9L402.4,525.5L401.6,527.7L400.8,527.6L399.1,526.4L396.6,526.5L393.8,529.1L392.6,529.1L392.4,526.5L393.4,523.7L395.6,522.6L393.4,522.5L393.6,520.7L395,519.1L392.3,518.7L390.7,520.1L390.2,518.9L390.9,516.6L394.3,515.6L393.5,514L392.3,514.5L391.8,513.1L393.7,508.6L391.8,509.6L390.9,511.5L390.9,513.9L389.8,513.9L388.4,510.8L389.8,510.5L389.7,508.4L388.6,508L388.1,509.9L386.9,511.2L387.7,512.3L386.6,514.8L386,513.6L383.8,514.5L382.6,514L380.6,510.7L379.4,510.2L379.6,508.5L376.5,502.5L379.1,501.9L379.8,500.4L378.8,500.7L377.6,498.6L378.6,497L380.2,496.2L381,497.2L382.5,496.1L382.7,497.6L385.5,497.9L387.2,499.5L387.7,499.1L385.7,496.3L383.4,495.8L382.4,494.1L381.5,494.2L379.4,491.2L378.8,492.3L377.2,491.5L377.1,493.8L376.2,493.5L376.6,489.5L378.9,485.8L380.7,487.6L381.8,487.2L381.4,482.3L380.4,481.6L378.2,483.5L376.6,483.3L376.7,485.2L375.2,485.9L375.7,481.8L377.8,477.8L378.7,479.8L381.4,480.2L382.8,479L382.1,476.9L383.5,474.7L381.4,475L381,477.1L381.5,478.3L380,477.6L380.4,475.1L379.6,472.8L378.7,472.2L380.8,466.8L382.3,465.2L382.1,464.2L383.9,463.2L384.8,461.7L388.6,462L387.2,461L389.5,458.2L388.3,458L389.8,453.1L385.3,454.1L384.5,456L386.1,457L386.6,458.2L385,458.8L380.7,462.6L379.8,461.4L380.7,459.3L379.7,458.1L379.7,459.9L378.5,461.9L379.5,463.3L378.6,465.1L377.9,461.3L375.9,460.7L376.7,464.8L375.7,464.5L374.9,466.2L376.4,467L373.7,468.8L372.8,469.9L371.1,469.6L370.9,468.5L368.1,466.7L368.4,468.5L369.6,469L369.8,470.7L373.3,472.8L373.5,475.5L372.9,476.5L374.6,478.4L371.6,480.2L372.5,481.7L372.1,483.3L370.9,483.1L370,485.3L370.8,487.4L368.6,489.7L369.7,491.7L369.4,493.8L370.2,496.7L369.9,500.3L370.8,502.9L373.7,506.1L374.7,508.5L373.5,510.3L371.7,510L372.9,511.7L374,510.8L375.1,511.4L374.2,513.3L374.7,515.2L377,518.8L376.3,519.7L377,523.6L375.8,522.8L374.4,520.5L373.3,520.3L372.7,517.8L371.6,518.1L371.4,520.4L370.5,518.9L369.4,519L368.8,517.1L367.2,515.3L364.2,514.4L359.7,514.2L358.7,509.1L357.6,508.5L357.1,509.8L358.4,512.5L358.1,513.4L355.2,511.6L355,510.3L353.3,509L351.8,504.5L349.2,506.2L344.8,508.4L343.3,507.3L342.5,502.7L343.9,499.4L345.9,497.2L348.5,496L347.9,495.6L347.8,493.8L348.7,492.8L351,491.8L351.2,488.4L355.9,483.8L351.2,479L348.4,481.8L347.3,480.3L344.7,480L343.7,479.3L343.8,477.4L340.5,475.7L336.1,475L335.4,473.5L334.1,472.9L334.3,470.6L335.4,469.9L336.4,468L333.4,466.2L332.7,464.4L330.8,464.4L328.7,463.4L327.1,463.5L325.8,462.9L326.6,460.4L326,458.7L324.8,458.2L325.1,456.9L322.7,455.2L321.2,452.4L323.3,451.9L323.3,450.4L321.5,450.5L319.4,449.6L317.1,450.3L316.1,448.7L313.9,446.7L310.9,445.8L307.2,449.2L304.8,448.2L303.6,449.7L301.8,449.2L303.2,450.5L301.6,450.4L302.4,452.4L300.6,453.9L297,453.6L296.1,452.9L293.9,452.8L291.4,451.4L291.2,450.4L289.5,449.6L291.2,449.1L289.6,448.6L284.5,454.8L283,456.9L279.5,455.3L278.1,455.2L276.3,458.1L272.2,460.4L270.9,463L269.3,462.9L264.9,466.8L263.6,467.1L264.9,443.2Z","ax":352.6,"ay":461.4,"room":16,"neutral":false,"chipX":720,"chipY":706},"Virginia":{"d":"M400.8,527.6L401.6,527.7L402.4,525.5L416.4,523.9L414.3,527.1L412.4,531L411.3,532.1L410.7,531.2L408.7,531.5L406.2,534.7L404.7,537.4L403.3,542.5L403.4,545L400.4,550.1L401.3,550.7L398.9,554.3L397.4,557.5L396.2,557.9L396.3,560.2L394.9,563.6L392.5,566.1L390.4,566.1L390.9,567.5L389.7,567.7L389.6,564.3L388.2,562.1L387.7,559.7L388,556.9L389.2,554.6L389.6,551L390.9,546.8L391.4,543.8L393.5,540.7L395.9,536.3L395.3,534.9L398.1,534.3L400.1,531.7L400.2,530.5L397.6,529.7L400.8,527.6ZM149.6,497.1L151.9,498L156.6,496.8L159.6,496.5L160.4,494.6L161,490.8L162.7,489.8L164.7,490.2L165.6,489L165.5,485L164.5,480.8L167.3,478.9L167.5,476.2L169.5,472.8L171.1,471.9L172,470.5L173.6,472.2L175,472.3L176.3,475.5L175.2,477.1L176.6,477.9L177.8,477.1L178.3,475.5L179.5,474.8L180.6,475.8L181.4,471.5L180.2,470.2L179.9,468.5L182.4,467.9L182.3,464.1L183.4,462.5L184.7,462.1L185.2,460L189.2,460.5L189.8,457.2L193.2,454.4L195.3,455.3L195.9,457.4L197.4,457.3L200.2,455.6L202.4,455.4L203.9,453.4L205.3,453.1L206.5,451.3L208.6,449.1L212.7,445.8L214.7,445.6L215.4,442.3L216.8,441.3L215.5,439.3L217.1,437.5L217.2,435.2L218.5,434.3L218.1,431.9L219.8,432.5L219.6,430.4L220.6,429.6L220.8,424.8L222,423.6L222.1,421.3L223.5,419.5L224.3,417.1L225.6,416.3L226.3,413.7L226.2,409.9L226.8,407.1L225.8,403.7L224.5,401.9L225.8,400L227.5,400.1L229.9,399.1L227.7,441.6L243.6,442.3L264.9,443.2L263.6,467.1L264.9,466.8L269.3,462.9L270.9,463L272.2,460.4L276.3,458.1L278.1,455.2L279.5,455.3L283,456.9L284.5,454.8L289.6,448.6L291.2,449.1L289.5,449.6L291.2,450.4L291.4,451.4L293.9,452.8L296.1,452.9L297,453.6L300.6,453.9L302.4,452.4L301.6,450.4L303.2,450.5L301.8,449.2L303.6,449.7L304.8,448.2L307.2,449.2L310.9,445.8L313.9,446.7L316.1,448.7L317.1,450.3L319.4,449.6L321.5,450.5L323.3,450.4L323.3,451.9L321.2,452.4L322.7,455.2L325.1,456.9L324.8,458.2L326,458.7L326.6,460.4L325.8,462.9L327.1,463.5L328.7,463.4L330.8,464.4L332.7,464.4L333.4,466.2L336.4,468L335.4,469.9L334.3,470.6L334.1,472.9L335.4,473.5L336.1,475L340.5,475.7L343.8,477.4L343.7,479.3L344.7,480L347.3,480.3L348.4,481.8L351.2,484.7L351.2,488.4L351,491.8L348.7,492.8L347.8,493.8L347.9,495.6L345.3,496.4L343.6,495.6L343.6,497.6L341.2,502.1L340.6,504.2L340.8,507.2L342.7,509.6L346.5,509L347.3,508L349.3,508L350.9,506.5L352,507.7L351.2,510.7L353.7,513.2L353.6,515.2L358.2,517.6L361.5,517.7L362.4,518.8L363.2,518L366.3,518.4L366.8,520.1L368.9,521.7L369.9,524L371.6,524.6L373.6,526.8L376.2,527.7L380.1,530.4L379.4,533L377.5,534L377.2,538.2L377.7,539.4L376.3,541.2L378,542.1L375.5,543.3L371.4,540.7L369.9,541.8L369,540.8L369,539.2L367.4,535.9L364.9,534.7L363.8,533.3L362.3,532.8L359.5,528.6L358.1,528.2L357.6,526.4L355.9,525.2L355.6,526.4L359.3,530L361.8,534.5L363.8,535.5L363.9,536.5L366,537.1L367.3,540.9L368.8,543L372.7,543.2L373.6,544.6L377.7,545.6L375.9,546.7L375.7,548.2L377.4,548.5L378,547.7L379,549.3L379.7,553.7L378.6,557.2L376.2,554.7L373.5,552.9L372.3,554.6L373.7,556.2L374.6,558.3L375.8,558.9L372.9,559.9L370.5,560L371.3,561.6L374.2,561.1L373.9,564.2L375.8,563.7L376.3,564.9L377.9,565.7L378.7,567.7L377.5,571.5L377,570.9L374.8,571.6L372.8,573L371.5,570.3L367.7,567.8L365.8,566L366.4,564.1L364.7,561.3L361.8,561.6L360.7,562.6L359.4,560.8L357,560.3L356.5,559.4L353.7,560.7L355.1,562.1L356.7,561.8L359.1,562.3L361.1,564.5L362.3,564.6L363.3,562.3L364.4,567L364.5,569.7L367.4,570.5L370.7,573.8L370.8,576.4L374.4,576.2L375.6,575.2L375.7,576.5L376.9,576.9L376.5,573.5L378.8,573.3L380.5,574.4L385.2,575.9L387.4,574.8L388.9,575.2L390,580.3L391.6,585.9L392.8,588.7L393.7,592.5L374.7,592.4L358.7,592.3L354.6,592.2L354.6,592.6L340.4,592.4L305.1,591.7L295.2,591.6L257.9,590.4L235.2,589.3L228.8,589L213.7,587.4L208.7,587.3L196.1,586L188.8,585.4L177.6,584.1L178.7,583.1L168.5,582.2L168,583.2L147.9,581.8L139.8,581.3L118.9,579.6L118.2,579.4L107.8,578.6L103.4,578.1L104.6,577.1L109.1,575.5L111.9,575.8L117.3,574.2L121.8,573.1L123.9,573.1L124.3,571.2L126.7,568.2L130.6,568.3L134,567.1L134.9,565.4L134.7,563L136.4,561.8L138,561.9L140.2,560.5L140.5,557.1L143.9,555.5L146.6,553.8L149.6,552.3L154.6,551.1L169.7,539.5L167.8,539.6L164.2,538.1L163.9,536.6L162.9,536.5L162.1,534.9L160.9,534.9L160.1,533.1L158.1,532.6L156.8,527.1L155.5,526.3L154,523.7L154.2,522.4L152.3,521.5L151.4,519.9L153,517.8L151.1,516.8L150.1,513.5L149,511.6L147.1,510L147.2,508.5L148.3,508.6L148.8,506.5L148.4,505.6L149.9,504.4L150.2,502.1L149.2,500.6L149.6,497.1Z","ax":231.8,"ay":521.9,"room":63,"neutral":false},"North Carolina":{"d":"M399,620.9L401.4,621.7L403.1,624.6L403.2,626.5L401.2,626.1L401.5,624.3L399,620.9ZM388.2,661.2L389.3,658.8L390.4,658.8L396.8,655.4L398.8,654.9L400.7,653.5L402.4,653.5L404.6,652.1L406.3,651.7L407,648.7L408.4,638.6L408.4,636.5L407.3,632.7L406.5,628.5L406.9,628.6L408.4,632.8L409.1,636.6L408.7,642L406.7,653.4L403.5,653.8L396.7,656.4L390.8,659.5L388.2,661.2ZM177.6,584.1L188.8,585.4L196.1,586L208.7,587.3L213.7,587.4L228.8,589L235.2,589.3L257.9,590.4L295.2,591.6L305.1,591.7L340.4,592.4L354.6,592.6L354.6,592.2L358.7,592.3L374.7,592.4L393.7,592.5L394,594.8L396.3,604.5L398.4,610.8L401.6,617L406.3,627.8L405.1,627.2L402.7,621.4L400.8,618.2L399,617.8L397.8,610.9L395.6,604.7L394.5,603.8L394.9,602.2L394.3,598.7L392.9,597.5L392.4,595.6L389,595.1L388.9,593.5L387.2,594.3L388,596.7L390.1,598.6L391.6,598.2L391.6,600.9L393.6,606.3L394.8,608.7L394.7,609.7L396.2,612.7L396.2,614.6L393.6,612L393.7,610.6L392,608.1L391.6,606.6L390,606.2L390.8,607.7L390.4,608.8L392.3,610.3L388.1,609.3L383.8,604.6L381.8,604.2L384.3,608L385.7,608.7L386.5,610.8L385.3,611.7L382.1,612.2L379.2,609.4L380.2,611.9L381.5,613L380.6,613.6L376.4,611.7L374.7,611.5L374,610.4L371.6,609.4L374.7,612.3L377.5,613.3L376.5,614L373.3,614.3L371.5,616.8L369.4,617.6L367.1,617.6L366,616.4L363.3,615.9L361.8,611L361.8,608.6L363.4,605.5L362.7,605L360.8,608L360.6,611L361.6,614.8L363.1,617.8L362.4,619.5L363.4,620.9L368.8,620.5L373.8,618.7L375,620.6L376.8,620.4L378.5,619.2L382,618.3L386.3,618.3L388.2,619.9L388.2,621.6L386.3,624.8L386.7,626.9L387,633.5L388.2,633.3L389.2,628.7L389.6,622.7L391.5,621.1L390.7,619.8L392.5,619L395.9,619.8L398.1,623.6L399,626.2L398.5,628.2L399.5,632.2L398.4,633.1L398.9,635.3L397.2,637.5L394.9,637.9L394.1,637.1L392.7,637.8L391.9,639.4L390.5,639.7L390.1,641.5L389.2,641.9L388.2,644.7L386.5,645.3L386.1,647.2L383.7,648.1L383.3,649.1L379.8,648.1L375.9,648.2L372.3,647.5L371.7,646.5L370.3,647.1L368.3,645.3L366.5,640.7L370.7,640.6L371.4,638.8L367.6,639.8L366,639.3L364.8,640.6L366,642.9L366.8,646.3L365.8,646.3L361.9,644.4L360,644.8L357.3,643.4L353.1,642.2L350,640.2L349.9,641.4L352.1,643.8L355,644.1L363.5,648.2L369.7,649.4L370.8,650.6L371,652.2L370,654.4L368.2,656.6L368.3,657.7L367.1,659.8L365,661.5L358.2,665.9L351.4,661.3L351.5,663.9L354.8,666.2L359.7,667.9L364.6,664.8L366.4,664.7L370.1,663.5L370.6,661.1L372.1,661.6L372.5,664.3L373.6,665.5L376.1,665.7L374.9,662.7L377.6,663.9L377.8,667.3L375.5,670.3L373,670.8L373,672.1L371.5,672.9L369.6,676.2L368.6,679.1L366.3,678.3L366.5,675.1L365.1,674.3L365.2,677.6L363,677.8L368.8,680.4L371.9,675.5L376.5,670.8L379.8,667.8L386.2,660.8L387.3,661.6L383.5,664.9L379.9,668.8L376.9,671.2L374,674.3L371.5,677.6L368.6,682.1L368.2,683.4L367.7,680.7L362.9,678.5L357.5,678.4L349.3,679.9L345.3,681.1L342.5,682.4L338.1,685.5L332.7,688.5L329.1,690.9L323.9,695.3L321.9,697.5L318.4,702.5L316.4,706.9L314.9,711.4L313.6,714.1L313,716.8L311.2,716.5L310.8,715.2L307.9,714.2L304.7,713.8L300.8,713.8L296.7,714.2L291.8,715.7L290.7,716.4L278.2,702.8L264.4,687.9L260.3,683.1L248.7,670.6L240.3,670.2L230.2,669.5L205.9,667.9L206.8,662.5L201.5,654.3L197.2,657L196.6,656.1L197.6,654.3L197.5,652.1L190,651.2L175.8,649.7L150.3,646.9L147.2,647.5L146.6,645.9L144.8,647.8L143.9,647.4L141.1,648.3L140.3,648L136.2,649.6L132.2,651.7L131.3,650.8L118.7,653.8L99.2,652.6L72.7,650.4L74.9,639.6L78,638L78.3,639L82.2,639.2L85.4,637L84.9,634.7L86.2,633.8L85.8,632L88.3,629.7L90.1,629.3L91.4,627.5L93.6,627.3L95.7,625.7L106.6,626.4L108.2,624.5L111.3,623.5L112,622.5L113.4,622.9L115.7,621.1L116.3,619.8L118.5,619.8L119.7,618.3L122.6,617.4L125.8,618.3L129.6,614L129.4,611.5L130.9,610.4L132.8,612L135.7,608.3L140.4,605.9L141.6,607.5L140.7,610.3L142.7,611.2L146.6,609L148.9,605.5L151,604.2L153.3,603.5L154.9,603.9L156.2,602.6L158.8,603.3L159.2,605.3L161.2,605.4L163.1,604.4L168.1,596.8L171,594.9L172.5,594.5L173.5,595.5L175.8,595.6L174.6,592.6L175.7,590.1L176.6,589.6L176.2,586.4L177.6,584.1Z","ax":297.2,"ay":642.8,"room":51,"neutral":false},"South Carolina":{"d":"M118.7,653.8L131.3,650.8L132.2,651.7L136.2,649.6L140.3,648L141.1,648.3L143.9,647.4L144.8,647.8L146.6,645.9L147.2,647.5L150.3,646.9L175.8,649.7L190,651.2L197.5,652.1L197.6,654.3L196.6,656.1L197.2,657L201.5,654.3L206.8,662.5L205.9,667.9L230.2,669.5L240.3,670.2L248.7,670.6L260.3,683.1L264.4,687.9L278.2,702.8L290.7,716.4L288.9,716.6L283.8,718.5L280,721L275,725.7L272.4,728.8L271.3,730.6L269,732.8L266.9,736.5L264.9,743.3L265.2,745.6L264.2,747.4L262.2,749.2L258.9,750.8L257.5,754.6L255.1,754.1L252.7,754.7L251.2,753L248.9,754.3L247.4,756.7L247.8,758L249,757.6L248.9,759L246.8,759.7L244.2,761.4L242.8,763.4L237.9,765.6L236.6,764L235.1,764.2L234.9,765.5L237.2,766.4L236.4,768.8L232.8,770.7L231.7,772.3L230.3,772L226.9,772.7L224.4,775L223.6,774.2L218.4,777.6L217.3,776.7L215.1,777.7L214.9,776.5L213.1,776.4L212.4,778.1L214.4,781.5L213.2,784.4L208.6,786.7L205.9,787.3L205.7,785.7L203.1,783.9L201.5,784.7L201.1,786L202.8,786.7L204.6,789.1L202.4,791.6L198.7,793.8L197.4,793.7L194.9,796.3L195.6,797.1L194.3,796.9L191.3,793.9L189.7,794.5L186.8,793L186.3,790.5L186.9,789.4L185.5,786.7L187,785L186.3,781.9L185.7,782L183.9,777.7L184.5,776.4L181.5,773L181.5,772.1L178.1,770.8L176.5,768.8L177.3,767.2L176.8,765.2L176,764.9L176.8,763.1L176.3,761.8L176.5,758.4L175.3,757.7L175.2,755.8L173.6,753.1L174.5,750.5L171.9,748.6L169.8,746.1L168.6,746.1L164.9,743.7L163.9,741.8L164.3,740.2L162.8,740.3L161.1,738.5L161.7,737.3L158,733.8L158.7,732.6L158.2,731L159.3,729.3L158.8,728.3L156.8,727.2L154.5,723.3L152.3,721.7L150.6,721.5L148.9,719.8L148.9,718.2L147.7,716.5L147.4,714L143.6,709.8L139.8,707.5L137.3,704.4L136.1,704.3L134.9,700.2L133.1,698.1L132.2,695.4L130.6,694.3L129.8,691.5L130,689.5L128.6,687.3L128.4,685.3L126.8,684L126.6,681.4L125.7,678.8L124.6,678.2L120.7,678.5L117.7,676.3L114.9,671.9L112.6,671.4L108.8,667.8L108.6,665.2L109.7,664.3L109.7,662.9L113.6,659L118,656.6L118.7,653.8Z","ax":210.2,"ay":718.6,"room":48,"neutral":false},"Georgia":{"d":"M24,645.8L29.3,646.4L47.8,648.1L72.7,650.4L99.3,652.8L118.7,653.8L118,656.6L113.6,659L109.7,662.9L109.7,664.3L108.6,665.2L108.8,667.8L112.6,671.4L114.9,671.9L117.7,676.3L120.7,678.5L124.6,678.2L125.7,678.8L126.6,681.4L126.8,684L128.4,685.3L128.6,687.3L130,689.5L129.8,691.5L130.6,694.3L132.2,695.4L133.1,698.1L134.9,700.2L136.1,704.3L137.3,704.4L139.8,707.5L143.6,709.8L147.4,714L147.7,716.5L148.9,718.2L148.9,719.8L150.6,721.5L152.3,721.7L154.5,723.3L156.8,727.2L158.8,728.3L159.3,729.3L158.2,731L158.7,732.6L158,733.8L161.7,737.3L161.1,738.5L162.8,740.3L164.3,740.2L163.9,741.8L164.9,743.7L168.6,746.1L169.8,746.1L171.9,748.6L174.5,750.5L173.6,753.1L175.2,755.8L175.3,757.7L176.5,758.4L176.3,761.8L176.8,763.1L176,764.9L176.8,765.2L177.3,767.2L176.5,768.8L178.1,770.8L181.5,772.1L181.5,773L184.5,776.4L183.9,777.7L185.7,782L186.3,781.9L187,785L185.5,786.7L186.9,789.4L186.3,790.5L186.8,793L189.7,794.5L191.3,793.9L194.3,796.9L195.6,797.1L197.2,797.7L196.4,800.2L194.3,801.3L192.9,800.6L192,802.5L193.4,802.9L191,805.2L188.1,804.1L187.5,806.3L189,806.8L187.6,809.1L185.1,811.1L182.7,810.5L182.2,811.1L183.9,812.5L185,812.4L184.7,815.7L183.6,818.2L179.5,819L179.4,819.9L181.9,819.6L182.7,820.6L179.1,825.7L178,829.3L179,829.8L178.2,831L177.3,834.9L175.4,835.6L174.1,837.9L172.8,838L172.6,840.8L171.5,843.5L170.5,843.4L168.6,845L170.4,846.1L172.1,845.2L172,848.5L169.3,854.8L169.9,857.7L168.1,856.8L166,857.3L163.6,856.4L158.9,855.3L157.9,854.3L155.4,853L153,852.7L152.1,851.3L149.9,850.9L148.5,853.2L146.8,852.7L147.3,853.7L146.1,854.3L146.1,856.3L145.4,858.7L146.9,862.4L146.1,867.2L145.1,869L144.9,872L139.5,872.2L138.1,869L138.8,866.2L137.8,865.1L137.7,862.8L138.5,862.3L119.1,859.5L89.6,855.2L52.2,849.6L32.7,846.8L30.9,844.7L30.3,841.6L30.4,838.2L29,836L28.5,832.7L28.4,830.3L27.7,827.6L25.2,823.7L25.8,821.6L25.3,819.5L26.4,818.7L26.6,815.6L28,812.5L27.9,810.7L29.1,808.6L29.2,803.7L26.8,800L27.3,798.3L27,793.2L27.6,791.5L29.8,788.8L31.2,785.5L31.8,782.1L31.6,779.8L33.6,777.9L35.7,777.3L35.5,776.3L37,776.4L38.7,774.5L37.1,772.7L34.7,771.4L36.6,766.9L35.5,765.3L35.4,762L33.2,759L32.1,756L32,750L30.4,748L31.1,746.6L30,745.2L28.3,716.4L27.5,703.8L26.9,692L26,676.7L24.7,658.7L24,645.8Z","ax":107.3,"ay":780.8,"room":68,"neutral":false},"Vermont":{"d":"M476.2,198.8L484.6,198.4L498.1,197.9L502.9,198.1L510.2,198L516.9,197.7L536.7,196.3L535.5,197.6L537.2,201.1L535.2,204.2L534.9,206.8L533.2,208.9L534.7,212.9L536,214.4L535.9,217.3L534.6,217.9L535.4,220.2L533.6,221.2L532.8,223L531.2,224.7L528.4,225.4L527.9,227.5L526,228.4L524.8,227.9L520.7,229.4L519.6,231.9L520.4,233.2L519.8,235.5L521.1,238.2L521.2,240L519.8,242.9L518.5,244.7L518.6,248.1L516.4,250.8L516.7,253.4L516,255.2L513.8,257L512.8,258.8L512.3,263.1L510.5,264.5L510,267.5L510.7,268.9L509.7,274.3L510.5,276.7L509.1,279.3L508.9,284.8L509.6,287.4L508.5,288.7L509.3,290.8L508.4,292.6L506.9,293.1L506.8,295.3L505.8,298.3L507.5,302.3L508.2,301.9L509.4,303.9L482,304L480.9,301.4L481.3,300L481.3,297L481.5,280.2L481.3,266.5L479.7,265.4L479.4,263.3L477.1,263.3L476.3,266L475.1,265L475.8,260.4L477.6,256.5L476.1,254.3L476.6,251.7L475.4,249L475.4,244.9L474.3,243.9L475.1,240.7L475.6,237.1L477.8,234.5L478.3,233.1L477.3,228.6L478.6,225.3L478.1,222.6L475.7,219.1L475.2,216.4L475.6,215.1L475.7,211.4L476.8,209.2L475.2,207L475.6,204.4L476.4,203.2L476.2,198.8Z","ax":499.7,"ay":223.2,"room":21,"neutral":true}}};
+
+</script>
+
+<script>
+/* =========================================================================
+   THE CONFEDERATION PROBLEM — the map board
+   Draws the thirteen states and reveals a vote across them one at a time.
+   Used by the teacher's projector view and by solo mode.
+   ========================================================================= */
+(function () {
+  "use strict";
+  var M = window.AOC_MAP, D = window.AOC;
+
+  var ABBR = {};
+  D.STATES.forEach(function (s) { ABBR[s.name] = s.abbr; });
+
+  var VOTE_CLASS = { Yes: "v-yes", No: "v-no", Abstain: "v-abstain" };
+  var PAY_CLASS  = { full: "p-full", half: "p-half", none: "p-none" };
+  var PAY_LABEL  = { full: "PAID", half: "HALF", none: "NOTHING" };
+
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+
+  /* ------------------------------------------------------------- markup */
+  function build(container) {
+    var svg = '<svg class="aoc-map" viewBox="' + (M.viewBox || ("0 0 " + M.width + " " + M.height)) +
+              '" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Map of the thirteen states">';
+
+    svg += '<defs>' +
+      '<pattern id="hatch" width="8" height="8" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">' +
+        '<rect width="8" height="8" fill="#c8912f"/>' +
+        '<line x1="0" y1="0" x2="0" y2="8" stroke="#8f6413" stroke-width="4"/>' +
+      '</pattern>' +
+      '<filter id="mapshadow" x="-8%" y="-8%" width="120%" height="120%">' +
+        '<feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000" flood-opacity=".28"/>' +
+      '</filter>' +
+    '</defs>';
+
+    // Leader lines first so shapes and chips sit on top.
+    svg += '<g class="leaders">';
+    Object.keys(M.states).forEach(function (name) {
+      var s = M.states[name];
+      if (!s.chipX) return;
+      svg += '<line class="leader" data-state="' + esc(name) + '" x1="' + s.ax + '" y1="' + s.ay +
+             '" x2="' + (s.chipX - 6) + '" y2="' + s.chipY + '"/>';
+    });
+    svg += '</g>';
+
+    svg += '<g class="shapes" filter="url(#mapshadow)">';
+    Object.keys(M.states).forEach(function (name) {
+      var s = M.states[name];
+      svg += '<g class="st' + (s.neutral ? " neutral" : "") + '" data-state="' + esc(name) + '">' +
+               '<path class="shape" d="' + s.d + '"/>' +
+             '</g>';
+    });
+    svg += '</g>';
+
+    // Labels for the roomy states go inside the shape.
+    svg += '<g class="inlabels">';
+    Object.keys(M.states).forEach(function (name) {
+      var s = M.states[name];
+      if (s.chipX) return;
+      if (s.neutral) {
+        svg += '<g class="inlabel neutral" data-state="' + esc(name) + '">' +
+               '<text class="ab" x="' + s.ax + '" y="' + (s.ay - 2) + '">VT</text>' +
+               '<text class="sub" x="' + s.ax + '" y="' + (s.ay + 16) + '">not a state</text></g>';
+        return;
+      }
+      svg += '<g class="inlabel" data-state="' + esc(name) + '">' +
+             '<text class="ab" x="' + s.ax + '" y="' + s.ay + '">' + ABBR[name] + '</text>' +
+             '<text class="vt" x="' + s.ax + '" y="' + (s.ay + 27) + '"></text></g>';
+    });
+    svg += '</g>';
+
+    // Cramped states get a chip out in the Atlantic.
+    svg += '<g class="chips">';
+    Object.keys(M.states).forEach(function (name) {
+      var s = M.states[name];
+      if (!s.chipX) return;
+      svg += '<g class="chip" data-state="' + esc(name) + '" transform="translate(' + s.chipX + ',' + s.chipY + ')">' +
+               '<rect class="chipbg" x="0" y="-27" rx="8" width="186" height="54"/>' +
+               '<text class="ab" x="13" y="8">' + ABBR[name] + '</text>' +
+               '<text class="nm" x="60" y="-3">' + esc(name) + '</text>' +
+               '<text class="vt" x="60" y="17"></text>' +
+             '</g>';
+    });
+    svg += '</g>';
+
+    svg += '</svg>';
+    container.innerHTML = svg;
+    return container.querySelector(".aoc-map");
+  }
+
+  /* ------------------------------------------------------------- update */
+  function paint(root, rows, mode) {
+    rows.forEach(function (r) {
+      var sel = '[data-state="' + r.name.replace(/"/g, '\\"') + '"]';
+      var nodes = root.querySelectorAll(sel);
+      var cls = "st";
+      var label = "";
+
+      if (r.absent) {
+        cls += " absent"; label = "NO DELEGATE";
+      } else if (mode === "payment" && r.payment) {
+        cls += " " + PAY_CLASS[r.payment]; label = PAY_LABEL[r.payment];
+      } else if (mode === "votes" && r.vote) {
+        cls += " " + VOTE_CLASS[r.vote]; label = r.vote.toUpperCase();
+      } else if (mode === "voting") {
+        if (r.vote) { cls += " sealed"; label = "VOTE SEALED"; }
+        else { cls += " pending"; label = r.isBot ? "" : "WAITING"; }
+      }
+      if (r.isYou) cls += " you";
+      if (r.isBot) cls += " bot";
+
+      for (var i = 0; i < nodes.length; i++) {
+        var n = nodes[i];
+        if (n.classList.contains("leader")) continue;
+        // keep the element's own base class, swap the state classes
+        var base = n.classList.contains("chip") ? "chip"
+                 : (n.classList.contains("inlabel") ? "inlabel" : "st");
+        n.setAttribute("class", base + " " + cls.replace(/^st\s*/, ""));
+        var vt = n.querySelector(".vt");
+        if (vt) vt.textContent = label;
+      }
+    });
+  }
+
+  /* --------------------------------------------------------- the reveal
+     Votes land one state at a time so the room can react. Order runs
+     north to south, which is also roughly the order the clerk called
+     the roll in the Confederation Congress.                              */
+  var ROLL_ORDER = ["New Hampshire","Massachusetts","Rhode Island","Connecticut","New York",
+                    "New Jersey","Pennsylvania","Delaware","Maryland","Virginia",
+                    "North Carolina","South Carolina","Georgia"];
+
+  var timers = [];
+  function clearTimers() { timers.forEach(clearTimeout); timers = []; }
+
+  function revealVotes(root, rows, opts) {
+    opts = opts || {};
+    var mode = opts.mode || "votes";
+    var step = opts.step || 420;
+    var onTick = opts.onTick || function () {};
+    var onDone = opts.onDone || function () {};
+    clearTimers();
+
+    var byName = {};
+    rows.forEach(function (r) { byName[r.name] = r; });
+    var order = ROLL_ORDER.filter(function (n) { return byName[n]; });
+
+    // start blank
+    paint(root, rows.map(function (r) {
+      return { name: r.name, isBot: r.isBot, isYou: r.isYou, absent: false };
+    }), "blank");
+
+    var yes = 0, no = 0, ab = 0, absent = 0;
+    order.forEach(function (name, i) {
+      timers.push(setTimeout(function () {
+        var r = byName[name];
+        paint(root, [r], mode);
+        var nodes = root.querySelectorAll('[data-state="' + name.replace(/"/g,'\\"') + '"]');
+        for (var k = 0; k < nodes.length; k++) {
+          if (nodes[k].classList.contains("leader")) continue;
+          nodes[k].classList.add("landing");
+          (function (el) { setTimeout(function () { el.classList.remove("landing"); }, 620); })(nodes[k]);
+        }
+        if (r.absent) absent++;
+        else if (r.vote === "Yes") yes++;
+        else if (r.vote === "No") no++;
+        else ab++;
+        onTick({ name: name, row: r, yes: yes, no: no, abstain: ab, absent: absent,
+                 index: i + 1, total: order.length });
+        if (i === order.length - 1) timers.push(setTimeout(function () { onDone({ yes: yes, no: no, abstain: ab }); }, step));
+      }, i * step));
+    });
+    return function cancel() { clearTimers(); };
+  }
+
+  window.AOCMAP = {
+    build: build,
+    paint: paint,
+    revealVotes: revealVotes,
+    cancel: clearTimers,
+    ROLL_ORDER: ROLL_ORDER
+  };
+})();
+
+</script>
+
+<script>
+/* =========================================================================
+   THE CONFEDERATION PROBLEM — end-of-game debrief
+   Shared by teacher.html, student.html and solo.html.
+   ========================================================================= */
+(function () {
+  "use strict";
+  var D = window.AOC, E = window.ENGINE;
+
+  function tier(stab) {
+    if (stab >= 55) return {
+      label: "Holding together — barely",
+      color: "#1d5233",
+      text: "You did better than the real Confederation Congress ever managed. The country is still standing, but it took constant deal-making to get there, and nothing you passed could actually be enforced."
+    };
+    if (stab >= 30) return {
+      label: "Falling apart",
+      color: "#8f6413",
+      text: "This is roughly where the real United States stood in 1786. Congress could meet, argue, and vote. It could not make anyone do anything."
+    };
+    return {
+      label: "Collapse",
+      color: "#8a2019",
+      text: "The national government has stopped functioning. Debts are unpaid, trade has broken down, and armed men are shutting down courts. Every state protected itself, and there is no longer a country worth protecting."
+    };
+  }
+
+  function render(container, G, states, opts) {
+    opts = opts || {};
+    var stab = Math.round(G.stability);
+    var t = tier(stab);
+    var hist = G.history || [];
+
+    var enriched = states.map(function (s) {
+      var d = D.byName(s.name) || {};
+      return {
+        name: s.name, abbr: s.abbr || d.abbr, isBot: s.isBot,
+        players: s.players || [], interest: s.interest || 50,
+        treasuryNow: s.treasuryNow !== undefined ? s.treasuryNow : d.treasury
+      };
+    });
+    var rep = E.finalReport(enriched, stab, hist);
+
+    var totalAsked = 0, totalGot = 0;
+    hist.forEach(function (h) { totalAsked += h.requested || 0; totalGot += h.collected || 0; });
+    var rate = totalAsked > 0 ? Math.round(totalGot / totalAsked * 100) : null;
+    var passedCount = hist.filter(function (h) { return h.passed; }).length;
+
+    var html = "";
+
+    /* ---- headline ---- */
+    html +=
+      '<div class="card center">' +
+        '<div class="eyebrow">The simulation is over</div>' +
+        '<h1 style="color:' + t.color + '">' + t.label + '</h1>' +
+        '<p class="lede" style="max-width:760px;margin:0 auto 14px">' + t.text + '</p>' +
+        '<div class="grid g3" style="max-width:760px;margin:0 auto">' +
+          '<div class="stat"><div class="k">Final stability</div><div class="v">' + stab + ' / 100</div></div>' +
+          '<div class="stat"><div class="k">Resolutions passed</div><div class="v">' + passedCount + ' of ' + hist.length + '</div></div>' +
+          '<div class="stat"><div class="k">Money actually collected</div><div class="v">' +
+            (rate === null ? "—" : rate + "%") + '</div></div>' +
+        '</div>' +
+      '</div>';
+
+    /* ---- THE central point ---- */
+    if (totalAsked > 0) {
+      html +=
+        '<div class="card">' +
+          '<div class="eyebrow">The whole problem, in two numbers</div>' +
+          '<div class="grid g2" style="align-items:center">' +
+            '<div>' +
+              '<div style="font-size:2.6rem;font-weight:700;line-height:1.1">Congress asked for<br>' +
+                '<span style="color:#8a2019">' + E.money(totalAsked) + '</span></div>' +
+              '<div style="font-size:2.6rem;font-weight:700;line-height:1.1;margin-top:10px">Congress received<br>' +
+                '<span style="color:#8a2019">' + E.money(totalGot) + '</span></div>' +
+            '</div>' +
+            '<div class="inset">' +
+              '<p><strong>Your Congress voted yes and the money still did not come.</strong></p>' +
+              '<p>That is not a bug in this game. Under the Articles of Confederation, a vote in Congress was ' +
+              'a <em>request</em>. There was no president to enforce it and no national court to punish a state ' +
+              'that ignored it. Delegates in Philadelphia voted like patriots. Their governments back home ' +
+              'acted like thirteen separate countries.</p>' +
+              '<p class="small muted">Between 1781 and 1786 the real Congress asked the states for about ' +
+              '$15 million and received about $2.5 million — roughly one dollar in six.</p>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+    }
+
+    /* ---- the trap ---- */
+    if (rep.collapsed) {
+      html +=
+        '<div class="card" style="border-color:#8a2019;border-width:3px">' +
+          '<h2 style="color:#8a2019">Everyone lost 20 points</h2>' +
+          '<p class="lede">National stability fell below 30, so every single state took a 20-point penalty — ' +
+          'including the states that played most cleverly.</p>' +
+          '<p>Look at what just happened. Every group made good decisions <em>for its own state</em>. ' +
+          'Refusing to pay was smart. Protecting your port was smart. Blocking a tax that would cost you money ' +
+          'was smart. Thirteen states each did the smart thing, and the country failed anyway.</p>' +
+          '<p><strong>That is the argument for the Constitution.</strong> Not that the delegates of 1787 were ' +
+          'better people than you. They had watched exactly this happen and decided the rules themselves had ' +
+          'to change.</p>' +
+        '</div>';
+    }
+
+    /* ---- standings ---- */
+    html +=
+      '<div class="card">' +
+        '<h2>Final standings</h2>' +
+        '<p class="muted small">State Interest measures one thing only: how well you protected your own state.</p>' +
+        '<table><thead><tr><th></th><th>State</th><th>Delegates</th>' +
+        '<th class="num">Treasury</th><th class="num">State Interest</th></tr></thead><tbody>' +
+        rep.ranked.map(function (r, i) {
+          var me = opts.you && opts.you === r.name;
+          return '<tr' + (me ? ' style="background:rgba(200,145,47,.22);font-weight:700"' : '') + '>' +
+            '<td class="num">' + (i + 1) + '</td>' +
+            '<td><strong>' + r.name + '</strong>' + (r.isBot ? ' <span class="pill">bot</span>' : '') + '</td>' +
+            '<td class="small">' + (r.players.length ? r.players.join(", ") : "—") + '</td>' +
+            '<td class="num">' + E.money(r.treasury) + '</td>' +
+            '<td class="num">' + r.finalInterest +
+              (r.penalty ? ' <span class="small" style="color:#8a2019">(' + r.penalty + ')</span>' : '') +
+            '</td></tr>';
+        }).join("") +
+        '</tbody></table>' +
+      '</div>';
+
+    /* ---- round by round ---- */
+    html +=
+      '<div class="card">' +
+        '<h2>What happened, round by round</h2>' +
+        '<table><thead><tr><th>Resolution</th><th>Vote</th><th>Result</th>' +
+        '<th class="num">Asked</th><th class="num">Paid</th><th class="num">Stability</th></tr></thead><tbody>' +
+        hist.map(function (h) {
+          var pct = h.requested ? Math.round(h.collected / h.requested * 100) + "%" : "—";
+          return '<tr><td><strong>' + h.title + '</strong></td>' +
+            '<td class="small">' + h.yes + "Y / " + h.no + "N / " + h.abstain + 'A</td>' +
+            '<td>' + (!h.quorum ? '<span class="pill">no quorum</span>'
+              : (h.passed ? '<span class="pill good">passed</span>' : '<span class="pill hot">failed</span>')) + '</td>' +
+            '<td class="num">' + (h.requested ? E.money(h.requested) : "—") + '</td>' +
+            '<td class="num">' + (h.requested ? E.money(h.collected) + " (" + pct + ")" : "—") + '</td>' +
+            '<td class="num">' + h.stabilityAfter + '</td></tr>';
+        }).join("") +
+        '</tbody></table>' +
+      '</div>';
+
+    /* ---- the other half of the story ---- */
+    var W = D.WHAT_WORKED;
+    if (W) {
+      html +=
+        '<div class="card">' +
+          '<div class="eyebrow">Before you decide it was all a disaster</div>' +
+          '<h2>' + W.title + '</h2>' +
+          W.body.split("\n\n").map(function (x) { return "<p>" + x + "</p>"; }).join("") +
+          '<div class="callout warn" style="margin-top:12px"><p class="small" style="margin:0">' +
+            W.note + '</p></div>' +
+        '</div>';
+    }
+
+    /* ---- two men, one rebellion ---- */
+    if (D.VOICES && D.VOICES.length) {
+      html +=
+        '<div class="card">' +
+          '<div class="eyebrow">Two people watch the same rebellion</div>' +
+          '<h2>Did Shays\u2019 Rebellion prove the government had to change?</h2>' +
+          '<div class="grid g2">' +
+          D.VOICES.map(function (v) {
+            return '<div class="inset">' +
+              '<div style="font-weight:700;font-size:1.1rem">' + v.who + '</div>' +
+              '<div class="small muted" style="margin-bottom:8px">' + v.role + '</div>' +
+              '<blockquote style="margin:0 0 10px;padding-left:12px;border-left:4px solid var(--gold);' +
+                'font-size:1.05rem;font-style:italic">' + v.quote + '</blockquote>' +
+              '<div class="small">' + v.gloss + '</div>' +
+            '</div>';
+          }).join("") +
+          '</div>' +
+          '<p class="center lede" style="margin:14px 0 0">They are both looking at the same four dead ' +
+          'farmers in Springfield. Which one is right?</p>' +
+        '</div>';
+    }
+
+    /* ---- the six weaknesses ---- */
+    html +=
+      '<div class="card">' +
+        '<h2>The six weaknesses you just lived through</h2>' +
+        '<div class="grid g2">' +
+        D.WEAKNESSES.map(function (w) {
+          return '<div class="inset"><h3>' + w.title + '</h3><p class="small" style="margin:0">' + w.text + '</p></div>';
+        }).join("") +
+        '</div>' +
+        '<hr class="rule">' +
+        '<p class="lede center" style="margin:0">In May 1787, delegates met in Philadelphia to fix the Articles. ' +
+        'Within four days they gave up on fixing them and started writing the Constitution instead.</p>' +
+      '</div>';
+
+    /* ---- teacher-only discussion ---- */
+    if (opts.teacher) {
+      html +=
+        '<div class="card dark">' +
+          '<div class="eyebrow" style="color:var(--gold)">Discussion questions</div>' +
+          '<h2 style="color:#f0e6cf">Ask these while it is still fresh</h2>' +
+          '<ul class="clean" style="font-size:1.05rem">' +
+            '<li>Whoever finished first: what did you do that worked? Was any of it good for the country?</li>' +
+            '<li>Who voted yes on a requisition and then did not pay? Why did you do it? What would have stopped you?</li>' +
+            '<li>Rhode Island blocked the import tax alone. Was that fair? Should one state out of thirteen be able to do that?</li>' +
+            '<li>If you could change exactly one rule of this government, which one, and what would break as a result?</li>' +
+            '<li>The states were afraid of a strong central government because of what they had just fought a war against. Were they wrong to be afraid?</li>' +
+            '<li>By Round 4 the treasury was empty because of what happened in Round 1. Where else does that pattern show up in history?</li>' +
+            '<li>The Northwest Ordinance worked when almost nothing else did. What made that one different?</li>' +
+            '<li>Jefferson\u2019s 1784 plan to ban slavery in the west lost by one vote, because one man was too sick to attend. What do you do with a fact like that?</li>' +
+          '</ul>' +
+          '<hr class="rule">' +
+          '<p class="small" style="color:#c9bfae;margin:0">Exit ticket: <em>Name one weakness of the Articles you ' +
+          'experienced today, describe the moment you felt it, and explain how the Constitution fixed it.</em></p>' +
+        '</div>';
+    }
+
+    container.innerHTML = html;
+  }
+
+  window.DEBRIEF = { render: render, tier: tier };
+})();
+
+</script>
+
+<script>
+
+(function(){
+"use strict";
+var D = window.AOC, E = window.ENGINE;
+var $ = function(i){ return document.getElementById(i); };
+
+var SEED = "SOLO" + Math.floor(Math.random()*100000);
+var MINE=null, ROUND=0, PHASE="deal", S=[], STAB=60, TREAS=0, HIST=[], DEALS=[], RESULT=null;
+var DEAL_LIMIT = 3, lastRequested = 0;
+
+function show(id){ ["s-pick","s-play","s-end"].forEach(function(x){ $(x).classList.toggle("hidden", x!==id); }); }
+function me(){ return S.filter(function(x){ return x.name===MINE; })[0]; }
+function res(){ return D.RESOLUTIONS[ROUND]; }
+
+/* ------------------------------------------------------------- pick */
+(function(){
+  var l = $("pick-list");
+  D.STATES.slice().sort(function(a,b){ return a.name.localeCompare(b.name); }).forEach(function(s){
+    var b = document.createElement("button");
+    b.className = "claim";
+    b.innerHTML = '<div class="t">' + s.name + '</div><div class="d">' + s.motto + '</div>';
+    b.addEventListener("click", function(){ begin(s.name); });
+    l.appendChild(b);
+  });
+})();
+
+function begin(name){
+  MINE = name;
+  S = D.STATES.map(function(s){
+    return { name:s.name, abbr:s.abbr, isBot: s.name !== name, interest:50,
+             treasuryNow:s.treasury, vote:null, pay:null };
+  });
+  var d = D.byName(name);
+  $("mast").textContent = d.name;
+  $("sub").textContent = "Solo Congress · you are one vote out of thirteen";
+  $("d-name").textContent = d.name;
+  $("d-bg").textContent = d.background;
+  $("d-obj").textContent = d.objective;
+  $("d-fac").innerHTML = d.factions.map(function(f){
+    return '<div class="faction"><div style="font-weight:700">' + f.name + '</div><div class="small">' + f.wants + '</div></div>';
+  }).join("");
+  show("s-play");
+  startRound();
+}
+
+/* ------------------------------------------------------------ round */
+function startRound(){
+  PHASE = "deal"; DEALS = []; RESULT = null;
+  S.forEach(function(s){ s.vote = null; s.pay = null; s.absent = false; });
+  // Cap absences at two: with a 9-of-13 bar, more than that silently turns the
+  // vote into a unanimity requirement among whoever bothered to show up.
+  var skipped = 0;
+  S.forEach(function(s){
+    if (s.isBot && skipped < 2 && !E.botAttends(D.byName(s.name), SEED, ROUND+1)) {
+      s.absent = true; skipped++;
+    }
+  });
+  var r = res();
+  var narr = E.narration(r, { treasury: TREAS });
+  if (narr) {
+    $("dsp-dateline").textContent = narr.dateline;
+    $("dsp-body").innerHTML = narr.lines.map(function(l){ return "<p>" + l + "</p>"; }).join("");
+  }
+  $("r-eye").textContent = "Resolution " + r.number + " of " + D.RESOLUTIONS.length + " — " + r.subtitle;
+  $("r-rule").textContent = r.voteRule === "unanimous" ? "Needs ALL 13 states" : "Needs 9 of 13 states";
+  $("r-title").textContent = r.title;
+  $("r-brief").textContent = r.brief;
+  $("r-detail").innerHTML = r.detail.split("\n\n").map(function(p){ return "<p>"+p+"</p>"; }).join("");
+  $("r-question").textContent = r.question;
+  $("r-ifpass").textContent = r.ifPasses;
+  $("r-iffail").textContent = r.ifFails;
+  $("r-yes").textContent = r.yesCase;
+  $("r-no").textContent = r.noCase;
+  $("vote-state").textContent = MINE;
+
+  var owed = E.amountOwed(D.byName(MINE), r);
+  $("cost-wrap").classList.remove("hidden");
+  if (!owed) $("cost-body").innerHTML = '<div class="nocost">This one does not take a penny out ' +
+    'of your treasury. It costs you something harder to measure — look at what it touches.</div>';
+  $("touch-body").innerHTML = E.interestBreakdown(D.byName(MINE), r).slice(0,5).map(function(b){
+    return '<div class="touch ' + (b.value > 0 ? "pos" : "neg") + '">' +
+      '<span class="arrow">' + (b.value > 0 ? "▲" : "▼") + '</span>' +
+      '<span class="txt">' + b.label + '</span>' +
+      '<span class="mag">' + (b.strength ? b.strength + " " : "") + "for " + b.toward.toLowerCase() + '</span>' +
+    '</div>';
+  }).join("");
+  if (owed) {
+    $("cost-body").innerHTML =
+      '<div class="bill"><span>Your share of ' + E.money(r.complianceTotal) + '</span><strong>' + E.money(owed) + '</strong></div>' +
+      '<div class="bill"><span>Your treasury</span><strong>' + E.money(me().treasuryNow) + '</strong></div>' +
+      '<div class="bill"><span>Paying in full costs you</span><strong style="color:#8a2019">' +
+        Math.round(owed/me().treasuryNow*100) + '% of everything you have</strong></div>';
+  }
+
+  var t = $("dt"); t.innerHTML = "";
+  S.filter(function(s){ return s.name !== MINE && !s.absent; }).forEach(function(s){
+    var o = document.createElement("option"); o.value = s.name; o.textContent = s.name; t.appendChild(o);
+  });
+  var off = $("do"); off.innerHTML = "";
+  E.DEAL_OPTIONS.forEach(function(o){
+    var el = document.createElement("option"); el.value = o.id; el.textContent = o.label; off.appendChild(el);
+  });
+
+  lastRequested = 0;
+  $("deal-card").classList.remove("hidden");
+  $("vote-card").classList.remove("hidden");
+  $("seat-card").classList.add("hidden");
+  $("t-money").classList.add("hidden");
+  $("pay-card").classList.add("hidden");
+  $("out-card").classList.add("hidden");
+  refresh();
+}
+
+function refresh(){
+  var m = me();
+  $("stats").innerHTML =
+    '<div class="stat"><div class="k">Treasury</div><div class="v">' + E.money(m.treasuryNow) + '</div></div>' +
+    '<div class="stat"><div class="k">Your interest</div><div class="v">' + Math.round(m.interest) + '</div></div>' +
+    '<div class="stat"><div class="k">Nation</div><div class="v">' + Math.round(STAB) + '</div></div>';
+  var left = DEAL_LIMIT - DEALS.length;
+  $("deal-left").textContent = left + " offer" + (left===1?"":"s") + " left";
+  $("dsend").disabled = left <= 0;
+  $("dlog").innerHTML = DEALS.length ? DEALS.slice().reverse().map(function(x){
+    return '<div class="line ' + (x.status==="accepted"?"ok":"bad") + '"><strong>To ' + x.to + ':</strong> ' +
+      x.label + "<br>" + x.reply + "</div>";
+  }).join("") : '<div class="line muted small">No offers yet.</div>';
+  renderLean();
+}
+
+/* A read of the room: shows which way each bot is leaning, so the player
+   learns to spend offers on states that are actually persuadable. */
+function renderLean(){
+  var r = res();
+  $("lean").innerHTML = S.map(function(s){
+    if (s.name === MINE) return '<div class="seat you"><div class="ab">' + s.abbr +
+      '</div><div class="nm">' + s.name + '</div><div class="vt">you</div></div>';
+    if (s.absent) return '<div class="seat absent"><div class="ab">' + s.abbr +
+      '</div><div class="nm">' + s.name + '</div><div class="vt">no delegate</div></div>';
+    var sc = E.botVoteScore(D.byName(s.name), r, DEALS.filter(function(d){ return d.status==="accepted"; }));
+    var v = sc.total + (r.isAmendment ? 0 : 2.6);
+    var cls = v > 1.2 ? "yes" : (v < -1.2 ? "no" : "abstain");
+    var lbl = v > 1.2 ? "leaning yes" : (v < -1.2 ? "leaning no" : "undecided");
+    return '<div class="seat ' + cls + '"><div class="ab">' + s.abbr + '</div><div class="nm">' +
+      s.name + '</div><div class="vt">' + lbl + '</div></div>';
+  }).join("");
+}
+
+$("dsend").addEventListener("click", function(){
+  var to = $("dt").value, id = $("do").value;
+  var opt = E.DEAL_OPTIONS.filter(function(o){ return o.id===id; })[0];
+  var reply = E.botDealReply(D.byName(to), { id:id, weight:opt.weight, from:MINE }, res(), SEED+DEALS.length, ROUND);
+  DEALS.push({ to:to, id:id, label:opt.label, status:reply.status, reply:reply.text, weight: reply.status==="accepted"?opt.weight:0 });
+  if (reply.status === "accepted" && opt.cost) {
+    var m = me(); m.treasuryNow = Math.max(0, m.treasuryNow - opt.cost);
+  }
+  refresh();
+});
+
+window.SV = function(v){
+  var r = res();
+  me().vote = v;
+  var accepted = DEALS.filter(function(d){ return d.status==="accepted"; });
+  S.forEach(function(s){
+    if (!s.isBot || s.absent) return;
+    s.vote = E.botVote(D.byName(s.name), r, accepted, SEED, ROUND+1).vote;
+  });
+  var pres = S.filter(function(s){ return !s.absent; });
+  var votes = {}; pres.forEach(function(s){ votes[s.name] = s.vote; });
+  var t = E.tally(votes, r, pres.map(function(s){ return s.name; }));
+  RESULT = t; RESULT.votes = votes;
+
+  $("deal-card").classList.add("hidden");
+  $("vote-card").classList.add("hidden");
+  $("seat-card").classList.remove("hidden");
+  $("seat-pill").textContent = t.present + " states present";
+  $("seat-head").textContent = "The roll is called";
+  $("seat-card").scrollIntoView({ behavior:"smooth", block:"start" });
+
+  rollCall("votes", function(){
+    $("seat-head").textContent = !t.quorum ? "Fewer than nine states came. No vote is possible."
+      : (t.passed ? "PASSED" : "FAILED — " + t.needed + " yes votes were needed");
+    if (t.passed && r.compliance) {
+      $("pay-card").classList.remove("hidden");
+      var owed = E.amountOwed(D.byName(MINE), r);
+      $("pay-owed").innerHTML = "You owe <strong>" + E.money(owed) + "</strong>. Your treasury holds " +
+        E.money(me().treasuryNow) + ".";
+      $("pay-card").scrollIntoView({ behavior:"smooth", block:"center" });
+    } else {
+      finish(0, 0, []);
+    }
+  });
+};
+
+/* ---------------------------------------------------------- the map board */
+var mapRoot = null, moneySoFar = 0;
+function boardRows(){
+  return S.map(function(s){
+    return { name:s.name, abbr:s.abbr, isBot:s.isBot, isYou:s.name===MINE,
+             absent:!!s.absent, vote:s.vote,
+             payment: s.pay ? s.pay.choice : null };
+  });
+}
+function setTally(y,n,a,needed,verdict){
+  $("t-yes").textContent=y; $("t-no").textContent=n; $("t-ab").textContent=a;
+  $("t-fill").style.width = Math.min(100,(y/13)*100)+"%";
+  $("t-need").style.left = ((needed/13)*100)+"%";
+  var v=$("t-verdict"); v.textContent=verdict||"";
+  v.className="verdict"+(verdict==="PASSED"?" pass":(verdict?" fail":""));
+}
+var LEGENDS = {
+  vote:[["#3f9160","Voted yes"],["#b8483a","Voted no"],["#8794a3","Abstained"],
+        ["#4a423a","No delegate"],["#b9b2a6","Vermont — not a state"]],
+  pay: [["#3f9160","Paid in full"],["#c8912f","Paid half"],["#7d2019","Paid nothing"],
+        ["#4a423a","No delegate"]]
+};
+function setLegend(k){
+  $("map-legend").innerHTML = LEGENDS[k].map(function(x){
+    return '<span><i style="background:'+x[0]+'"></i>'+x[1]+"</span>"; }).join("");
+}
+function rollCall(mode, done){
+  if (!mapRoot) mapRoot = window.AOCMAP.build($("map-view"));
+  var r = res();
+  var needed = r.voteRule === "unanimous" ? 13 : 9;
+  setLegend(mode === "payment" ? "pay" : "vote");
+  moneySoFar = 0;
+  $("t-money").classList.toggle("hidden", mode !== "payment");
+  if (mode === "votes") setTally(0,0,0,needed,"");
+  if (mode === "payment") {
+    $("t-money-val").textContent = "$0";
+    $("t-money-of").textContent = "of " + E.money(lastRequested);
+  }
+  $("map-view").classList.add("dim");
+  window.AOCMAP.revealVotes(mapRoot, boardRows(), {
+    mode: mode,
+    step: mode === "payment" ? 330 : 430,
+    onTick: function(t){
+      if (mode === "votes") { setTally(t.yes,t.no,t.abstain,needed,""); return; }
+      var owed = E.amountOwed(D.byName(t.name), r);
+      var c = t.row.payment;
+      moneySoFar += c === "full" ? owed : (c === "half" ? Math.round(owed/2) : 0);
+      $("t-money-val").textContent = E.money(moneySoFar);
+    },
+    onDone: function(t){
+      $("map-view").classList.remove("dim");
+      if (mode === "votes") setTally(t.yes,t.no,t.abstain,needed, RESULT.passed ? "PASSED" : "FAILED");
+      if (done) done();
+    }
+  });
+}
+$("replay-btn").addEventListener("click", function(){
+  rollCall(lastRequested > 0 && S.some(function(s){return s.pay;}) ? "payment" : "votes");
+});
+
+window.SP = function(choice){
+  var r = res(), requested = 0, collected = 0, excuses = [];
+  S.forEach(function(s){
+    var d = D.byName(s.name);
+    var owed = E.amountOwed(d, r); requested += owed;
+    var c;
+    if (s.name === MINE) {
+      c = { choice: choice, paid: choice==="full"?owed:(choice==="half"?Math.round(owed/2):0) };
+    } else {
+      c = E.botCompliance(Object.assign({}, d, {treasuryNow:s.treasuryNow}), r,
+        RESULT.votes[s.name]==="Yes", SEED, ROUND+1);
+    }
+    s.pay = c; collected += c.paid;
+    s.treasuryNow -= c.paid;
+    s.interest += E.stateInterestFromCompliance(c.choice);
+    excuses.push({ choice:c.choice, text: s.name===MINE
+      ? ("You " + ({full:"paid in full.",half:"paid half and promised the rest later.",none:"sent nothing."})[c.choice])
+      : E.complianceExcuse(d, c.choice, SEED, ROUND+1) });
+  });
+  $("pay-card").classList.add("hidden");
+  lastRequested = requested;
+  $("seat-head").textContent = "Now see who actually paid";
+  $("seat-card").scrollIntoView({ behavior:"smooth", block:"start" });
+  rollCall("payment", function(){ finish(requested, collected, excuses); });
+};
+
+function finish(requested, collected, excuses){
+  var r = res();
+  S.forEach(function(s){
+    if (s.absent) return;
+    s.interest += E.stateInterestFromVote(D.byName(s.name), r, s.vote);
+  });
+  var frac = requested > 0 ? collected/requested : 0;
+  STAB = E.clamp(STAB + E.nationalStabilityChange(r, RESULT, frac), 0, 100);
+  TREAS += collected;
+
+  $("out-card").classList.remove("hidden");
+  $("out-head").textContent = !RESULT.quorum ? "Congress could not meet"
+    : (RESULT.passed ? "Resolution passed" : "Resolution failed");
+  $("out-head").style.color = RESULT.passed ? "#1d5233" : "#8a2019";
+  $("out-narr").textContent = E.outcomeNarrative(r, RESULT, collected, requested);
+  $("out-money").classList.toggle("hidden", requested === 0);
+  if (requested) {
+    $("o-ask").textContent = E.money(requested);
+    $("o-got").textContent = E.money(collected);
+    $("o-pct").textContent = Math.round(collected/requested*100) + "%";
+    $("o-excuses").innerHTML = excuses.map(function(x){
+      return '<div class="line ' + (x.choice==="full"?"ok":(x.choice==="none"?"bad":"")) + '">' + x.text + "</div>";
+    }).join("");
+  }
+  $("o-hist").innerHTML = (D.HISTORY_NOTES[r.id] || "").split("\n\n")
+    .map(function(x){ return "<p>" + x + "</p>"; }).join("");
+  HIST.push({ id:r.id, title:r.title, passed:RESULT.passed, yes:RESULT.yes, no:RESULT.no,
+    abstain:RESULT.abstain, quorum:RESULT.quorum, requested:requested, collected:collected,
+    stabilityAfter: Math.round(STAB) });
+  $("next-btn").textContent = (ROUND + 1 >= D.RESOLUTIONS.length) ? "See how it all ended" : "Next resolution";
+  refresh();
+  $("out-card").scrollIntoView({ behavior:"smooth", block:"start" });
+}
+
+$("next-btn").addEventListener("click", function(){
+  if (ROUND + 1 >= D.RESOLUTIONS.length) {
+    show("s-end");
+    window.DEBRIEF.render($("s-end"), { stability: STAB, history: HIST }, S, { you: MINE });
+    window.scrollTo({ top:0, behavior:"smooth" });
+    return;
+  }
+  ROUND++; startRound();
+  window.scrollTo({ top:0, behavior:"smooth" });
+});
+})();
+
+</script>

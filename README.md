@@ -195,6 +195,31 @@ puts words in another group's mouth.
 
 ---
 
+## Playable links
+
+**Single player, nothing to set up:** https://claude.ai/code/artifact/2d71f49e-6025-4826-b4c0-e6b69e8a5d88
+
+That is the whole solo game — narration, map, roll call, payment reveal, debrief — in one page. Nothing
+to install and no internet needed once it has loaded. Good for absent students, homework, a substitute,
+or trying the thing yourself before class.
+
+`standalone.html` in this repo is the same build as a file you can email, drop in Google Drive, or put
+on a USB stick. It is generated — after editing any content, regenerate it:
+
+```bash
+node tools/build-standalone.js standalone.html
+```
+
+**The classroom version** (teacher panel + student delegations) needs real hosting, because the two
+talk to each other through Firestore. Two steps:
+
+1. Repo → Settings → Pages → deploy from this branch. You get
+   `https://<your-username>.github.io/ArticlesGame/`.
+2. Firebase console → Firestore → Rules → paste `firestore.rules` → Publish. **Nothing saves until you
+   do this.**
+
+Then `teacher.html` is your projector and `student.html` is the link the groups open.
+
 ## The three pages
 
 | Page | Who | Needs internet? |
