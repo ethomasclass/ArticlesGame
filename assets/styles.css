@@ -370,30 +370,3 @@ ul.clean li::before{content:"—";position:absolute;left:0;color:var(--gold-dk);
 .outcome.fail .h{color:#8a2019}
 .outcome p{margin:0;font-size:.98rem;line-height:1.45}
 .nocost{font-size:.9rem;color:var(--ink-soft);line-height:1.45}
-
-/* ============================================================
-   THE COLD OPEN — the candy vote
-   ============================================================ */
-.optgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
-.optcard{background:var(--parch-2);border:3px solid var(--line);border-radius:12px;padding:16px;
-  text-align:center;transition:.25s;position:relative}
-.optcard.lead{border-color:var(--gold);background:#f6e6c6}
-.optcard.win{border-color:var(--yes);background:#dcefe0}
-.optcard .lbl{font-size:1.25rem;font-weight:700;line-height:1.2;margin-bottom:8px}
-.optcard .cnt{font-size:3rem;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
-.optcard .of{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.68rem;font-weight:700;
-  letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint)}
-.optcard .who{font-size:.78rem;color:var(--ink-soft);margin-top:8px;line-height:1.35}
-.optbtn{display:block;width:100%;background:var(--parch-2);border:3px solid var(--line);
-  border-radius:12px;padding:18px 14px;font-family:inherit;font-size:1.3rem;font-weight:700;
-  cursor:pointer;transition:.15s;margin-bottom:10px}
-.optbtn:hover{border-color:var(--gold);background:var(--parch-3);transform:translateY(-2px)}
-.lesson{display:grid;grid-template-columns:1fr 1.4fr;gap:14px;padding:14px 0;
-  border-bottom:1px dashed var(--line);align-items:start}
-.lesson:last-child{border-bottom:0}
-@media(max-width:760px){.lesson{grid-template-columns:1fr}}
-.lesson .what{font-weight:700;font-size:1.06rem}
-.lesson .why{color:var(--ink-soft)}
-.lesson .why b{color:var(--red-dk)}
-.bridge{background:var(--slate);color:var(--gold);border-radius:10px;padding:20px;text-align:center;
-  font-size:1.7rem;font-weight:700;font-style:italic;margin-top:18px;line-height:1.35}

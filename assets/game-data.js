@@ -412,52 +412,6 @@
     shays: "In real life, Congress authorized 1,340 troops in October 1786 and asked the states to pay for them. The states sent almost nothing.\n\nOn January 25, 1787, Shays led about 1,200 men against the Springfield arsenal, planning to march on Boston afterward. The militia opened fire. Four farmers were killed and the rest scattered. The rebellion was put down not by Congress but by a private army of 4,000 paid for by Boston merchants and led by General Benjamin Lincoln.\n\nThree months later, the Constitutional Convention opened in Philadelphia."
   };
 
-  /* ----------------------------------------------------------------------
-     THE COLD OPEN — "The Candy Vote"
-     Before any history happens, the class tries to agree on one snack under
-     the Articles' own rules: one vote per group, nine of thirteen to decide
-     anything, and everybody has to chip in. It fails for exactly the reasons
-     the Confederation failed, and then the room is told so.
-     ---------------------------------------------------------------------- */
-  var COLD_OPEN = {
-    question: "We can buy ONE treat for the whole class. Everybody chips in $5. What are we getting?",
-    options: ["Sour candy", "Chocolate", "Chips and salty snacks", "Doughnuts"],
-    payQuestion: "Is your group actually going to bring the $5?",
-    rules: [
-      "Your group gets one vote. So does every other group, big or small.",
-      "Nine of the thirteen groups have to pick the SAME thing, or nobody gets anything.",
-      "If it wins, every group has to bring the money. Nobody can make you."
-    ],
-    // Each row fires only if the class actually produced that outcome, so the
-    // debrief describes what happened in this room rather than a generic list.
-    lessons: [
-      { when: "nowinner",
-        what: "No snack got nine of thirteen groups.",
-        why: "Nine out of thirteen is a very high bar. Under the Articles, most proposals died exactly like this — not voted down, just never able to reach nine." },
-      { when: "split",
-        what: "The class split across {optionCount} different snacks.",
-        why: "Thirteen groups wanted thirteen different things. The states were the same: each one voted for what was good for itself, not for the class." },
-      { when: "smallequal",
-        what: "Every group counted the same, however big it was.",
-        why: "Under the Articles each state got exactly one vote. Virginia had about 700,000 people. Delaware had about 59,000. Same vote." },
-      { when: "refusers",
-        what: "{n} group{s} said they would not bring the money.",
-        why: "This is the whole problem. Congress could only ASK the states for money. There was no president to collect it and no court to sue them. States said yes and then sent nothing." },
-      { when: "nopower",
-        what: "Nobody in this room could force anyone to agree.",
-        why: "There was no president and no national court. Congress could pass something and then simply watch nothing happen." },
-      { when: "winner",
-        what: "You actually got nine of thirteen. That almost never happened.",
-        why: "Congress did sometimes reach nine. The trouble came next — when the states had to actually do the thing they had voted for." }
-    ],
-    bridge: "In 1786, the states found themselves in exactly this situation."
-  };
-
-  /* ----------------------------------------------------------------------
-     THE OTHER HALF OF THE STORY
-     The Articles were not a total failure, and the debrief should say so —
-     otherwise students learn a cartoon. Congress governed the west well.
-     ---------------------------------------------------------------------- */
   var WHAT_WORKED = {
     title: "One thing the Articles got right",
     body: "Congress under the Articles did do something lasting. The Land Ordinance of 1785 " +
@@ -500,7 +454,6 @@
   ];
 
   window.AOC = {
-    COLD_OPEN: COLD_OPEN,
     WHAT_WORKED: WHAT_WORKED,
     VOICES: VOICES,
     TAGS: TAGS,

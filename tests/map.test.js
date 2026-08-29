@@ -10,7 +10,6 @@ const fs = require('fs');
   T.on('pageerror', e => errs.push('ERR ' + e.message));
   T.on('console', m => { if (m.type()==='error' && !/favicon/.test(m.text())) errs.push('CON ' + m.text()); });
   await T.goto('http://localhost:8899/teacher.html');
-  await T.selectOption('#cold-open', 'off');   // these suites test the 1786 rounds
   await T.click('#create-btn');
   await T.waitForSelector('#lobby:not(.hidden)');
   await T.click('#begin-btn');

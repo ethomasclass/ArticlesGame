@@ -14,7 +14,6 @@ const EXE = '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
   const T = await ctx.newPage();
   T.on('pageerror', e => errs.push('TEACHER ' + e.message));
   await T.goto('http://localhost:8899/teacher.html');
-  await T.selectOption('#cold-open', 'off');   // these suites test the 1786 rounds
   await T.click('#create-btn'); await T.waitForSelector('#lobby:not(.hidden)');
   const code = (await T.textContent('#game-code')).trim();
 

@@ -154,13 +154,6 @@
     <div class="deck">
       <!-- MAIN -->
       <div>
-        <!-- cold open -->
-        <div class="card bigcard vote hidden" id="co-card">
-          <div class="eyebrow">Before we start</div>
-          <h2 id="co-q">—</h2>
-          <div id="co-body"></div>
-        </div>
-
         <div class="dispatch follow hidden" id="dispatch">
           <div class="cuehead">
             <span class="dateline" id="dsp-dateline"></span>
@@ -457,9 +450,6 @@ function render(){
   $("p-nation").textContent = Math.round(G.stability);
   renderRecord();
 
-  if (G.status === "coldopen") return renderColdOpen();
-
-  $("co-card").classList.add("hidden");
   if (G.status === "lobby" || G.round < 0) {
     setCue("wait", "Get ready", "Read your objective and your two factions on the right. Your teacher will start Resolution 1.");
     ["res-card","deal-card","vote-card","pay-card","wait-card","out-card","dispatch"].forEach(function(x){
@@ -568,50 +558,6 @@ function render(){
       .map(function(x){ return "<p>" + x + "</p>"; }).join("");
   }
 }
-
-/* The candy vote. Same shape as everything that follows: pick one thing,
-   nine of thirteen have to agree, then decide whether you actually pay. */
-function renderColdOpen(){
-  ["res-card","deal-card","vote-card","pay-card","wait-card","out-card","dispatch"].forEach(function(x){
-    $(x).classList.add("hidden"); });
-  $("p-cost-blk").classList.add("hidden");
-  $("p-touch-blk").classList.add("hidden");
-  $("co-card").classList.remove("hidden");
-
-  var opts = (G.settings && G.settings.coldOptions) || D.COLD_OPEN.options;
-  $("co-q").textContent = (G.settings && G.settings.coldQuestion) || D.COLD_OPEN.question;
-  var voted = ME.coldVote !== undefined && ME.coldVote !== null;
-  var paid  = ME.coldPay  !== undefined && ME.coldPay  !== null;
-
-  if (G.phase === "co_vote") {
-    setCue(voted ? "wait" : "vote", voted ? "Locked in" : "Pick one",
-      voted ? "You picked " + opts[ME.coldVote] + ". Waiting for the other groups."
-            : "Nine of the thirteen groups have to pick the SAME thing, or nobody gets anything.");
-    $("co-body").innerHTML = voted
-      ? '<div class="waitbox"><div class="h">You picked ' + opts[ME.coldVote] + '</div>' +
-        '<div class="muted">Waiting for the other groups<span class="dot">…</span></div></div>'
-      : opts.map(function(o, i){
-          return '<button class="optbtn" onclick="COLDVOTE(' + i + ')">' + o + '</button>'; }).join("");
-    return;
-  }
-  if (G.phase === "co_pay") {
-    setCue(paid ? "wait" : "pay", paid ? "Answered" : "Now the real question",
-      paid ? "You said you " + (ME.coldPay ? "would" : "would not") + " bring the money."
-           : "Nobody can make you. Decide honestly.");
-    $("co-body").innerHTML = paid
-      ? '<div class="waitbox"><div class="h">You said you ' + (ME.coldPay ? "WILL" : "WILL NOT") +
-        ' bring it</div><div class="muted">Waiting<span class="dot">…</span></div></div>'
-      : '<p class="lede">' + D.COLD_OPEN.payQuestion + '</p>' +
-        '<div class="vote-row"><button class="btn btn-yes" onclick="COLDPAY(true)">YES, WE WILL</button>' +
-        '<button class="btn btn-no" onclick="COLDPAY(false)">NO, WE WILL NOT</button></div>';
-    return;
-  }
-  setCue("wait", "Look up", "Your teacher is about to show you what just happened — and why it matters.");
-  $("co-body").innerHTML = '<div class="waitbox"><div class="h">Look at the board</div>' +
-    '<div class="muted">' + D.COLD_OPEN.bridge + '</div></div>';
-}
-window.COLDVOTE = function(i){ NET.updateState(CODE, MINE, { coldVote: i }); };
-window.COLDPAY  = function(v){ NET.updateState(CODE, MINE, { coldPay: v }); };
 
 function renderCost(d, r){
   var owed = E.amountOwed(d, r);
