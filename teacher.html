@@ -183,6 +183,17 @@
           <h2 id="res-title">—</h2>
           <p class="lede" id="res-brief"></p>
           <div class="inset" id="res-detail"></div>
+
+          <div class="thequestion" id="res-question-box">
+            <div class="lab">The question before Congress</div>
+            <div class="q" id="res-question">—</div>
+          </div>
+
+          <div class="outcomes" id="res-outcomes">
+            <div class="outcome pass"><div class="h">If it passes</div><p id="res-ifpass"></p></div>
+            <div class="outcome fail"><div class="h">If it fails</div><p id="res-iffail"></p></div>
+          </div>
+
           <div class="hist" style="margin-top:14px" id="res-teaches">
             <div class="eyebrow">What this shows</div>
             <div id="teaches-text"></div>
@@ -414,6 +425,9 @@ function applyResCollapse(){
   $("res-detail").classList.toggle("hidden", resCollapsed);
   $("res-teaches").classList.toggle("hidden", resCollapsed);
   $("res-brief").classList.toggle("hidden", resCollapsed);
+  $("res-outcomes").classList.toggle("hidden", resCollapsed);
+  // The question itself stays up: it is what the room is arguing about.
+  $("res-question-box").classList.remove("hidden");
   $("res-toggle").textContent = resCollapsed ? "Show the full text" : "Hide the text";
 }
 $("res-toggle").addEventListener("click", function(){
@@ -599,6 +613,9 @@ function render(){
   $("res-brief").textContent = r.brief;
   $("res-detail").innerHTML = r.detail.split("\n\n").map(function(p){ return "<p>"+p+"</p>"; }).join("");
   $("teaches-text").textContent = r.teaches;
+  $("res-question").textContent = r.question;
+  $("res-ifpass").textContent = r.ifPasses;
+  $("res-iffail").textContent = r.ifFails;
 
   var ph = G.phase;
   $("phase-flag").textContent = ({brief:"Brief",caucus:"Debate",voting:"Voting",tally:"Result",

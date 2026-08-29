@@ -69,6 +69,16 @@
       <h2 id="r-title"></h2>
       <p class="lede" id="r-brief"></p>
       <div class="inset" id="r-detail"></div>
+
+      <div class="thequestion">
+        <div class="lab">You are voting on this</div>
+        <div class="q" id="r-question">—</div>
+      </div>
+
+      <div class="outcomes">
+        <div class="outcome pass"><div class="h">If it passes</div><p id="r-ifpass"></p></div>
+        <div class="outcome fail"><div class="h">If it fails</div><p id="r-iffail"></p></div>
+      </div>
     </div>
 
     <div class="card" id="cost-card">
@@ -247,12 +257,17 @@ function startRound(){
   $("r-title").textContent = r.title;
   $("r-brief").textContent = r.brief;
   $("r-detail").innerHTML = r.detail.split("\n\n").map(function(p){ return "<p>"+p+"</p>"; }).join("");
+  $("r-question").textContent = r.question;
+  $("r-ifpass").textContent = r.ifPasses;
+  $("r-iffail").textContent = r.ifFails;
   $("r-yes").textContent = r.yesCase;
   $("r-no").textContent = r.noCase;
   $("vote-state").textContent = MINE;
 
   var owed = E.amountOwed(D.byName(MINE), r);
-  $("cost-wrap").classList.toggle("hidden", owed === 0);
+  $("cost-wrap").classList.remove("hidden");
+  if (!owed) $("cost-body").innerHTML = '<div class="nocost">This one does not take a penny out ' +
+    'of your treasury. It costs you something harder to measure — look at what it touches.</div>';
   $("touch-body").innerHTML = E.interestBreakdown(D.byName(MINE), r).slice(0,5).map(function(b){
     return '<div class="touch ' + (b.value > 0 ? "pos" : "neg") + '">' +
       '<span class="arrow">' + (b.value > 0 ? "▲" : "▼") + '</span>' +

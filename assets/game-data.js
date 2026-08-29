@@ -242,6 +242,8 @@
   var RESOLUTIONS = [
     {
       id: "debt",
+      ifPasses: "Congress sends the request out to all thirteen states. Then every state decides on its own whether to actually send the money. No court can make them and no president can collect it.",
+      ifFails: "Congress does not even ask. France is told that no payment is coming. American credit in Europe collapses, and every merchant here who borrows from abroad pays for it.",
       narration: {
         dateline: "Philadelphia \u00b7 January 1786",
         lines: [
@@ -274,6 +276,8 @@
     },
     {
       id: "trade",
+      ifPasses: "Congress sends every state a polite request to drop its tariffs on other states. New York does not have to listen, and Congress has no way to make it. The trade war does not actually stop.",
+      ifFails: "The trade war spreads. More states start taxing their neighbors' goods to get even, prices rise everywhere, and states begin treating each other like foreign countries.",
       narration: {
         dateline: "New York Harbor \u00b7 March 1786",
         lines: [
@@ -302,6 +306,8 @@
     },
     {
       id: "impost",
+      ifPasses: "The Articles are amended. Congress collects its own money for the first time and stops depending on the states. In real life this never happened.",
+      ifFails: "Nothing changes. Congress stays broke and goes on begging. Any single state that wants to block a fix can keep blocking it forever.",
       narration: {
         dateline: "Philadelphia \u00b7 July 1786",
         lines: [
@@ -324,7 +330,7 @@
       question: "Should the Articles be amended to give Congress a 5% import tax?",
       yesCase: "Asking has failed for six straight years. This is the only plan that has ever been proposed that would actually work.",
       noCase: "We just fought a war against a government that taxed us from far away. Give Congress the power to tax and we will have traded one master for another.",
-      glossary: ["amendment", "impost"],
+      glossary: ["amendment", "impost", "credit"],
       special: "import_tax",     // triggers red lines on NY and RI
       isAmendment: true,
       tags: { taxation: 8, national_power: 9, trade_regulation: 6, state_sovereignty: -9, debt_honor: 6, north_economy: 2, south_economy: -1, small_state: 2, military: 2, west_expansion: 0 },
@@ -333,6 +339,8 @@
     },
     {
       id: "shays",
+      ifPasses: "Congress asks the states for money and volunteers. Then each state decides whether to actually send them. The rebels are not waiting for anyone to make up their mind.",
+      ifFails: "Congress does nothing at all. The rebels reach the arsenal at Springfield, and every state government in the country watches to see whether armed men can simply walk in and take one.",
       narration: {
         dateline: "Springfield, Massachusetts \u00b7 January 1787",
         lines: [

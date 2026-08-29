@@ -170,6 +170,22 @@
           <h2 id="r-title">—</h2>
           <p class="lede" id="r-brief"></p>
           <div class="inset" id="r-detail"></div>
+
+          <div class="thequestion">
+            <div class="lab">You are voting on this</div>
+            <div class="q" id="r-question">—</div>
+          </div>
+
+          <div class="outcomes">
+            <div class="outcome pass">
+              <div class="h">If it passes</div>
+              <p id="r-ifpass"></p>
+            </div>
+            <div class="outcome fail">
+              <div class="h">If it fails</div>
+              <p id="r-iffail"></p>
+            </div>
+          </div>
         </div>
 
         <div class="card">
@@ -456,6 +472,9 @@ function render(){
   $("r-brief").innerHTML = glossify(r.brief, r.glossary);
   $("r-detail").innerHTML = r.detail.split("\n\n").map(function(p){
     return "<p>" + glossify(p, r.glossary) + "</p>"; }).join("");
+  $("r-question").textContent = r.question;
+  $("r-ifpass").innerHTML = glossify(r.ifPasses, r.glossary);
+  $("r-iffail").innerHTML = glossify(r.ifFails, r.glossary);
   $("r-yes").innerHTML = glossify(r.yesCase, r.glossary);
   $("r-no").innerHTML = glossify(r.noCase, r.glossary);
   $("vote-state").textContent = MINE;
@@ -541,8 +560,12 @@ function render(){
 
 function renderCost(d, r){
   var owed = E.amountOwed(d, r);
-  $("p-cost-blk").classList.toggle("hidden", owed === 0);
-  if (!owed) return;
+  $("p-cost-blk").classList.remove("hidden");
+  if (!owed) {
+    $("p-cost").innerHTML = '<div class="nocost">This one does not take a penny out of your ' +
+      'treasury. It costs you something harder to measure — look at what it touches, below.</div>';
+    return;
+  }
   var pct = Math.round(owed / Math.max(1, ME.treasuryNow) * 100);
   $("p-cost").innerHTML =
     '<div class="spread" style="font-size:1.05rem"><span>Your share</span>' +
