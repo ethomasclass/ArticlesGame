@@ -21,18 +21,23 @@ const { chromium } = require('playwright');
       await p.waitForTimeout(80);
     }
     const leans = await p.$$eval('#lean .seat .vt', els => els.map(e => e.textContent));
+    const mapReady = await p.isVisible('#deal-card');
     await p.click('button:has-text("YES")');
     await p.waitForSelector('#seat-card:not(.hidden)');
+    // the vote roll call plays across the map before the result settles
+    await p.waitForFunction(() => !/roll is called/i.test(document.getElementById('seat-head').textContent),
+      null, { timeout: 20000 });
     const head = await p.textContent('#seat-head');
-    const pill = await p.textContent('#seat-pill');
+    const pill = `${await p.textContent('#t-yes')}Y/${await p.textContent('#t-no')}N/${await p.textContent('#t-ab')}A ${await p.textContent('#t-verdict')}`;
 
     let payLine = '';
     if (await p.isVisible('#pay-card')) {
       await p.click('button:has-text("PAY NOTHING")');
-      await p.waitForSelector('#out-card:not(.hidden)');
       payLine = ' | paid: NOTHING';
+      // second roll call: who actually sent money
+      await p.waitForSelector('#out-card:not(.hidden)', { timeout: 25000 });
     }
-    await p.waitForSelector('#out-card:not(.hidden)');
+    await p.waitForSelector('#out-card:not(.hidden)', { timeout: 25000 });
     const money = await p.isVisible('#out-money')
       ? ` | asked ${await p.textContent('#o-ask')} got ${await p.textContent('#o-got')} (${await p.textContent('#o-pct')})` : '';
     const stab = await p.textContent('#stats .stat:nth-child(3) .v');

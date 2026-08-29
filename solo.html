@@ -103,8 +103,26 @@
     </div>
 
     <div class="card hidden" id="seat-card">
-      <div class="spread"><h3 style="margin:0" id="seat-head">The vote</h3><span class="pill" id="seat-pill"></span></div>
-      <div class="seats" id="seats" style="margin-top:12px"></div>
+      <div class="spread"><h3 style="margin:0" id="seat-head">The vote</h3>
+        <div class="row">
+          <span class="pill" id="seat-pill"></span>
+          <button class="btn ghost sm" id="replay-btn">Replay the roll call</button>
+        </div>
+      </div>
+      <div class="tallybar" id="tallybar">
+        <div class="grp yes"><div class="big" id="t-yes">0</div><div class="lab">Yes</div></div>
+        <div class="grp no"><div class="big" id="t-no">0</div><div class="lab">No</div></div>
+        <div class="grp ab"><div class="big" id="t-ab">0</div><div class="lab">Abstain</div></div>
+        <div class="track"><div class="fill" id="t-fill"></div><div class="need" id="t-need"></div></div>
+        <div class="verdict" id="t-verdict"></div>
+        <div class="moneybar hidden" id="t-money">
+          <div class="lab">Money actually arriving</div>
+          <div class="big" id="t-money-val">$0</div>
+          <div class="lab" id="t-money-of">of $0</div>
+        </div>
+      </div>
+      <div class="map-wrap" id="map-view"></div>
+      <div class="maplegend" id="map-legend"></div>
     </div>
 
     <div class="card hidden" id="pay-card" style="border-color:var(--red);border-width:3px">
@@ -141,6 +159,8 @@
 </div>
 
 <script src="assets/game-data.js"></script>
+<script src="assets/map-data.js"></script>
+<script src="assets/map.js"></script>
 <script src="assets/engine.js"></script>
 <script src="assets/debrief.js"></script>
 <script>
@@ -151,7 +171,7 @@ var $ = function(i){ return document.getElementById(i); };
 
 var SEED = "SOLO" + Math.floor(Math.random()*100000);
 var MINE=null, ROUND=0, PHASE="deal", S=[], STAB=60, TREAS=0, HIST=[], DEALS=[], RESULT=null;
-var DEAL_LIMIT = 3;
+var DEAL_LIMIT = 3, lastRequested = 0;
 
 function show(id){ ["s-pick","s-play","s-end"].forEach(function(x){ $(x).classList.toggle("hidden", x!==id); }); }
 function me(){ return S.filter(function(x){ return x.name===MINE; })[0]; }
@@ -229,9 +249,11 @@ function startRound(){
     var el = document.createElement("option"); el.value = o.id; el.textContent = o.label; off.appendChild(el);
   });
 
+  lastRequested = 0;
   $("deal-card").classList.remove("hidden");
   $("vote-card").classList.remove("hidden");
   $("seat-card").classList.add("hidden");
+  $("t-money").classList.add("hidden");
   $("pay-card").classList.add("hidden");
   $("out-card").classList.add("hidden");
   refresh();
@@ -298,26 +320,84 @@ window.SV = function(v){
   $("deal-card").classList.add("hidden");
   $("vote-card").classList.add("hidden");
   $("seat-card").classList.remove("hidden");
-  $("seat-pill").textContent = t.yes + " yes · " + t.no + " no · " + t.abstain + " abstain";
-  $("seat-head").textContent = !t.quorum ? "Fewer than nine states came. No vote is possible."
-    : (t.passed ? "PASSED" : "FAILED — " + t.needed + " yes votes were needed");
-  $("seats").innerHTML = S.map(function(s){
-    if (s.absent) return '<div class="seat absent"><div class="ab">' + s.abbr + '</div><div class="nm">' +
-      s.name + '</div><div class="vt">no delegate</div></div>';
-    return '<div class="seat ' + (s.vote||"").toLowerCase() + (s.name===MINE?" you":"") + '">' +
-      '<div class="ab">' + s.abbr + '</div><div class="nm">' + s.name + '</div>' +
-      '<div class="vt">' + s.vote + '</div></div>';
-  }).join("");
+  $("seat-pill").textContent = t.present + " states present";
+  $("seat-head").textContent = "The roll is called";
+  $("seat-card").scrollIntoView({ behavior:"smooth", block:"start" });
 
-  if (t.passed && r.compliance) {
-    $("pay-card").classList.remove("hidden");
-    var owed = E.amountOwed(D.byName(MINE), r);
-    $("pay-owed").innerHTML = "You owe <strong>" + E.money(owed) + "</strong>. Your treasury holds " +
-      E.money(me().treasuryNow) + ".";
-  } else {
-    finish(0, 0, []);
-  }
+  rollCall("votes", function(){
+    $("seat-head").textContent = !t.quorum ? "Fewer than nine states came. No vote is possible."
+      : (t.passed ? "PASSED" : "FAILED — " + t.needed + " yes votes were needed");
+    if (t.passed && r.compliance) {
+      $("pay-card").classList.remove("hidden");
+      var owed = E.amountOwed(D.byName(MINE), r);
+      $("pay-owed").innerHTML = "You owe <strong>" + E.money(owed) + "</strong>. Your treasury holds " +
+        E.money(me().treasuryNow) + ".";
+      $("pay-card").scrollIntoView({ behavior:"smooth", block:"center" });
+    } else {
+      finish(0, 0, []);
+    }
+  });
 };
+
+/* ---------------------------------------------------------- the map board */
+var mapRoot = null, moneySoFar = 0;
+function boardRows(){
+  return S.map(function(s){
+    return { name:s.name, abbr:s.abbr, isBot:s.isBot, isYou:s.name===MINE,
+             absent:!!s.absent, vote:s.vote,
+             payment: s.pay ? s.pay.choice : null };
+  });
+}
+function setTally(y,n,a,needed,verdict){
+  $("t-yes").textContent=y; $("t-no").textContent=n; $("t-ab").textContent=a;
+  $("t-fill").style.width = Math.min(100,(y/13)*100)+"%";
+  $("t-need").style.left = ((needed/13)*100)+"%";
+  var v=$("t-verdict"); v.textContent=verdict||"";
+  v.className="verdict"+(verdict==="PASSED"?" pass":(verdict?" fail":""));
+}
+var LEGENDS = {
+  vote:[["#3f9160","Voted yes"],["#b8483a","Voted no"],["#8794a3","Abstained"],
+        ["#4a423a","No delegate"],["#b9b2a6","Vermont — not a state"]],
+  pay: [["#3f9160","Paid in full"],["#c8912f","Paid half"],["#7d2019","Paid nothing"],
+        ["#4a423a","No delegate"]]
+};
+function setLegend(k){
+  $("map-legend").innerHTML = LEGENDS[k].map(function(x){
+    return '<span><i style="background:'+x[0]+'"></i>'+x[1]+"</span>"; }).join("");
+}
+function rollCall(mode, done){
+  if (!mapRoot) mapRoot = window.AOCMAP.build($("map-view"));
+  var r = res();
+  var needed = r.voteRule === "unanimous" ? 13 : 9;
+  setLegend(mode === "payment" ? "pay" : "vote");
+  moneySoFar = 0;
+  $("t-money").classList.toggle("hidden", mode !== "payment");
+  if (mode === "votes") setTally(0,0,0,needed,"");
+  if (mode === "payment") {
+    $("t-money-val").textContent = "$0";
+    $("t-money-of").textContent = "of " + E.money(lastRequested);
+  }
+  $("map-view").classList.add("dim");
+  window.AOCMAP.revealVotes(mapRoot, boardRows(), {
+    mode: mode,
+    step: mode === "payment" ? 330 : 430,
+    onTick: function(t){
+      if (mode === "votes") { setTally(t.yes,t.no,t.abstain,needed,""); return; }
+      var owed = E.amountOwed(D.byName(t.name), r);
+      var c = t.row.payment;
+      moneySoFar += c === "full" ? owed : (c === "half" ? Math.round(owed/2) : 0);
+      $("t-money-val").textContent = E.money(moneySoFar);
+    },
+    onDone: function(t){
+      $("map-view").classList.remove("dim");
+      if (mode === "votes") setTally(t.yes,t.no,t.abstain,needed, RESULT.passed ? "PASSED" : "FAILED");
+      if (done) done();
+    }
+  });
+}
+$("replay-btn").addEventListener("click", function(){
+  rollCall(lastRequested > 0 && S.some(function(s){return s.pay;}) ? "payment" : "votes");
+});
 
 window.SP = function(choice){
   var r = res(), requested = 0, collected = 0, excuses = [];
@@ -339,7 +419,10 @@ window.SP = function(choice){
       : E.complianceExcuse(d, c.choice, SEED, ROUND+1) });
   });
   $("pay-card").classList.add("hidden");
-  finish(requested, collected, excuses);
+  lastRequested = requested;
+  $("seat-head").textContent = "Now see who actually paid";
+  $("seat-card").scrollIntoView({ behavior:"smooth", block:"start" });
+  rollCall("payment", function(){ finish(requested, collected, excuses); });
 };
 
 function finish(requested, collected, excuses){

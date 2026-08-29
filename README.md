@@ -77,8 +77,33 @@ You drive every transition. Nothing advances without you clicking.
 **Six student groups is the sweet spot.** Leave Rhode Island as a bot — Round 3 depends on someone
 blocking the amendment, and a bot does it without a student taking the blame.
 
+### The map board
+
+The projector view is a real map of the thirteen states, drawn from US Census boundary data with 1786
+borders: **Maine is part of Massachusetts**, **West Virginia is part of Virginia**, and Vermont is drawn
+in grey because in 1786 it was a self-declared republic, not a state.
+
+When you close the vote, the map runs a **roll call**. States light up one at a time, north to south,
+while the counter climbs toward the nine it needs and a gold marker shows where the bar sits. The room
+watches the count stall at seven, or cross nine on the last state.
+
+Then on a money resolution the same map runs **a second time** for the payment step, and goes dark red
+as states refuse to pay. The tally bar still reads PASSED while the map bleeds out, and a money counter
+ticks up and visibly stalls. That contradiction on one screen is the entire lesson.
+
+**Replay the roll call** re-runs either pass on demand. **Map / List** toggles to the plain grid if you
+want delegate names instead.
+
+To regenerate the map (different states, different borders, different projection):
+
+```bash
+npm install us-atlas topojson-client topojson-simplify d3-geo --no-save
+node tools/build-map.js        # rewrites assets/map-data.js
+```
+
 ### Things on the teacher panel worth knowing
 
+- **Resolution text folds away** once the brief is over, so the map is what fills the projector.
 - **Deal ticker.** Groups send formal offers to other states ("we'll pay $50,000 of your share").
   Bots answer in one line. Read the good ones out loud — it makes the horse-trading public.
 - **Send 3 delegations home.** Drops the room below the nine-state quorum so nothing can be voted on
@@ -135,6 +160,9 @@ total 100.
 
 To change how harshly the country falls apart, see `nationalStabilityChange` in `assets/engine.js`.
 
+`assets/map-data.js` is generated — edit `tools/build-map.js` and re-run it rather than hand-editing the
+path data.
+
 ---
 
 ## Tests
@@ -144,6 +172,7 @@ npm install playwright --no-save
 python3 -m http.server 8899 &
 node tests/solo.test.js          # full 4-round solo playthrough
 node tests/multiplayer.test.js   # teacher + student, both tabs, all 4 rounds
+node tests/map.test.js           # map board, roll call, payment reveal
 ```
 
 The multiplayer test replaces the Firebase SDK with a small localStorage-backed stand-in

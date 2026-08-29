@@ -161,7 +161,10 @@
         <div class="card" id="res-card">
           <div class="spread">
             <div class="eyebrow" id="res-eyebrow">Resolution 1</div>
-            <span class="pill hot" id="rule-pill">Needs 9 of 13</span>
+            <div class="row">
+              <span class="pill hot" id="rule-pill">Needs 9 of 13</span>
+              <button class="btn ghost sm" id="res-toggle">Hide the text</button>
+            </div>
           </div>
           <h2 id="res-title">—</h2>
           <p class="lede" id="res-brief"></p>
@@ -172,16 +175,36 @@
           </div>
         </div>
 
-        <!-- seats -->
+        <!-- the board -->
         <div class="card">
           <div class="spread">
             <h3 style="margin:0" id="seats-heading">The thirteen states</h3>
             <div class="row">
+              <div class="viewtabs">
+                <button id="tab-map" class="on">Map</button><button id="tab-list">List</button>
+              </div>
               <span class="pill" id="votes-in">0 of 13 voted</span>
               <span class="pill" id="tally-pill"></span>
+              <button class="btn ghost sm hidden" id="replay-btn">Replay the roll call</button>
             </div>
           </div>
-          <div class="seats" id="seats" style="margin-top:12px"></div>
+
+          <div class="tallybar hidden" id="tallybar">
+            <div class="grp yes"><div class="big" id="t-yes">0</div><div class="lab">Yes</div></div>
+            <div class="grp no"><div class="big" id="t-no">0</div><div class="lab">No</div></div>
+            <div class="grp ab"><div class="big" id="t-ab">0</div><div class="lab">Abstain</div></div>
+            <div class="track"><div class="fill" id="t-fill"></div><div class="need" id="t-need"></div></div>
+            <div class="verdict" id="t-verdict"></div>
+            <div class="moneybar hidden" id="t-money">
+              <div class="lab">Money actually arriving</div>
+              <div class="big" id="t-money-val">$0</div>
+              <div class="lab" id="t-money-of">of $0</div>
+            </div>
+          </div>
+
+          <div class="map-wrap" id="map-view" style="margin-top:4px"></div>
+          <div class="maplegend" id="map-legend"></div>
+          <div class="seats hidden" id="seats" style="margin-top:12px"></div>
         </div>
 
         <!-- result -->
@@ -240,6 +263,8 @@
 </div>
 
 <script src="assets/game-data.js"></script>
+<script src="assets/map-data.js"></script>
+<script src="assets/map.js"></script>
 <script src="assets/engine.js"></script>
 <script src="assets/net.js"></script>
 <script src="assets/debrief.js"></script>
@@ -337,6 +362,164 @@ function seatHTML(s, opts){
     (line ? '<div class="vt">' + line + '</div>' : "") + pay + '</div>';
 }
 
+/* ---------------------------------------------------------------- board
+   The map is the projector's centrepiece. On a tally it runs a roll call:
+   states light up one at a time, north to south, with the count climbing
+   toward the nine it needs. On the payment reveal the same map runs again
+   and goes dark red as states refuse to pay — the visual rhyme is the
+   whole lesson in two passes over one picture.                          */
+var mapRoot = null, revealedKey = null, boardView = "map";
+var resCollapsed = false, lastPhase = null, moneySoFar = 0;
+
+function applyResCollapse(){
+  $("res-detail").classList.toggle("hidden", resCollapsed);
+  $("res-teaches").classList.toggle("hidden", resCollapsed);
+  $("res-brief").classList.toggle("hidden", resCollapsed);
+  $("res-toggle").textContent = resCollapsed ? "Show the full text" : "Hide the text";
+}
+$("res-toggle").addEventListener("click", function(){
+  resCollapsed = !resCollapsed; applyResCollapse();
+});
+
+function boardRows(){
+  return STATES.map(function(s){
+    return {
+      name: s.name,
+      abbr: s.abbr,
+      isBot: s.isBot,
+      isYou: false,
+      absent: (G.absent||[]).indexOf(s.name) !== -1,
+      vote: s.votes ? s.votes[G.round] : null,
+      payment: (s.payments && s.payments[G.round]) ? s.payments[G.round].choice : null
+    };
+  });
+}
+
+function setTally(y, n, a, needed, verdict){
+  $("t-yes").textContent = y; $("t-no").textContent = n; $("t-ab").textContent = a;
+  $("t-fill").style.width = Math.min(100, (y / 13) * 100) + "%";
+  $("t-need").style.left = ((needed / 13) * 100) + "%";
+  var v = $("t-verdict");
+  v.textContent = verdict || "";
+  v.className = "verdict" + (verdict === "PASSED" ? " pass" : (verdict ? " fail" : ""));
+}
+
+var LEGENDS = {
+  vote: [["#3f9160","Voted yes"],["#b8483a","Voted no"],["#8794a3","Abstained"],
+         ["#4a423a","No delegate"],["#b9b2a6","Vermont — not a state"]],
+  pay:  [["#3f9160","Paid in full"],["#c8912f","Paid half"],["#7d2019","Paid nothing"],
+         ["#4a423a","No delegate"]],
+  wait: [["#efe4cb","Yet to vote"],["#8d7f6b","Vote sealed"],
+         ["#4a423a","No delegate"],["#b9b2a6","Vermont — not a state"]]
+};
+function setLegend(kind){
+  $("map-legend").innerHTML = LEGENDS[kind].map(function(x){
+    return '<span><i style="background:' + x[0] + '"></i>' + x[1] + "</span>";
+  }).join("");
+}
+
+function renderBoard(r, ph){
+  if (!mapRoot) mapRoot = window.AOCMAP.build($("map-view"));
+  var rows = boardRows();
+  var needed = r.voteRule === "unanimous" ? 13 : 9;
+  var key = G.round + ":" + ph;
+
+  var isTally = (ph === "tally");
+  var isPayReveal = (ph === "reveal" && G.result && G.result.requested > 0);
+  var showTallybar = isTally || ph === "compliance" || ph === "reveal" || ph === "done";
+  $("tallybar").classList.toggle("hidden", !showTallybar);
+  $("replay-btn").classList.toggle("hidden", !(isTally || ph === "reveal" || ph === "done"));
+
+  if (isTally || isPayReveal) {
+    if (revealedKey !== key) {
+      revealedKey = key;
+      runReveal(rows, needed, isPayReveal ? "payment" : "votes");
+    }
+    return;
+  }
+
+  window.AOCMAP.cancel();
+  var payMode = G.result && G.result.requested > 0;
+  $("t-money").classList.toggle("hidden", !(payMode && (ph === "reveal" || ph === "done")));
+  if (payMode && G.result) {
+    $("t-money-val").textContent = E.money(G.result.collected);
+    $("t-money-of").textContent = "of " + E.money(G.result.requested);
+  }
+  if (ph === "reveal" || ph === "done") {
+    setLegend(payMode ? "pay" : "vote");
+    window.AOCMAP.paint(mapRoot, rows, payMode ? "payment" : "votes");
+    if (G.result) setTally(G.result.yes, G.result.no, G.result.abstain, needed,
+      G.result.passed ? "PASSED" : "FAILED");
+  } else if (ph === "compliance") {
+    setLegend("vote");
+    window.AOCMAP.paint(mapRoot, rows, "votes");
+    if (G.result) setTally(G.result.yes, G.result.no, G.result.abstain, needed,
+      G.result.passed ? "PASSED" : "FAILED");
+  } else {
+    setLegend("wait");
+    window.AOCMAP.paint(mapRoot, rows, "voting");
+    revealedKey = null;
+  }
+}
+
+function runReveal(rows, needed, mode){
+  setLegend(mode === "payment" ? "pay" : "vote");
+  moneySoFar = 0;
+  var R0 = G.result;
+  $("t-money").classList.toggle("hidden", mode !== "payment");
+  if (mode === "payment" && R0) {
+    $("t-money-val").textContent = "$0";
+    $("t-money-of").textContent = "of " + E.money(R0.requested);
+  }
+  if (boardView === "map") {
+    try { $("tallybar").scrollIntoView({ behavior:"smooth", block:"center" }); } catch(e){}
+  }
+  $("map-view").classList.add("dim");
+  if (mode === "votes") setTally(0, 0, 0, needed, "");
+  window.AOCMAP.revealVotes(mapRoot, rows, {
+    mode: mode,
+    step: mode === "payment" ? 330 : 430,
+    onTick: function(t){
+      if (mode === "votes") { setTally(t.yes, t.no, t.abstain, needed, ""); return; }
+      // Payment pass: watch the total climb and then stall, state by state.
+      var d = dataFor(t.name), r2 = res();
+      var owed = E.amountOwed(d, r2);
+      var choice = t.row.payment;
+      moneySoFar += choice === "full" ? owed : (choice === "half" ? Math.round(owed/2) : 0);
+      $("t-money-val").textContent = E.money(moneySoFar);
+    },
+    onDone: function(t){
+      $("map-view").classList.remove("dim");
+      var R = G.result;
+      if (mode === "votes") {
+        setTally(t.yes, t.no, t.abstain, needed,
+          R ? (R.passed ? "PASSED" : "FAILED") : (t.yes >= needed ? "PASSED" : "FAILED"));
+      } else if (R) {
+        setTally(R.yes, R.no, R.abstain, needed, R.passed ? "PASSED" : "FAILED");
+      }
+    }
+  });
+}
+
+$("replay-btn").addEventListener("click", function(){
+  var r = res(); if (!r) return;
+  var needed = r.voteRule === "unanimous" ? 13 : 9;
+  var mode = (G.result && G.result.requested > 0 && (G.phase === "reveal" || G.phase === "done"))
+    ? "payment" : "votes";
+  runReveal(boardRows(), needed, mode);
+});
+
+$("tab-map").addEventListener("click", function(){ setBoardView("map"); });
+$("tab-list").addEventListener("click", function(){ setBoardView("list"); });
+function setBoardView(v){
+  boardView = v;
+  $("tab-map").classList.toggle("on", v === "map");
+  $("tab-list").classList.toggle("on", v === "list");
+  $("map-view").classList.toggle("hidden", v !== "map");
+  $("map-legend").classList.toggle("hidden", v !== "map");
+  $("seats").classList.toggle("hidden", v !== "list");
+}
+
 var PROMPTS = {
   brief: "Read the resolution out loud. Tell groups to open their own screen and read what it costs their state.",
   caucus: "Two minutes. Get out of your seats. Argue, threaten, and make deals. Watch the deal ticker — read good offers out loud.",
@@ -383,6 +566,11 @@ function render(){
     compliance:"Payment",reveal:"Reveal",done:"Between rounds"})[ph] || ph;
   $("prompt-text").textContent = PROMPTS[ph] || "";
 
+  // The class reads the resolution during the brief. After that the map is
+  // what belongs on the projector, so fold the wall of text away by default.
+  if (ph !== lastPhase) { resCollapsed = (ph !== "brief"); lastPhase = ph; }
+  applyResCollapse();
+
   var showVotes = (ph === "tally" || ph === "compliance" || ph === "reveal" || ph === "done");
   var showPay = (ph === "reveal" || ph === "done");
   $("seats").innerHTML = present().map(function(s){
@@ -391,6 +579,8 @@ function render(){
     var s = STATES.filter(function(x){return x.name===n;})[0];
     return s ? seatHTML(s, {}) : "";
   }).join("");
+
+  renderBoard(r, ph);
 
   var voted = present().filter(function(s){ return s.votes && s.votes[G.round]; }).length;
   $("votes-in").textContent = voted + " of " + present().length + " voted";

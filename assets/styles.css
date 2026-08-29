@@ -201,3 +201,107 @@ ul.clean{list-style:none;padding:0;margin:0}
 ul.clean li{padding:5px 0 5px 22px;position:relative}
 ul.clean li::before{content:"—";position:absolute;left:0;color:var(--gold-dk);font-weight:700}
 .scroll-y{overflow-y:auto}
+
+/* ============================================================
+   THE MAP BOARD
+   ============================================================ */
+.map-wrap{background:#c3d6e0;border:2px solid var(--line);border-radius:var(--r);
+  padding:8px;position:relative;overflow:hidden}
+.map-wrap.dim{background:#a9c2d0}
+.aoc-map{display:block;width:100%;height:auto;max-height:76vh}
+
+.aoc-map .shape{fill:var(--parch);stroke:#6b4a2f;stroke-width:1.3;stroke-linejoin:round;
+  transition:fill .45s ease, stroke .45s ease}
+.aoc-map .st.neutral .shape{fill:#b9b2a6;stroke:#8c8378}
+.aoc-map .st.pending .shape{fill:#efe4cb}
+.aoc-map .st.sealed  .shape{fill:#8d7f6b;stroke:#5d5344}
+.aoc-map .st.absent  .shape{fill:#4a423a;stroke:#2f2924}
+.aoc-map .st.v-yes     .shape{fill:#3f9160;stroke:#1d5233}
+.aoc-map .st.v-no      .shape{fill:#b8483a;stroke:#6e1f17}
+.aoc-map .st.v-abstain .shape{fill:#8794a3;stroke:#4a5563}
+.aoc-map .st.p-full .shape{fill:#3f9160;stroke:#1d5233}
+.aoc-map .st.p-half .shape{fill:url(#hatch);stroke:#8f6413}
+.aoc-map .st.p-none .shape{fill:#7d2019;stroke:#4a0f0b}
+.aoc-map .st.you .shape{stroke:var(--gold);stroke-width:3.5}
+
+.aoc-map .landing .shape{animation:landflash .6s ease}
+@keyframes landflash{0%{filter:brightness(2.3)}100%{filter:brightness(1)}}
+.aoc-map .landing .ab,.aoc-map .landing .nm,.aoc-map .landing .vt{animation:landpop .6s ease}
+@keyframes landpop{0%{opacity:0;transform:translateY(-6px)}60%{opacity:1}100%{opacity:1;transform:none}}
+.aoc-map .landing .chipbg{animation:landflash .6s ease}
+
+/* text on the map */
+.aoc-map text{font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  paint-order:stroke fill;pointer-events:none}
+.aoc-map .inlabel .ab{font-size:31px;font-weight:800;text-anchor:middle;fill:var(--ink);
+  stroke:rgba(255,255,255,.6);stroke-width:3.5px;letter-spacing:.02em}
+.aoc-map .inlabel .vt{font-size:15px;font-weight:800;text-anchor:middle;fill:var(--ink-soft);
+  stroke:rgba(255,255,255,.55);stroke-width:3px;letter-spacing:.08em}
+.aoc-map .inlabel .sub{font-size:13px;font-weight:700;text-anchor:middle;fill:#5f5850;
+  stroke:rgba(255,255,255,.45);stroke-width:2.5px}
+.aoc-map .inlabel.v-yes .ab,.aoc-map .inlabel.v-yes .vt,
+.aoc-map .inlabel.p-full .ab,.aoc-map .inlabel.p-full .vt{fill:#0f3d22;stroke:rgba(255,255,255,.75)}
+.aoc-map .inlabel.v-no .ab,.aoc-map .inlabel.v-no .vt,
+.aoc-map .inlabel.p-none .ab,.aoc-map .inlabel.p-none .vt{fill:#fff;stroke:rgba(0,0,0,.35)}
+.aoc-map .inlabel.absent .ab,.aoc-map .inlabel.absent .vt{fill:#cdc3b6;stroke:rgba(0,0,0,.5)}
+.aoc-map .inlabel.v-abstain .ab,.aoc-map .inlabel.v-abstain .vt{fill:#1d242c;stroke:rgba(255,255,255,.6)}
+
+/* chips out in the Atlantic */
+.aoc-map .leader{stroke:#5d7b8c;stroke-width:1.6;stroke-dasharray:4 4}
+.aoc-map .chipbg{fill:var(--parch);stroke:#6b4a2f;stroke-width:1.6;transition:fill .45s ease}
+.aoc-map .chip .ab{font-size:23px;font-weight:800;fill:var(--ink)}
+.aoc-map .chip .nm{font-size:13px;font-weight:700;fill:var(--ink-soft);letter-spacing:.03em}
+.aoc-map .chip .vt{font-size:14px;font-weight:800;fill:var(--ink-soft);letter-spacing:.09em}
+.aoc-map .chip.pending .chipbg{fill:#efe4cb}
+.aoc-map .chip.sealed  .chipbg{fill:#8d7f6b}
+.aoc-map .chip.absent  .chipbg{fill:#4a423a}
+.aoc-map .chip.v-yes     .chipbg{fill:#3f9160;stroke:#1d5233}
+.aoc-map .chip.v-no      .chipbg{fill:#b8483a;stroke:#6e1f17}
+.aoc-map .chip.v-abstain .chipbg{fill:#8794a3;stroke:#4a5563}
+.aoc-map .chip.p-full .chipbg{fill:#3f9160;stroke:#1d5233}
+.aoc-map .chip.p-half .chipbg{fill:url(#hatch);stroke:#8f6413}
+.aoc-map .chip.p-none .chipbg{fill:#7d2019;stroke:#4a0f0b}
+.aoc-map .chip.you .chipbg{stroke:var(--gold);stroke-width:3.5}
+.aoc-map .chip.v-yes .ab,.aoc-map .chip.v-yes .nm,.aoc-map .chip.v-yes .vt,
+.aoc-map .chip.p-full .ab,.aoc-map .chip.p-full .nm,.aoc-map .chip.p-full .vt{fill:#eafaf0}
+.aoc-map .chip.v-no .ab,.aoc-map .chip.v-no .nm,.aoc-map .chip.v-no .vt,
+.aoc-map .chip.p-none .ab,.aoc-map .chip.p-none .nm,.aoc-map .chip.p-none .vt,
+.aoc-map .chip.absent .ab,.aoc-map .chip.absent .nm,.aoc-map .chip.absent .vt,
+.aoc-map .chip.sealed .ab,.aoc-map .chip.sealed .nm,.aoc-map .chip.sealed .vt{fill:#fdf6e6}
+.aoc-map .chip.v-abstain .ab,.aoc-map .chip.v-abstain .nm,.aoc-map .chip.v-abstain .vt{fill:#141a20}
+
+/* the running tally that sits over the map */
+.tallybar{display:flex;align-items:center;gap:14px;background:var(--slate);color:var(--parch);
+  border-radius:9px;padding:10px 15px;margin-bottom:8px;flex-wrap:wrap}
+.tallybar .big{font-size:2.1rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
+.tallybar .lab{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.66rem;font-weight:700;
+  letter-spacing:.13em;text-transform:uppercase;color:#b3a795}
+.tallybar .grp{text-align:center;min-width:56px}
+.tallybar .grp.yes .big{color:#6ed296}
+.tallybar .grp.no .big{color:#f0897a}
+.tallybar .grp.ab .big{color:#b9c4d1}
+.tallybar .track{flex:1;min-width:170px;height:20px;background:#3d3730;border-radius:99px;
+  position:relative;overflow:hidden;border:1px solid #52493f}
+.tallybar .fill{height:100%;background:linear-gradient(90deg,#2f7d4f,#5fbf87);
+  width:0;transition:width .4s cubic-bezier(.2,.8,.2,1)}
+.tallybar .need{position:absolute;top:-3px;bottom:-3px;width:3px;background:var(--gold);
+  box-shadow:0 0 0 1px rgba(0,0,0,.4)}
+.tallybar .verdict{font-size:1.5rem;font-weight:800;letter-spacing:.04em}
+.tallybar .verdict.pass{color:#6ed296}
+.tallybar .verdict.fail{color:#f0897a}
+
+/* map legend */
+.maplegend{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:8px;
+  font-family:ui-sans-serif,system-ui,sans-serif;font-size:.72rem;font-weight:700;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint)}
+.maplegend span{display:flex;align-items:center;gap:6px}
+.maplegend i{width:15px;height:15px;border-radius:4px;border:1px solid var(--line);display:inline-block}
+
+.viewtabs{display:inline-flex;border:2px solid var(--line);border-radius:8px;overflow:hidden}
+.viewtabs button{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.76rem;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;padding:.45em .9em;border:0;cursor:pointer;
+  background:var(--parch-2);color:var(--ink-soft)}
+.viewtabs button.on{background:var(--red);color:var(--parch)}
+.tallybar .moneybar{text-align:right;padding-left:16px;border-left:2px solid #4a423a;min-width:150px}
+.tallybar .moneybar .big{font-size:1.6rem;color:#f0c97a;font-variant-numeric:tabular-nums}
+.tallybar .moneybar .lab{color:#b3a795}
