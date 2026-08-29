@@ -145,6 +145,23 @@ node tools/build-map.js        # rewrites assets/map-data.js
 
 ---
 
+## How a resolution is explained
+
+Before a single vote is cast, every resolution puts four things in front of the student:
+
+1. **The question, in one sentence** — "Should the Articles be amended to give Congress a 5% import
+   tax?" Boxed and set apart, so nobody votes without knowing what they are voting on.
+2. **If it passes / If it fails** — side by side, green and red. Written honestly: under the Articles,
+   passing frequently changed nothing, and the text says so ("Congress sends every state a polite
+   request. New York does not have to listen.").
+3. **What it costs you** — your share in dollars and as a share of your whole treasury. On the two
+   rounds with no bill to pay, it says so plainly instead of vanishing.
+4. **What this touches for you** — which of your state's interests are pulled, and how hard.
+
+Plus the vote threshold on a badge (9 of 13, or ALL 13) and tappable definitions for the hard words.
+The prose runs at roughly a 6th-grade reading level, which is deliberate — students read it under time
+pressure while somebody argues at them.
+
 ## The student screen
 
 Two students share one laptop, so the screen is built to answer three questions without scrolling:
@@ -215,6 +232,7 @@ Nearly everything a teacher would want to change is in **`assets/game-data.js`**
 
 - `STATES` — each state's background, secret objective, two internal factions, treasury, and bot weights
 - `RESOLUTIONS` — the text students read, the yes/no arguments, vote rule, tags
+- `question`, `ifPasses`, `ifFails` — the briefing shown before the vote
 - `narration` on each resolution — the opening scene you read to the class
 - `HISTORY_NOTES` — the "what actually happened" box after each round
 - `GLOSSARY` and `WEAKNESSES` — used in the debrief
@@ -239,6 +257,7 @@ node tests/multiplayer.test.js   # teacher + student, both tabs, all 4 rounds
 node tests/map.test.js           # map board, roll call, payment reveal
 node tests/deals.test.js         # bot offers answer, human offers are only delivered
 node tests/narration.test.js     # read-aloud on both screens, live treasury token
+node tests/explain.test.js       # every resolution states the question, both outcomes and the stake
 ```
 
 The multiplayer test replaces the Firebase SDK with a small localStorage-backed stand-in
