@@ -242,6 +242,16 @@
   var RESOLUTIONS = [
     {
       id: "debt",
+      narration: {
+        dateline: "Philadelphia \u00b7 January 1786",
+        lines: [
+          "The letter from Paris came this morning. It is extremely polite, and it is a threat.",
+          "France lent us millions to win our war. French ships sealed the bay at Yorktown. French soldiers died in our fields. The loan came due two years ago, and we have not sent them one dollar.",
+          "You are the Congress of the United States. Look around the room. There is no president in it. There is no court. There is no treasury with money in it. There are thirteen delegations and a bill nobody here can pay.",
+          "Congress may ask the states for money. Congress may not make them send it.",
+          "The floor is open."
+        ]
+      },
       number: 1,
       title: "Paying the War Debt",
       subtitle: "A requisition of $1,000,000",
@@ -264,6 +274,16 @@
     },
     {
       id: "trade",
+      narration: {
+        dateline: "New York Harbor \u00b7 March 1786",
+        lines: [
+          "A farmer in New Jersey loaded a wagon with grain and drove it to the docks. New York taxed him for crossing. He paid, sold his grain for less than it cost him to grow, and went home angry.",
+          "New Jersey struck back last week. There is a lighthouse out on Sandy Hook that New York built and New York owns, and it stands on Jersey sand. New Jersey has started taxing it.",
+          "Understand what you are looking at. This is not two countries fighting. These are two American states, and they are doing this to each other on purpose, and the men who did it were cheered at home.",
+          "Congress may ask them to stop. Asking is the entire power Congress has here.",
+          "The floor is open."
+        ]
+      },
       number: 2,
       title: "The Trade War",
       subtitle: "A resolution asking states to stop taxing each other",
@@ -282,6 +302,17 @@
     },
     {
       id: "impost",
+      narration: {
+        dateline: "Philadelphia \u00b7 July 1786",
+        lines: [
+          "Five years of asking. Five years of writing to the states for money and watching most of it never arrive.",
+          "There is one way out and every delegate in this room already knows it. Give Congress a tax of its own. Five dollars on every hundred dollars of foreign goods that crosses a dock. Small, steady, and ours \u2014 so that we never have to beg again.",
+          "But this changes the Articles themselves, and Article Thirteen is not vague about what that costs.",
+          "Not nine states. Not twelve.",
+          "All thirteen. Every delegation in this room. Any one of you can end this by folding your arms and saying nothing.",
+          "Look around and decide who that is going to be."
+        ]
+      },
       number: 3,
       title: "The Import Tax Amendment",
       subtitle: "A 5% tax on imported goods — requires all 13 states",
@@ -302,6 +333,17 @@
     },
     {
       id: "shays",
+      narration: {
+        dateline: "Springfield, Massachusetts \u00b7 January 1787",
+        lines: [
+          "Daniel Shays fought at Bunker Hill. He fought at Saratoga. He was wounded, he was decorated, and he was never paid.",
+          "He came home to a farm and a stack of debts. When the courts started taking farms from men like him, he stopped asking politely. Tonight he is marching on Springfield with more than a thousand armed men, and they are going for the guns inside the federal arsenal.",
+          "Massachusetts cannot stop him. Massachusetts has no money left.",
+          "Congress has no army. Congress cannot draft a single soldier. All Congress can do is ask you, again, for money and men.",
+          "Before you answer, look at what is actually in the national treasury tonight: {treasury}.",
+          "The floor is open."
+        ]
+      },
       number: 4,
       title: "Shays' Rebellion",
       subtitle: "An emergency: $500,000 and troops",

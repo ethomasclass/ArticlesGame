@@ -314,3 +314,36 @@ ul.clean li::before{content:"—";position:absolute;left:0;color:var(--gold-dk);
 .touch .txt{flex:1}
 .touch .mag{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.66rem;font-weight:700;
   letter-spacing:.07em;text-transform:uppercase;color:var(--ink-faint);white-space:nowrap}
+
+/* ============================================================
+   THE READ-ALOUD  — the teacher performs this to open a round
+   ============================================================ */
+.dispatch{
+  background:#211d19;color:#f2e8d4;border:2px solid #4a4137;border-left:8px solid var(--gold);
+  border-radius:var(--r);padding:22px 26px;margin-bottom:18px;box-shadow:var(--shadow);
+  position:relative
+}
+.dispatch .cuehead{display:flex;justify-content:space-between;align-items:center;gap:14px;
+  flex-wrap:wrap;margin-bottom:14px;padding-bottom:10px;border-bottom:1px dashed #4a4137}
+.dispatch .dateline{font-family:ui-sans-serif,system-ui,-apple-system,sans-serif;
+  font-size:.78rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+.dispatch .badge{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.66rem;font-weight:800;
+  letter-spacing:.13em;text-transform:uppercase;color:#a39683;white-space:nowrap}
+.dispatch p{font-size:1.28rem;line-height:1.62;margin:0 0 .82em;color:#f2e8d4;
+  text-wrap:pretty;max-width:62ch}
+.dispatch p:last-child{margin-bottom:0}
+.dispatch p:last-child{color:var(--gold);font-style:italic}
+.dispatch .tools{margin-top:14px;padding-top:12px;border-top:1px dashed #4a4137;
+  display:flex;gap:9px;flex-wrap:wrap}
+.dispatch .tools .btn{background:#3a332b;border-color:#574d41;color:#f2e8d4;box-shadow:none}
+.dispatch .tools .btn:hover:not(:disabled){background:#4a4137;transform:none}
+
+/* presenter mode: bigger for the back row */
+.dispatch.big p{font-size:1.72rem;line-height:1.55;max-width:none}
+.dispatch.big .dateline{font-size:.95rem}
+
+/* students follow along while the teacher reads */
+.dispatch.follow{border-left-color:#8c7a5c}
+.dispatch.follow p{font-size:1.12rem}
+
+.replay-narr{margin-bottom:14px}

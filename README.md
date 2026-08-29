@@ -77,6 +77,36 @@ You drive every transition. Nothing advances without you clicking.
 **Six student groups is the sweet spot.** Leave Rhode Island as a bot — Round 3 depends on someone
 blocking the amendment, and a bot does it without a student taking the blame.
 
+### The opening read-aloud
+
+Every resolution opens with a short scene for you to perform to the class — about 45 seconds, written to
+be spoken rather than skimmed. It appears on your screen in read-aloud type, and on every student screen
+at the same time so they follow the words while they hear them.
+
+The datelines advance across the period:
+
+| | | |
+|---|---|---|
+| 1 | **Philadelphia · January 1786** | the letter from Paris |
+| 2 | **New York Harbor · March 1786** | a farmer, a wagon, and a taxed lighthouse |
+| 3 | **Philadelphia · July 1786** | five years of asking, and the one way out |
+| 4 | **Springfield, Massachusetts · January 1787** | Daniel Shays on the road with a thousand men |
+
+Students feel a year pass in forty minutes, and the chronology teaches itself.
+
+Each one ends by handing the floor over — *"The floor is open."* — so there is no awkward gap between
+the story and the arguing.
+
+**Round 4 reads your class's own numbers back to it.** The line "look at what is actually in the national
+treasury tonight" is filled in live with whatever the states actually paid in Round 1. If they defected,
+you say the real, humiliating figure out loud, and the room hears the cost of its own choice.
+
+**Bigger text** switches to presenter type for the back row. **Done reading** folds it away so the map
+takes the screen, and a small button brings it back if someone arrives late.
+
+To rewrite them, edit `narration` on each entry in `assets/game-data.js`. Use `{treasury}` anywhere you
+want the live national treasury spoken.
+
 ### The map board
 
 The projector view is a real map of the thirteen states, drawn from US Census boundary data with 1786
@@ -185,6 +215,7 @@ Nearly everything a teacher would want to change is in **`assets/game-data.js`**
 
 - `STATES` — each state's background, secret objective, two internal factions, treasury, and bot weights
 - `RESOLUTIONS` — the text students read, the yes/no arguments, vote rule, tags
+- `narration` on each resolution — the opening scene you read to the class
 - `HISTORY_NOTES` — the "what actually happened" box after each round
 - `GLOSSARY` and `WEAKNESSES` — used in the debrief
 
@@ -207,6 +238,7 @@ node tests/solo.test.js          # full 4-round solo playthrough
 node tests/multiplayer.test.js   # teacher + student, both tabs, all 4 rounds
 node tests/map.test.js           # map board, roll call, payment reveal
 node tests/deals.test.js         # bot offers answer, human offers are only delivered
+node tests/narration.test.js     # read-aloud on both screens, live treasury token
 ```
 
 The multiplayer test replaces the Firebase SDK with a small localStorage-backed stand-in

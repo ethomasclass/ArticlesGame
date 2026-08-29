@@ -53,6 +53,14 @@
       <div class="grid g2" id="d-fac" style="margin-top:12px"></div>
     </div>
 
+    <div class="dispatch" id="dispatch">
+      <div class="cuehead">
+        <span class="dateline" id="dsp-dateline"></span>
+        <span class="badge">Read this before you decide</span>
+      </div>
+      <div id="dsp-body"></div>
+    </div>
+
     <div class="card">
       <div class="spread">
         <div class="eyebrow" id="r-eye">Resolution 1</div>
@@ -229,6 +237,11 @@ function startRound(){
     }
   });
   var r = res();
+  var narr = E.narration(r, { treasury: TREAS });
+  if (narr) {
+    $("dsp-dateline").textContent = narr.dateline;
+    $("dsp-body").innerHTML = narr.lines.map(function(l){ return "<p>" + l + "</p>"; }).join("");
+  }
   $("r-eye").textContent = "Resolution " + r.number + " of " + D.RESOLUTIONS.length + " — " + r.subtitle;
   $("r-rule").textContent = r.voteRule === "unanimous" ? "Needs ALL 13 states" : "Needs 9 of 13 states";
   $("r-title").textContent = r.title;

@@ -393,6 +393,26 @@
     return "";
   }
 
+  /* ---------------------------------------------------- the read-aloud
+     Each resolution opens with a short piece the teacher performs to the
+     class. Tokens let one line carry live game state, so Round 4 can read
+     the real treasury balance out loud and the room hears the consequence
+     of what it did in Round 1.                                           */
+  function narration(resolution, ctx) {
+    var n = resolution.narration;
+    if (!n) return null;
+    ctx = ctx || {};
+    var lines = n.lines.map(function (l) {
+      return l.replace(/\{treasury\}/g, money(ctx.treasury || 0));
+    });
+    var words = lines.join(" ").split(/\s+/).length;
+    return {
+      dateline: n.dateline,
+      lines: lines,
+      seconds: Math.round(words / 2.6)   // ~155 words a minute, read slowly
+    };
+  }
+
   /* ------------------------------------------------------------- endgame */
   function finalReport(states, nationalStability, history) {
     var COLLAPSE = 30;
@@ -449,6 +469,7 @@
     stateInterestFromCompliance: stateInterestFromCompliance,
     nationalStabilityChange: nationalStabilityChange,
     outcomeNarrative: outcomeNarrative,
+    narration: narration,
     finalReport: finalReport
   };
 })();

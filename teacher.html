@@ -157,6 +157,20 @@
           </div>
         </div>
 
+        <!-- the read-aloud -->
+        <div class="dispatch hidden" id="dispatch">
+          <div class="cuehead">
+            <span class="dateline" id="dsp-dateline"></span>
+            <span class="badge" id="dsp-badge">Read aloud to the class</span>
+          </div>
+          <div id="dsp-body"></div>
+          <div class="tools">
+            <button class="btn sm" id="dsp-big">Bigger text</button>
+            <button class="btn sm" id="dsp-done">Done reading — show the resolution</button>
+          </div>
+        </div>
+        <button class="btn ghost sm replay-narr hidden" id="dsp-again">Read the opening again</button>
+
         <!-- resolution -->
         <div class="card" id="res-card">
           <div class="spread">
@@ -369,7 +383,32 @@ function seatHTML(s, opts){
    and goes dark red as states refuse to pay — the visual rhyme is the
    whole lesson in two passes over one picture.                          */
 var mapRoot = null, revealedKey = null, boardView = "map";
-var resCollapsed = false, lastPhase = null, moneySoFar = 0;
+var resCollapsed = false, lastPhase = null, moneySoFar = 0, dspOpen = false, dspRound = null;
+
+/* -------------------------------------------------------- the read-aloud
+   Opens each round with a short scene the teacher performs. It carries the
+   live treasury into Round 4, so the class hears the cost of what it chose
+   back in Round 1 read out as a real number.                             */
+function renderDispatch(r, ph){
+  var n = E.narration(r, { treasury: G.nationalTreasury || 0 });
+  if (!n) { $("dispatch").classList.add("hidden"); $("dsp-again").classList.add("hidden"); return; }
+  if (dspRound !== G.round) {
+    dspRound = G.round;
+    $("dispatch").classList.remove("big");
+    $("dsp-big").textContent = "Bigger text";
+  }
+  $("dsp-dateline").textContent = n.dateline;
+  $("dsp-badge").textContent = "Read aloud · about " + n.seconds + " seconds";
+  $("dsp-body").innerHTML = n.lines.map(function(l){ return "<p>" + l + "</p>"; }).join("");
+  $("dispatch").classList.toggle("hidden", !dspOpen);
+  $("dsp-again").classList.toggle("hidden", dspOpen);
+}
+$("dsp-big").addEventListener("click", function(){
+  var d = $("dispatch"); d.classList.toggle("big");
+  this.textContent = d.classList.contains("big") ? "Normal text" : "Bigger text";
+});
+$("dsp-done").addEventListener("click", function(){ dspOpen = false; renderDispatch(res(), G.phase); });
+$("dsp-again").addEventListener("click", function(){ dspOpen = true; renderDispatch(res(), G.phase); });
 
 function applyResCollapse(){
   $("res-detail").classList.toggle("hidden", resCollapsed);
@@ -568,8 +607,13 @@ function render(){
 
   // The class reads the resolution during the brief. After that the map is
   // what belongs on the projector, so fold the wall of text away by default.
-  if (ph !== lastPhase) { resCollapsed = (ph !== "brief"); lastPhase = ph; }
+  if (ph !== lastPhase) {
+    resCollapsed = (ph !== "brief");
+    dspOpen = (ph === "brief");
+    lastPhase = ph;
+  }
   applyResCollapse();
+  renderDispatch(r, ph);
 
   var showVotes = (ph === "tally" || ph === "compliance" || ph === "reveal" || ph === "done");
   var showPay = (ph === "reveal" || ph === "done");

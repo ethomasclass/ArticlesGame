@@ -154,6 +154,14 @@
     <div class="deck">
       <!-- MAIN -->
       <div>
+        <div class="dispatch follow hidden" id="dispatch">
+          <div class="cuehead">
+            <span class="dateline" id="dsp-dateline"></span>
+            <span class="badge">Your teacher is reading this</span>
+          </div>
+          <div id="dsp-body"></div>
+        </div>
+
         <div class="card" id="res-card">
           <div class="spread">
             <div class="eyebrow" id="r-eyebrow">Resolution 1</div>
@@ -455,11 +463,20 @@ function render(){
   renderCost(d, r);
   renderTouch(d, r);
 
+  // Students follow along on their own screen while the teacher performs it.
+  // Seeing the words as they hear them helps the weaker readers most.
+  var narr = E.narration(r, { treasury: G.nationalTreasury || 0 });
+  $("dispatch").classList.toggle("hidden", !(narr && ph === "brief"));
+  if (narr && ph === "brief") {
+    $("dsp-dateline").textContent = narr.dateline;
+    $("dsp-body").innerHTML = narr.lines.map(function(l){ return "<p>" + l + "</p>"; }).join("");
+  }
+
   // one cue per phase
   if (amAbsent) {
     setCue("wait", "Not present", "Your delegation did not make it to Congress this round. Sit tight.");
   } else if (ph === "brief") {
-    setCue("wait", "Read it", "Read the resolution, then check what it costs you on the right. Debate is next.");
+    setCue("wait", "Listen", "Follow along while your teacher reads. Then check what this costs you, on the right.");
   } else if (ph === "caucus") {
     setCue("debate", "Debate now", "Get up and argue. Send offers to the bot states below — they answer straight away.");
   } else if (ph === "voting") {
