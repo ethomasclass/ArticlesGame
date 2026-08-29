@@ -63,9 +63,17 @@
       <div class="inset" id="r-detail"></div>
     </div>
 
-    <div class="card hidden" id="cost-card">
-      <div class="eyebrow">What this costs you</div>
-      <div id="cost-body"></div>
+    <div class="card" id="cost-card">
+      <div class="grid g2">
+        <div id="cost-wrap">
+          <div class="eyebrow">What this costs you</div>
+          <div id="cost-body"></div>
+        </div>
+        <div>
+          <div class="eyebrow">What this touches for your state</div>
+          <div id="touch-body"></div>
+        </div>
+      </div>
     </div>
 
     <div class="card">
@@ -231,7 +239,14 @@ function startRound(){
   $("vote-state").textContent = MINE;
 
   var owed = E.amountOwed(D.byName(MINE), r);
-  $("cost-card").classList.toggle("hidden", owed === 0);
+  $("cost-wrap").classList.toggle("hidden", owed === 0);
+  $("touch-body").innerHTML = E.interestBreakdown(D.byName(MINE), r).slice(0,5).map(function(b){
+    return '<div class="touch ' + (b.value > 0 ? "pos" : "neg") + '">' +
+      '<span class="arrow">' + (b.value > 0 ? "▲" : "▼") + '</span>' +
+      '<span class="txt">' + b.label + '</span>' +
+      '<span class="mag">' + (b.strength ? b.strength + " " : "") + "for " + b.toward.toLowerCase() + '</span>' +
+    '</div>';
+  }).join("");
   if (owed) {
     $("cost-body").innerHTML =
       '<div class="bill"><span>Your share of ' + E.money(r.complianceTotal) + '</span><strong>' + E.money(owed) + '</strong></div>' +

@@ -36,24 +36,28 @@ async function stub(ctx) {
   await S.waitForSelector('#s-claim:not(.hidden)', { timeout: 15000 });
   console.log('✔ claimable states:', (await S.$$eval('.claim .t', e=>e.map(x=>x.textContent))).join(', '));
   await S.locator('.claim', { has: S.locator('.t', { hasText:/^Virginia$/ }) }).click();
-  await S.waitForSelector('#s-dossier:not(.hidden)', { timeout: 15000 });
-  console.log('✔ student is', await S.textContent('#dos-name'), '| objective:',
-    (await S.textContent('#dos-obj')).slice(0,60) + '…');
+  await S.waitForSelector('#live:not(.hidden)', { timeout: 15000 });
+  console.log('✔ student is', await S.textContent('#p-name'), '| objective always on screen:',
+    (await S.textContent('#p-obj')).slice(0,55) + '…');
   await T.waitForTimeout(1200);
   console.log('✔ teacher lobby says:', (await T.textContent('#joined-count')).trim());
 
   await T.click('#begin-btn');
   await T.waitForSelector('#game:not(.hidden)', { timeout: 15000 });
-  await S.waitForSelector('#s-round:not(.hidden)', { timeout: 15000 });
+  await S.waitForSelector('#res-card:not(.hidden)', { timeout: 15000 });
   await T.waitForTimeout(600);
   console.log('✔ R1 teacher:', await T.textContent('#res-title'), '·', await T.textContent('#rule-pill'));
-  console.log('✔ R1 student cost:', (await S.textContent('#cost-body')).replace(/\s+/g,' ').slice(0,88));
+  console.log('✔ student cue:', await S.textContent('#cue'), '—', await S.textContent('#say'));
+  console.log('✔ student cost:', (await S.textContent('#p-cost')).replace(/\s+/g,' ').slice(0,80));
+  console.log('✔ what it touches:', (await S.$$eval('#p-touch .touch', e=>e.map(x=>x.textContent.replace(/\s+/g,' ').trim()))).slice(0,3).join(' | '));
 
   // debate + deal
   await T.click('#next-btn');
   await S.waitForSelector('#deal-card:not(.hidden)', { timeout: 12000 });
-  console.log('✔ timer showing:', await T.textContent('#timer'));
-  await S.selectOption('#deal-target', 'Delaware');
+  console.log('✔ teacher timer:', await T.textContent('#timer'),
+    '| student timer:', await S.textContent('#clock'),
+    '| student cue:', await S.textContent('#cue'));
+  await S.click('#deal-targets button[data-name="Delaware"]');
   await S.selectOption('#deal-offer', 'pay50');
   await S.click('#deal-send');
   await S.waitForTimeout(1500);
@@ -63,7 +67,8 @@ async function stub(ctx) {
   // vote
   await T.click('#next-btn');
   await S.waitForSelector('#vote-card:not(.hidden)', { timeout: 12000 });
-  await S.click('button:has-text("YES")');
+  console.log('✔ vote cue:', await S.textContent('#cue'));
+  await S.click('#vote-card .btn-yes');
   await S.waitForTimeout(900);
   console.log('✔ votes in:', await T.textContent('#votes-in'));
   await T.click('#next-btn');
@@ -76,15 +81,17 @@ async function stub(ctx) {
   await T.waitForTimeout(1200);
   if (passed) {
     await S.waitForSelector('#pay-card:not(.hidden)', { timeout: 12000 });
-    console.log('✔ student payment prompt:', (await S.textContent('#pay-owed')).replace(/\s+/g,' '));
-    await S.click('button:has-text("PAY NOTHING")');
+    console.log('✔ payment cue:', await S.textContent('#cue'), '—',
+      (await S.textContent('#pay-owed')).replace(/\s+/g,' '));
+    await S.click('#pay-card .btn-no');
     await S.waitForTimeout(700);
     await T.click('#next-btn');
     await T.waitForTimeout(1800);
     console.log('✔ REVEAL: asked', await T.textContent('#asked-val'), '| got', await T.textContent('#got-val'),
       '(' + await T.textContent('#pct-val') + ') | stability', await T.textContent('#stab-val'),
       '| treasury', await T.textContent('#nat-treasury'));
-    console.log('✔ student sees reveal:', (await S.textContent('#res-narr')).slice(0,90) + '…');
+    console.log('✔ student sees reveal:', (await S.textContent('#out-narr')).slice(0,88) + '…');
+    console.log('✔ student record strip:', (await S.$$eval('#p-record .rec', e=>e.map(x=>x.textContent.replace(/\s+/g,' ').trim()))).join(' / ') || '(none yet)');
   }
   await T.screenshot({ path:'tests/out-teacher.png', fullPage:true });
   await S.screenshot({ path:'tests/out-student.png', fullPage:true });
@@ -94,13 +101,14 @@ async function stub(ctx) {
     await T.click('#next-btn'); await T.waitForTimeout(700);   // next resolution
     await T.click('#next-btn'); await T.waitForTimeout(500);   // caucus
     await T.click('#next-btn'); await T.waitForTimeout(500);   // voting
-    if (await S.isVisible('#vote-card')) { await S.click('button:has-text("YES")'); await S.waitForTimeout(500); }
+    if (await S.isVisible('#vote-card')) { await S.click('#vote-card .btn-yes'); await S.waitForTimeout(500); }
     await T.click('#next-btn'); await T.waitForTimeout(1400);  // tally
     const head = (await T.textContent('#result-headline')).trim();
     await T.click('#next-btn'); await T.waitForTimeout(1000);
-    if (await S.isVisible('#pay-card')) { await S.click('button:has-text("PAY HALF")'); await S.waitForTimeout(600);
+    if (await S.isVisible('#pay-card')) { await S.click('#pay-card .btn.gold'); await S.waitForTimeout(600);
       await T.click('#next-btn'); await T.waitForTimeout(1500); }
-    console.log(`✔ R${r}: ${head}`);
+    const rec = await S.$$eval('#p-record .rec', e=>e.map(x=>x.textContent.replace(/\s+/g,' ').trim()));
+    console.log(`✔ R${r}: ${head}` + (rec.length ? `  | student record: ${rec.join(' / ')}` : ''));
   }
   await T.click('#next-btn'); await T.waitForTimeout(2000);
   await T.waitForSelector('#debrief:not(.hidden)', { timeout: 15000 });

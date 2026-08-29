@@ -7,43 +7,115 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%276%27 fill=%27%238a3324%27/%3E%3Ctext x=%2716%27 y=%2723%27 font-size=%2719%27 text-anchor=%27middle%27 fill=%27%23f5ecd8%27 font-family=%27Georgia,serif%27%3E13%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="assets/styles.css">
 <style>
+  /* ---- the bar that tells you what to do right now ---- */
+  .actionbar{position:sticky;top:0;z-index:60;display:flex;align-items:center;gap:14px;
+    background:var(--slate);color:var(--parch);border-radius:0 0 12px 12px;padding:12px 18px;
+    box-shadow:0 6px 18px rgba(0,0,0,.35);margin:0 0 16px;flex-wrap:wrap;
+    border-bottom:4px solid var(--gold)}
+  .actionbar.act-vote{border-bottom-color:#5fbf87}
+  .actionbar.act-pay{border-bottom-color:#e0574a}
+  .actionbar.act-debate{border-bottom-color:var(--gold)}
+  .actionbar.act-wait{border-bottom-color:#6b6255}
+  .actionbar .cue{font-family:ui-sans-serif,system-ui,sans-serif;font-weight:800;font-size:1.25rem;
+    letter-spacing:.03em;text-transform:uppercase;line-height:1.1}
+  .actionbar.act-vote .cue{color:#7ee0a4}
+  .actionbar.act-pay .cue{color:#ff9b8d}
+  .actionbar.act-debate .cue{color:#f0c97a}
+  .actionbar.act-wait .cue{color:#b3a795}
+  .actionbar .say{flex:1;min-width:200px;font-size:1rem;color:#e8dcc4}
+  .actionbar .clock{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:2.3rem;font-weight:700;
+    font-variant-numeric:tabular-nums;line-height:1;color:#f0c97a}
+  .actionbar .clock.low{color:#ff9b8d;animation:pulse 1s infinite}
+
+  /* ---- two columns ---- */
+  .deck{display:grid;grid-template-columns:1fr 340px;gap:18px;align-items:start}
+  @media(max-width:960px){.deck{grid-template-columns:1fr}}
+  .rail{position:sticky;top:96px}
+  @media(max-width:960px){.rail{position:static}}
+
+  /* ---- the state panel ---- */
+  .statecard{background:var(--parch);border:2px solid var(--line);border-radius:var(--r);
+    box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px}
+  .statecard .top{background:var(--slate);color:var(--parch);padding:12px 15px}
+  .statecard .top .nm{font-size:1.5rem;font-weight:700;line-height:1.1}
+  .statecard .top .who{font-size:.82rem;color:#b3a795}
+  .statecard .body{padding:14px 15px}
+  .statecard .blk{padding:11px 0;border-bottom:1px dashed var(--line)}
+  .statecard .blk:last-child{border-bottom:0;padding-bottom:0}
+  .statecard .blk:first-child{padding-top:0}
+  .numrow{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+  .obj{background:#f6e2c8;border-left:5px solid var(--red);border-radius:0 7px 7px 0;padding:10px 12px;
+    font-size:1.02rem;line-height:1.4}
+  .delegate{display:flex;gap:9px;align-items:flex-start;margin-bottom:8px}
+  .delegate .pin{flex:0 0 auto;width:22px;height:22px;border-radius:99px;background:var(--gold);
+    color:#2b1f06;font-family:ui-sans-serif,system-ui,sans-serif;font-weight:800;font-size:.76rem;
+    display:flex;align-items:center;justify-content:center;margin-top:1px}
+  .delegate .w{font-weight:700;font-size:.94rem}
+  .delegate .g{font-size:.85rem;color:var(--ink-soft);line-height:1.35}
+
+  /* ---- what this touches ---- */
+  .touch{display:flex;align-items:center;gap:9px;padding:5px 0;font-size:.95rem}
+  .touch .arrow{font-weight:800;font-size:1rem;width:15px;text-align:center;flex:0 0 auto}
+  .touch.pos .arrow{color:#1d5233}
+  .touch.neg .arrow{color:#9e2f24}
+  .touch .txt{flex:1}
+  .touch .mag{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.66rem;font-weight:700;
+    letter-spacing:.07em;text-transform:uppercase;color:var(--ink-faint);white-space:nowrap}
+
+  /* ---- record strip ---- */
+  .record{display:flex;flex-direction:column;gap:6px}
+  .rec{display:flex;gap:8px;align-items:center;font-size:.85rem;padding:5px 8px;border-radius:6px;
+    background:var(--parch-2);border:1px solid var(--line)}
+  .rec .n{font-family:ui-sans-serif,system-ui,sans-serif;font-weight:800;font-size:.7rem;
+    background:var(--slate);color:var(--parch);border-radius:4px;padding:2px 6px}
+  .rec .v{font-weight:700}
+  .rec .v.yes{color:#1d5233}.rec .v.no{color:#9e2f24}.rec .v.abs{color:#4a5563}
+  .rec .p{margin-left:auto;font-size:.74rem;font-family:ui-sans-serif,system-ui,sans-serif;
+    font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+  .rec .p.full{color:#1d5233}.rec .p.half{color:#8f6413}.rec .p.none{color:#9e2f24}
+
+  /* ---- voting ---- */
   .vote-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
-  .vote-row .btn{font-size:1.35rem;padding:1.1em .5em;width:100%}
+  .vote-row .btn{font-size:1.4rem;padding:1.1em .5em;width:100%}
   @media(max-width:600px){.vote-row{grid-template-columns:1fr}}
-  .faction{background:var(--parch-2);border:1px solid var(--line);border-left:5px solid var(--gold-dk);
-    border-radius:0 8px 8px 0;padding:11px 14px}
-  .faction .who{font-weight:700}
-  .claim{display:block;width:100%;text-align:left;background:var(--parch-2);border:2px solid var(--line);
-    border-radius:9px;padding:11px 13px;cursor:pointer;font-family:inherit;font-size:1rem;transition:.15s;margin-bottom:9px}
-  .claim:hover:not(:disabled){border-color:var(--gold);background:var(--parch-3)}
-  .claim:disabled{opacity:.45;cursor:not-allowed}
-  .claim .t{font-weight:700;font-size:1.1rem}
-  .claim .d{font-size:.8rem;color:var(--ink-faint);line-height:1.35}
-  .bill{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed var(--line)}
-  .bill:last-child{border:0}
-  .deal-form{display:grid;grid-template-columns:1fr 1fr auto;gap:9px;align-items:end}
-  @media(max-width:700px){.deal-form{grid-template-columns:1fr}}
-  .waiting{font-size:1.2rem;text-align:center;padding:22px}
-  .waiting .dot{animation:blink 1.4s infinite}
+  .bigcard{border-width:3px}
+  .bigcard.vote{border-color:#2f7d4f}
+  .bigcard.pay{border-color:var(--red)}
+
+  /* ---- deals ---- */
+  .dealgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:7px}
+  .target{text-align:left;background:var(--parch-2);border:2px solid var(--line);border-radius:8px;
+    padding:8px 10px;cursor:pointer;font-family:inherit;transition:.14s}
+  .target:hover:not(:disabled){border-color:var(--gold);background:var(--parch-3)}
+  .target.on{border-color:var(--red);background:#f6e2c8}
+  .target:disabled{opacity:.4;cursor:not-allowed}
+  .target .t{font-weight:700;font-size:.95rem}
+  .target .k{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.62rem;font-weight:700;
+    letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint)}
+  .inbox{background:#f2e6cd;border-left:5px solid var(--gold-dk);border-radius:0 8px 8px 0;
+    padding:10px 13px;margin-bottom:9px}
+
+  .waitbox{text-align:center;padding:26px 16px}
+  .waitbox .h{font-size:1.3rem;font-weight:700;margin-bottom:6px}
+  .dot{animation:blink 1.4s infinite}
   @keyframes blink{0%,100%{opacity:.25}50%{opacity:1}}
+  .glosspop{position:fixed;z-index:200;max-width:300px;background:var(--slate);color:var(--parch);
+    padding:11px 14px;border-radius:9px;box-shadow:0 8px 24px rgba(0,0,0,.4);font-size:.9rem;line-height:1.45}
+  .glosspop b{color:var(--gold);display:block;margin-bottom:3px}
 </style>
 </head>
 <body>
-<div class="wrap">
 
+<!-- ============ JOIN / CLAIM ============ -->
+<div class="wrap" id="pre">
   <div class="masthead">
-    <div>
-      <h1 id="mast-title">The Confederation Problem</h1>
-      <div class="sub" id="mast-sub">Delegation Portal</div>
-    </div>
-    <div class="row" id="mast-stats"></div>
+    <div><h1>The Confederation Problem</h1><div class="sub">Delegation Portal</div></div>
   </div>
 
-  <!-- ============ JOIN ============ -->
   <section id="s-join">
     <div class="card">
       <h2>Join your Congress</h2>
-      <p class="lede">Two delegates share this screen. Put both names in.</p>
+      <p class="lede">Two delegates share this screen. Put both first names in.</p>
       <div class="field">
         <label for="names">Your names</label>
         <input type="text" id="names" placeholder="e.g. Maya and Dev" autocomplete="off">
@@ -59,146 +131,178 @@
     </div>
   </section>
 
-  <!-- ============ CLAIM ============ -->
   <section id="s-claim" class="hidden">
     <div class="card">
       <h2>Choose your state</h2>
-      <p class="lede">Read these carefully. The state you pick decides what you want and what you are afraid of.</p>
+      <p class="lede">Read these carefully. The state you pick decides what you want and what you fear.</p>
       <div id="claim-list"></div>
     </div>
   </section>
-
-  <!-- ============ DOSSIER / WAITING ============ -->
-  <section id="s-dossier" class="hidden">
-    <div class="card">
-      <div class="eyebrow">Your delegation</div>
-      <h2 id="dos-name">—</h2>
-      <p class="lede" id="dos-bg"></p>
-      <div class="callout warn" style="margin-bottom:14px">
-        <div class="eyebrow">Secret objective — do not read this out loud</div>
-        <div id="dos-obj" style="font-size:1.1rem"></div>
-      </div>
-      <h3>The two of you do not agree</h3>
-      <p class="small muted">Your state is split. Settle it between yourselves before every vote.</p>
-      <div class="grid g2" id="dos-factions"></div>
-    </div>
-    <div class="card center">
-      <div class="waiting" id="dos-wait">Waiting for your teacher to begin<span class="dot">…</span></div>
-    </div>
-  </section>
-
-  <!-- ============ ROUND ============ -->
-  <section id="s-round" class="hidden">
-    <div class="card">
-      <div class="spread">
-        <div class="eyebrow" id="r-eyebrow">Resolution 1</div>
-        <span class="pill hot" id="r-rule">Needs 9 of 13</span>
-      </div>
-      <h2 id="r-title">—</h2>
-      <p class="lede" id="r-brief"></p>
-      <div class="inset" id="r-detail"></div>
-    </div>
-
-    <div class="card" id="cost-card">
-      <div class="eyebrow">What this costs your state</div>
-      <div id="cost-body"></div>
-    </div>
-
-    <div class="card">
-      <h3>The argument</h3>
-      <div class="grid g2">
-        <div class="inset" style="border-left:5px solid var(--yes)">
-          <div class="eyebrow" style="color:#1d5233">A reason to vote yes</div>
-          <div id="r-yes"></div>
-        </div>
-        <div class="inset" style="border-left:5px solid var(--no)">
-          <div class="eyebrow" style="color:#8a2019">A reason to vote no</div>
-          <div id="r-no"></div>
-        </div>
-      </div>
-      <div id="r-factions" class="grid g2" style="margin-top:14px"></div>
-    </div>
-
-    <!-- deals -->
-    <div class="card" id="deal-card">
-      <div class="spread">
-        <h3 style="margin:0">Make a deal</h3>
-        <span class="pill" id="deal-left">2 offers left</span>
-      </div>
-      <p class="small muted">Bot states will answer you. Student states you have to talk to in person.</p>
-      <div class="deal-form">
-        <div class="field" style="margin:0">
-          <label for="deal-target">Offer to</label>
-          <select id="deal-target"></select>
-        </div>
-        <div class="field" style="margin:0">
-          <label for="deal-offer">You offer</label>
-          <select id="deal-offer"></select>
-        </div>
-        <button class="btn" id="deal-send">Send</button>
-      </div>
-      <div class="ticker inset" id="deal-log" style="margin-top:12px"></div>
-    </div>
-
-    <!-- voting -->
-    <div class="card" id="vote-card">
-      <h3 class="center" id="vote-q">How does your delegation vote?</h3>
-      <div class="vote-row">
-        <button class="btn btn-yes" onclick="AOCVOTE('Yes')">YES</button>
-        <button class="btn btn-no" onclick="AOCVOTE('No')">NO</button>
-        <button class="btn btn-abstain" onclick="AOCVOTE('Abstain')">ABSTAIN</button>
-      </div>
-      <p class="small muted center" style="margin-top:10px">An abstention is not neutral. Nine <em>yes</em>
-      votes are needed, so abstaining helps the resolution fail.</p>
-    </div>
-
-    <div class="card hidden" id="voted-card">
-      <div class="waiting">Your vote is recorded: <strong id="voted-what"></strong><br>
-      <span class="small muted">Waiting for the other states<span class="dot">…</span></span></div>
-    </div>
-
-    <!-- compliance -->
-    <div class="card hidden" id="pay-card" style="border-color:var(--red);border-width:3px">
-      <div class="eyebrow" style="color:var(--red)">Congress said yes. Now decide for real.</div>
-      <h2>Are you actually going to send the money?</h2>
-      <p class="lede" id="pay-owed">—</p>
-      <div class="callout warn">
-        <p style="margin:0"><strong>Nobody can make you pay.</strong> There is no president to send after you
-        and no national court to take you to. If you refuse, the money simply never arrives, and nothing
-        happens to your state.</p>
-      </div>
-      <div class="vote-row" style="margin-top:14px">
-        <button class="btn btn-yes" onclick="AOCPAY('full')">PAY IN FULL</button>
-        <button class="btn gold" onclick="AOCPAY('half')">PAY HALF</button>
-        <button class="btn btn-no" onclick="AOCPAY('none')">PAY NOTHING</button>
-      </div>
-    </div>
-
-    <div class="card hidden" id="paid-card">
-      <div class="waiting">Your decision is recorded: <strong id="paid-what"></strong><br>
-      <span class="small muted">Waiting for the reveal<span class="dot">…</span></span></div>
-    </div>
-
-    <!-- result -->
-    <div class="card hidden" id="res-card">
-      <h2 id="res-head">—</h2>
-      <p class="lede" id="res-narr"></p>
-      <div id="res-money" class="hidden">
-        <div class="grid g3">
-          <div class="stat"><div class="k">Congress asked</div><div class="v" id="res-asked">$0</div></div>
-          <div class="stat"><div class="k">Congress got</div><div class="v" id="res-got">$0</div></div>
-          <div class="stat"><div class="k">That is</div><div class="v" id="res-pct">0%</div></div>
-        </div>
-      </div>
-      <div class="hist hidden" id="res-hist" style="margin-top:14px">
-        <div class="eyebrow">What actually happened</div>
-        <div id="res-hist-text"></div>
-      </div>
-    </div>
-  </section>
-
-  <section id="s-debrief" class="hidden"></section>
 </div>
+
+<!-- ============ THE GAME ============ -->
+<div id="live" class="hidden">
+  <div class="actionbar act-wait" id="actionbar">
+    <div>
+      <div class="cue" id="cue">Waiting</div>
+    </div>
+    <div class="say" id="say">Waiting for your teacher to begin.</div>
+    <div class="clock hidden" id="clock">2:00</div>
+  </div>
+
+  <div class="wrap-wide">
+    <div class="deck">
+      <!-- MAIN -->
+      <div>
+        <div class="card" id="res-card">
+          <div class="spread">
+            <div class="eyebrow" id="r-eyebrow">Resolution 1</div>
+            <span class="pill hot" id="r-rule">Needs 9 of 13</span>
+          </div>
+          <h2 id="r-title">—</h2>
+          <p class="lede" id="r-brief"></p>
+          <div class="inset" id="r-detail"></div>
+        </div>
+
+        <div class="card">
+          <h3>What each side says</h3>
+          <div class="grid g2">
+            <div class="inset" style="border-left:5px solid var(--yes)">
+              <div class="eyebrow" style="color:#1d5233">A reason to vote yes</div>
+              <div id="r-yes"></div>
+            </div>
+            <div class="inset" style="border-left:5px solid var(--no)">
+              <div class="eyebrow" style="color:#8a2019">A reason to vote no</div>
+              <div id="r-no"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- deals -->
+        <div class="card" id="deal-card">
+          <div class="spread">
+            <h3 style="margin:0">Go get votes</h3>
+            <span class="pill" id="deal-left">2 offers left</span>
+          </div>
+          <p class="small muted">Nine states must say yes. You cannot get there alone.</p>
+          <div id="inbox"></div>
+          <div class="eyebrow" style="margin-top:10px">1 · Who are you offering?</div>
+          <div class="dealgrid" id="deal-targets"></div>
+          <div class="eyebrow" style="margin-top:12px">2 · What are you offering?</div>
+          <select id="deal-offer" style="margin-bottom:10px"></select>
+          <button class="btn wide" id="deal-send" disabled>Send the offer</button>
+          <div class="ticker inset" id="deal-log" style="margin-top:12px"></div>
+        </div>
+
+        <!-- vote -->
+        <div class="card bigcard vote" id="vote-card">
+          <h3 class="center" style="font-size:1.4rem">How does <span id="vote-state"></span> vote?</h3>
+          <div class="vote-row">
+            <button class="btn btn-yes" onclick="AOCVOTE('Yes')">YES</button>
+            <button class="btn btn-no" onclick="AOCVOTE('No')">NO</button>
+            <button class="btn btn-abstain" onclick="AOCVOTE('Abstain')">ABSTAIN</button>
+          </div>
+          <p class="small muted center" style="margin-top:10px">Abstaining is not neutral. Nine
+          <em>yes</em> votes are needed, so abstaining helps it fail.</p>
+        </div>
+
+        <!-- payment -->
+        <div class="card bigcard pay hidden" id="pay-card">
+          <div class="eyebrow" style="color:var(--red)">Congress said yes. Now decide for real.</div>
+          <h2>Are you actually going to send the money?</h2>
+          <p class="lede" id="pay-owed">—</p>
+          <div class="callout warn">
+            <p style="margin:0"><strong>Nobody can make you pay.</strong> There is no president to send
+            after you and no national court to take you to. Refuse, and nothing happens to your state.</p>
+          </div>
+          <div class="vote-row" style="margin-top:14px">
+            <button class="btn btn-yes" onclick="AOCPAY('full')">PAY IN FULL</button>
+            <button class="btn gold" onclick="AOCPAY('half')">PAY HALF</button>
+            <button class="btn btn-no" onclick="AOCPAY('none')">PAY NOTHING</button>
+          </div>
+        </div>
+
+        <!-- waiting / result -->
+        <div class="card hidden" id="wait-card">
+          <div class="waitbox">
+            <div class="h" id="wait-h">Locked in</div>
+            <div class="muted" id="wait-p">Waiting for the other states<span class="dot">…</span></div>
+          </div>
+        </div>
+
+        <div class="card hidden" id="out-card">
+          <h2 id="out-head">—</h2>
+          <p class="lede" id="out-narr"></p>
+          <div id="out-money" class="hidden">
+            <div class="grid g3">
+              <div class="stat"><div class="k">Congress asked</div><div class="v" id="o-ask">$0</div></div>
+              <div class="stat"><div class="k">Congress got</div><div class="v" id="o-got">$0</div></div>
+              <div class="stat"><div class="k">That is</div><div class="v" id="o-pct">0%</div></div>
+            </div>
+          </div>
+          <div class="hist hidden" id="out-hist" style="margin-top:14px">
+            <div class="eyebrow">What actually happened</div>
+            <div id="out-hist-text"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RAIL: your state, always here -->
+      <div class="rail">
+        <div class="statecard">
+          <div class="top">
+            <div class="nm" id="p-name">—</div>
+            <div class="who" id="p-who"></div>
+          </div>
+          <div class="body">
+            <div class="blk">
+              <div class="numrow">
+                <div class="stat"><div class="k">Treasury</div><div class="v" id="p-treas">$0</div></div>
+                <div class="stat"><div class="k">Your interest</div><div class="v" id="p-int">50</div></div>
+              </div>
+              <div class="small muted" style="margin-top:7px">Your score is how well you protect
+              <em>your own state</em>. The country's health is a separate number
+              (<strong id="p-nation">60</strong>/100).</div>
+            </div>
+
+            <div class="blk">
+              <div class="eyebrow">Your secret objective</div>
+              <div class="obj" id="p-obj">—</div>
+            </div>
+
+            <div class="blk" id="p-cost-blk">
+              <div class="eyebrow">What this bill costs you</div>
+              <div id="p-cost"></div>
+            </div>
+
+            <div class="blk" id="p-touch-blk">
+              <div class="eyebrow">What this touches for you</div>
+              <div id="p-touch"></div>
+            </div>
+
+            <div class="blk">
+              <div class="eyebrow">The two of you disagree</div>
+              <div id="p-factions"></div>
+              <div class="small muted">Settle it between yourselves before you vote.</div>
+            </div>
+
+            <div class="blk" id="p-rec-blk">
+              <div class="eyebrow">Your record so far</div>
+              <div class="record" id="p-record"></div>
+            </div>
+
+            <div class="blk">
+              <div class="eyebrow">Where you come from</div>
+              <div class="small" id="p-bg"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="s-debrief" class="wrap hidden"></div>
 
 <script src="assets/game-data.js"></script>
 <script src="assets/engine.js"></script>
@@ -210,17 +314,13 @@
 var D = window.AOC, E = window.ENGINE;
 var $ = function(id){ return document.getElementById(id); };
 
-var CODE=null, NAMES=null, MINE=null, G=null, ME=null, ALL=[], lastPhase=null;
+var CODE=null, NAMES=null, MINE=null, G=null, ME=null, ALL=[];
+var dealTarget=null, tickTimer=null;
 
-function show(id){
-  ["s-join","s-claim","s-dossier","s-round","s-debrief"].forEach(function(x){
-    $(x).classList.toggle("hidden", x !== id);
-  });
-}
 function myData(){ return D.byName(MINE); }
 function res(){ return (G && G.round >= 0) ? D.RESOLUTIONS[G.round] : null; }
 
-/* ------------------------------------------------------------- joining */
+/* ---------------------------------------------------------------- join */
 $("join-btn").addEventListener("click", function(){
   var names = $("names").value.trim();
   var code = $("code").value.trim().toUpperCase();
@@ -231,7 +331,10 @@ $("join-btn").addEventListener("click", function(){
     CODE = code; NAMES = names; G = g;
     $("join-err").textContent = "";
     return NET.listStates(code).then(function(list){
-      ALL = list; renderClaims(); show("s-claim");
+      ALL = list;
+      $("s-join").classList.add("hidden");
+      $("s-claim").classList.remove("hidden");
+      renderClaims();
       try{ localStorage.setItem("aoc_student", JSON.stringify({code:code,names:names})); }catch(e){}
     });
   }).catch(function(err){ $("join-err").textContent = "Could not connect: " + err.message; });
@@ -265,17 +368,43 @@ function claim(name){
 
 function startListening(){
   var d = myData();
-  $("mast-title").textContent = d.name;
-  $("mast-sub").textContent = "Delegates: " + NAMES;
-  $("dos-name").textContent = d.name;
-  $("dos-bg").textContent = d.background;
-  $("dos-obj").textContent = d.objective;
-  $("dos-factions").innerHTML = d.factions.map(function(f){
-    return '<div class="faction"><div class="who">' + f.name + '</div><div>' + f.wants + '</div></div>';
+  $("pre").classList.add("hidden");
+  $("live").classList.remove("hidden");
+  $("p-name").textContent = d.name;
+  $("p-who").textContent = "Delegates: " + NAMES;
+  $("p-obj").textContent = d.objective;
+  $("p-bg").textContent = d.background;
+  $("p-factions").innerHTML = d.factions.map(function(f,i){
+    return '<div class="delegate"><div class="pin">' + (i+1) + '</div><div>' +
+           '<div class="w">' + f.name + '</div><div class="g">' + f.wants + '</div></div></div>';
   }).join("");
-  show("s-dossier");
+  document.title = d.name + " — The Confederation Problem";
   NET.onGame(CODE, function(g){ G = g; render(); });
   NET.onState(CODE, MINE, function(s){ ME = s; render(); });
+}
+
+/* ------------------------------------------------------------- the cue
+   One line at the top that always answers "what am I supposed to be doing
+   right now". Everything else on the page is reference material.        */
+function setCue(kind, cue, say){
+  var b = $("actionbar");
+  b.className = "actionbar act-" + kind;
+  $("cue").textContent = cue;
+  $("say").textContent = say;
+}
+
+function runClock(){
+  if (tickTimer) { clearInterval(tickTimer); tickTimer = null; }
+  var on = G.phase === "caucus" && G.caucusEndsAt;
+  $("clock").classList.toggle("hidden", !on);
+  if (!on) return;
+  var tick = function(){
+    var left = Math.max(0, Math.round((G.caucusEndsAt - Date.now())/1000));
+    var m = Math.floor(left/60), s = left % 60;
+    $("clock").textContent = m + ":" + (s<10?"0":"") + s;
+    $("clock").classList.toggle("low", left <= 20);
+  };
+  tick(); tickTimer = setInterval(tick, 250);
 }
 
 /* -------------------------------------------------------------- render */
@@ -283,135 +412,268 @@ function render(){
   if (!G || !ME) return;
   var d = myData();
 
-  $("mast-stats").innerHTML =
-    '<div class="stat"><div class="k">Treasury</div><div class="v">' + E.money(ME.treasuryNow) + '</div></div>' +
-    '<div class="stat"><div class="k">State interest</div><div class="v">' + Math.round(ME.interest) + '</div></div>' +
-    '<div class="stat"><div class="k">Nation</div><div class="v">' + Math.round(G.stability) + '</div></div>';
-
   if (G.status === "ended") {
-    show("s-debrief");
+    $("live").classList.add("hidden");
+    $("s-debrief").classList.remove("hidden");
     NET.listStates(CODE).then(function(list){
       window.DEBRIEF.render($("s-debrief"), G, list, { you: MINE });
     });
     return;
   }
-  if (G.status === "lobby" || G.round < 0) { show("s-dossier"); return; }
+
+  $("p-treas").textContent = E.money(ME.treasuryNow);
+  $("p-int").textContent = Math.round(ME.interest);
+  $("p-nation").textContent = Math.round(G.stability);
+  renderRecord();
+
+  if (G.status === "lobby" || G.round < 0) {
+    setCue("wait", "Get ready", "Read your objective and your two factions on the right. Your teacher will start Resolution 1.");
+    ["res-card","deal-card","vote-card","pay-card","wait-card","out-card"].forEach(function(x){
+      $(x).classList.add("hidden"); });
+    $("p-cost-blk").classList.add("hidden");
+    $("p-touch-blk").classList.add("hidden");
+    return;
+  }
 
   var r = res(); if (!r) return;
-  show("s-round");
-
-  if ((G.absent||[]).indexOf(MINE) !== -1) {
-    $("dos-wait").textContent = "Your delegation is not present today.";
-  }
-
-  $("r-eyebrow").textContent = "Resolution " + r.number + " — " + r.subtitle;
-  $("r-rule").textContent = r.voteRule === "unanimous" ? "Needs ALL 13 states" : "Needs 9 of 13 states";
-  $("r-title").textContent = r.title;
-  $("r-brief").textContent = r.brief;
-  $("r-detail").innerHTML = r.detail.split("\n\n").map(function(p){ return "<p>"+p+"</p>"; }).join("");
-  $("r-yes").textContent = r.yesCase;
-  $("r-no").textContent = r.noCase;
-  $("r-factions").innerHTML = d.factions.map(function(f){
-    return '<div class="faction"><div class="who">' + f.name + '</div><div class="small">' + f.wants + '</div></div>';
-  }).join("");
-
-  // cost to this state
-  var owed = E.amountOwed(d, r);
-  if (owed > 0) {
-    $("cost-card").classList.remove("hidden");
-    var pctT = Math.round(owed / ME.treasuryNow * 100);
-    $("cost-body").innerHTML =
-      '<div class="bill"><span>Your share of ' + E.money(r.complianceTotal) + '</span>' +
-        '<strong>' + E.money(owed) + '</strong></div>' +
-      '<div class="bill"><span>Your treasury right now</span><strong>' + E.money(ME.treasuryNow) + '</strong></div>' +
-      '<div class="bill"><span>Paying in full would cost you</span><strong style="color:#8a2019">' +
-        pctT + '% of everything you have</strong></div>' +
-      '<p class="small muted" style="margin:9px 0 0">Your share is based on ' +
-        (r.complianceBasis === "popShare" ? "how many people live in your state" : "the value of your land") + '.</p>';
-  } else {
-    $("cost-card").classList.add("hidden");
-  }
-
   var ph = G.phase;
   var myVote = ME.votes && ME.votes[G.round];
   var myPay  = ME.payments && ME.payments[G.round];
+  var amAbsent = (G.absent||[]).indexOf(MINE) !== -1;
 
-  $("deal-card").classList.toggle("hidden", ph !== "caucus");
-  $("vote-card").classList.toggle("hidden", !(ph === "voting" && !myVote));
-  $("voted-card").classList.toggle("hidden", !(ph === "voting" && myVote));
-  if (myVote) $("voted-what").textContent = myVote.toUpperCase();
+  $("res-card").classList.remove("hidden");
+  $("r-eyebrow").textContent = "Resolution " + r.number + " of " + D.RESOLUTIONS.length + " — " + r.subtitle;
+  $("r-rule").textContent = r.voteRule === "unanimous" ? "Needs ALL 13 states" : "Needs 9 of 13 states";
+  $("r-title").textContent = r.title;
+  $("r-brief").innerHTML = glossify(r.brief, r.glossary);
+  $("r-detail").innerHTML = r.detail.split("\n\n").map(function(p){
+    return "<p>" + glossify(p, r.glossary) + "</p>"; }).join("");
+  $("r-yes").innerHTML = glossify(r.yesCase, r.glossary);
+  $("r-no").innerHTML = glossify(r.noCase, r.glossary);
+  $("vote-state").textContent = MINE;
 
-  $("pay-card").classList.toggle("hidden", !(ph === "compliance" && !myPay));
-  $("paid-card").classList.toggle("hidden", !(ph === "compliance" && myPay));
-  if (myPay) $("paid-what").textContent =
-    ({full:"PAY IN FULL", half:"PAY HALF", none:"PAY NOTHING"})[myPay.choice];
-  if (ph === "compliance") {
-    $("pay-owed").innerHTML = "You owe <strong>" + E.money(owed) + "</strong>. " +
-      "Your treasury holds " + E.money(ME.treasuryNow) + ".";
+  renderCost(d, r);
+  renderTouch(d, r);
+
+  // one cue per phase
+  if (amAbsent) {
+    setCue("wait", "Not present", "Your delegation did not make it to Congress this round. Sit tight.");
+  } else if (ph === "brief") {
+    setCue("wait", "Read it", "Read the resolution, then check what it costs you on the right. Debate is next.");
+  } else if (ph === "caucus") {
+    setCue("debate", "Debate now", "Get up and argue. Send offers to the bot states below — they answer straight away.");
+  } else if (ph === "voting") {
+    setCue(myVote ? "wait" : "vote",
+      myVote ? "Vote locked" : "Vote now",
+      myVote ? "You voted " + myVote.toUpperCase() + ". Waiting for the other states."
+             : "Your delegation must vote. Nine of thirteen states have to agree.");
+  } else if (ph === "compliance") {
+    setCue(myPay ? "wait" : "pay",
+      myPay ? "Decision locked" : "Now pay — or don't",
+      myPay ? "You chose to " + ({full:"pay in full",half:"pay half",none:"pay nothing"})[myPay.choice] + "."
+            : "It passed. Nobody can force you to pay. Decide.");
+  } else {
+    setCue("wait", "Results", "Look at what your Congress actually managed to do.");
   }
+  runClock();
+
+  $("deal-card").classList.toggle("hidden", ph !== "caucus" || amAbsent);
+  $("vote-card").classList.toggle("hidden", !(ph === "voting" && !myVote && !amAbsent));
+  $("pay-card").classList.toggle("hidden", !(ph === "compliance" && !myPay && !amAbsent));
+  if (ph === "compliance") {
+    var owedNow = E.amountOwed(d, r);
+    $("pay-owed").innerHTML = "You owe <strong>" + E.money(owedNow) + "</strong>. Your treasury holds " +
+      E.money(ME.treasuryNow) + ". Paying in full leaves you with " +
+      E.money(Math.max(0, ME.treasuryNow - owedNow)) + ".";
+  }
+
+  var waiting = (ph === "voting" && myVote) || (ph === "compliance" && myPay) || amAbsent;
+  $("wait-card").classList.toggle("hidden", !waiting);
+  if (waiting) {
+    $("wait-h").textContent = amAbsent ? "No delegate present"
+      : (ph === "voting" ? "You voted " + myVote.toUpperCase()
+                         : "You chose: " + ({full:"PAY IN FULL",half:"PAY HALF",none:"PAY NOTHING"})[myPay.choice]);
+    $("wait-p").innerHTML = amAbsent ? "You cannot vote this round."
+      : 'Waiting for the other states<span class="dot">…</span>';
+  }
+
+  if (ph === "caucus") renderDeals();
 
   // result
   var showRes = (ph === "tally" || ph === "reveal" || ph === "done") && G.result;
-  $("res-card").classList.toggle("hidden", !showRes);
+  $("out-card").classList.toggle("hidden", !showRes);
   if (showRes) {
     var R = G.result;
-    $("res-head").textContent = !R.quorum ? "No quorum — no vote could be held"
-      : (R.passed ? "PASSED  (" + R.yes + " yes)" : "FAILED  (" + R.yes + " yes, " + R.needed + " needed)");
-    $("res-head").style.color = R.passed ? "#1d5233" : "#8a2019";
-    $("res-narr").textContent = (ph === "tally" && r.compliance && R.passed) ? r.passText : (R.narrative || "");
+    $("out-head").textContent = !R.quorum ? "No quorum — no vote could be held"
+      : (R.passed ? "PASSED  (" + R.yes + " yes of " + R.needed + " needed)"
+                  : "FAILED  (" + R.yes + " yes, " + R.needed + " needed)");
+    $("out-head").style.color = R.passed ? "#1d5233" : "#8a2019";
+    $("out-narr").textContent = (ph === "tally" && r.compliance && R.passed) ? r.passText : (R.narrative || "");
     var money = (ph === "reveal" || ph === "done") && R.requested > 0;
-    $("res-money").classList.toggle("hidden", !money);
+    $("out-money").classList.toggle("hidden", !money);
     if (money) {
-      $("res-asked").textContent = E.money(R.requested);
-      $("res-got").textContent = E.money(R.collected);
-      $("res-pct").textContent = Math.round(R.collected/R.requested*100) + "%";
+      $("o-ask").textContent = E.money(R.requested);
+      $("o-got").textContent = E.money(R.collected);
+      $("o-pct").textContent = Math.round(R.collected/R.requested*100) + "%";
     }
     var hn = (ph === "reveal" || ph === "done");
-    $("res-hist").classList.toggle("hidden", !hn);
-    if (hn) $("res-hist-text").textContent = D.HISTORY_NOTES[r.id] || "";
+    $("out-hist").classList.toggle("hidden", !hn);
+    if (hn) $("out-hist-text").textContent = D.HISTORY_NOTES[r.id] || "";
   }
+}
 
-  if (ph === "caucus") renderDealUI();
-  lastPhase = ph;
+function renderCost(d, r){
+  var owed = E.amountOwed(d, r);
+  $("p-cost-blk").classList.toggle("hidden", owed === 0);
+  if (!owed) return;
+  var pct = Math.round(owed / Math.max(1, ME.treasuryNow) * 100);
+  $("p-cost").innerHTML =
+    '<div class="spread" style="font-size:1.05rem"><span>Your share</span>' +
+      '<strong>' + E.money(owed) + '</strong></div>' +
+    '<div class="spread small"><span class="muted">You have</span><span>' + E.money(ME.treasuryNow) + '</span></div>' +
+    '<div class="spread small"><span class="muted">Paying in full costs</span>' +
+      '<strong style="color:#8a2019">' + pct + '% of everything</strong></div>' +
+    '<div class="small muted" style="margin-top:6px">Split by ' +
+      (r.complianceBasis === "popShare" ? "how many people live here" : "the value of your land") + '.</div>';
+}
+
+// Same maths the bots use, shown plainly. It does not tell them how to vote —
+// it shows which of their interests are being pulled, and how hard.
+function renderTouch(d, r){
+  var rows = E.interestBreakdown(d, r).slice(0, 5);
+  $("p-touch-blk").classList.toggle("hidden", rows.length === 0);
+  $("p-touch").innerHTML = rows.map(function(b){
+    return '<div class="touch ' + (b.value > 0 ? "pos" : "neg") + '">' +
+      '<span class="arrow">' + (b.value > 0 ? "▲" : "▼") + '</span>' +
+      '<span class="txt">' + b.label + '</span>' +
+      '<span class="mag">' + (b.strength ? b.strength + " " : "") + "for " + b.toward.toLowerCase() + '</span>' +
+    '</div>';
+  }).join("");
+}
+
+function renderRecord(){
+  var hist = G.history || [];
+  $("p-rec-blk").classList.toggle("hidden", hist.length === 0);
+  if (!hist.length) return;
+  $("p-record").innerHTML = hist.map(function(h, i){
+    var v = (ME.votes && ME.votes[i]) || "—";
+    var p = ME.payments && ME.payments[i];
+    var vc = v === "Yes" ? "yes" : (v === "No" ? "no" : "abs");
+    return '<div class="rec"><span class="n">R' + (i+1) + '</span>' +
+      '<span class="v ' + vc + '">' + v.toUpperCase() + '</span>' +
+      '<span class="muted small">' + (h.passed ? "passed" : "failed") + '</span>' +
+      (p ? '<span class="p ' + p.choice + '">' +
+           ({full:"paid",half:"half",none:"paid nothing"})[p.choice] + '</span>' : '') +
+    '</div>';
+  }).join("");
 }
 
 /* --------------------------------------------------------------- deals */
-function renderDealUI(){
-  var r = res();
+function renderDeals(){
   var mine = (G.deals||[]).filter(function(x){ return x.round === G.round && x.from === MINE; });
   var limit = (G.settings && G.settings.dealLimit) || 2;
   var left = Math.max(0, limit - mine.length);
   $("deal-left").textContent = left + " offer" + (left===1?"":"s") + " left";
-  $("deal-send").disabled = left === 0;
 
-  var t = $("deal-target");
-  if (t.options.length === 0 || t.dataset.round !== String(G.round)) {
-    t.innerHTML = ""; t.dataset.round = String(G.round);
-    D.STATES.filter(function(s){ return s.name !== MINE && (G.absent||[]).indexOf(s.name) === -1; })
-      .forEach(function(s){
-        var o = document.createElement("option"); o.value = s.name; o.textContent = s.name; t.appendChild(o);
+  // offers other delegations have sent US
+  var incoming = (G.deals||[]).filter(function(x){ return x.round === G.round && x.to === MINE; });
+  $("inbox").innerHTML = incoming.length ? incoming.map(function(x){
+    return '<div class="inbox"><strong>' + x.from + ' offers you:</strong> ' + x.label +
+      '<div class="small muted">Answer them out loud. Nothing here votes for you.</div></div>';
+  }).join("") : "";
+
+  var bots = G.activeBots || [];
+  var tg = $("deal-targets");
+  var sig = MINE + "|" + G.round + "|" + bots.join(",") + "|" + (G.absent||[]).join(",");
+  if (tg.dataset.sig !== sig) {
+    tg.dataset.sig = sig;
+    tg.innerHTML = "";
+    D.STATES.filter(function(s){
+      return s.name !== MINE && (G.absent||[]).indexOf(s.name) === -1;
+    }).forEach(function(s){
+      var isBot = bots.indexOf(s.name) !== -1;
+      var b = document.createElement("button");
+      b.className = "target"; b.dataset.name = s.name;
+      b.innerHTML = '<div class="t">' + s.abbr + ' · ' + s.name + '</div>' +
+                    '<div class="k">' + (isBot ? "answers right away" : "talk to them in person") + '</div>';
+      b.addEventListener("click", function(){
+        dealTarget = s.name;
+        Array.prototype.forEach.call(tg.children, function(c){
+          c.classList.toggle("on", c.dataset.name === dealTarget); });
+        updateSend();
       });
+      tg.appendChild(b);
+    });
     var off = $("deal-offer"); off.innerHTML = "";
     E.DEAL_OPTIONS.forEach(function(o){
       var el = document.createElement("option"); el.value = o.id; el.textContent = o.label; off.appendChild(el);
     });
   }
+  updateSend(left);
+
   $("deal-log").innerHTML = mine.length ? mine.slice().reverse().map(function(x){
-    return '<div class="line ' + (x.status==="accepted"?"ok":(x.status==="rejected"?"bad":"")) + '">' +
-      "<strong>To " + x.to + ":</strong> " + x.label +
-      (x.reply ? "<br>" + x.reply : ' <span class="muted">(waiting for an answer)</span>') + "</div>";
+    var cls = x.status==="accepted" ? "ok" : (x.status==="rejected" ? "bad" : "");
+    return '<div class="line ' + cls + '"><strong>To ' + x.to + ':</strong> ' + x.label +
+      (x.reply ? "<br>" + x.reply : ' <span class="muted">(waiting)</span>') + "</div>";
   }).join("") : '<div class="line muted small">You have not made any offers this round.</div>';
 }
 
+function updateSend(left){
+  if (left === undefined) {
+    var mine = (G.deals||[]).filter(function(x){ return x.round === G.round && x.from === MINE; });
+    left = Math.max(0, ((G.settings && G.settings.dealLimit) || 2) - mine.length);
+  }
+  var b = $("deal-send");
+  b.disabled = !dealTarget || left === 0;
+  b.textContent = left === 0 ? "No offers left this round"
+    : (dealTarget ? "Send the offer to " + dealTarget : "Pick a state first");
+}
+
 $("deal-send").addEventListener("click", function(){
-  var to = $("deal-target").value, id = $("deal-offer").value;
+  if (!dealTarget) return;
+  var id = $("deal-offer").value;
   var opt = E.DEAL_OPTIONS.filter(function(o){ return o.id === id; })[0];
   $("deal-send").disabled = true;
-  NET.pushDeal(CODE, { from: MINE, to: to, id: id, label: opt.label,
+  NET.pushDeal(CODE, { from: MINE, to: dealTarget, id: id, label: opt.label,
     round: G.round, status: "pending", ts: Date.now() });
+  dealTarget = null;
+  Array.prototype.forEach.call($("deal-targets").children, function(c){ c.classList.remove("on"); });
 });
 
-/* --------------------------------------------------------- vote / pay */
+/* ------------------------------------------------------------ glossary */
+function glossify(text, terms){
+  if (!terms || !terms.length) return text;
+  var out = text;
+  terms.forEach(function(t){
+    if (!D.GLOSSARY[t]) return;
+    // Glossary keys are plain words ("requisition", "standing army"),
+    // so a word-boundary match on the first occurrence is enough.
+    var re = new RegExp("\\b(" + t + ")\\b", "i");
+    out = out.replace(re, '<mark class="gloss" data-term="' + t + '">$1</mark>');
+  });
+  return out;
+}
+
+var pop = null;
+document.addEventListener("click", function(e){
+  if (pop) { pop.remove(); pop = null; }
+  var m = e.target.closest ? e.target.closest("mark.gloss") : null;
+  if (!m) return;
+  var term = m.dataset.term, def = D.GLOSSARY[term];
+  if (!def) return;
+  pop = document.createElement("div");
+  pop.className = "glosspop";
+  pop.innerHTML = "<b>" + term + "</b>" + def;
+  document.body.appendChild(pop);
+  var rect = m.getBoundingClientRect();
+  var top = rect.bottom + 8, left = Math.min(rect.left, window.innerWidth - pop.offsetWidth - 14);
+  if (top + pop.offsetHeight > window.innerHeight) top = rect.top - pop.offsetHeight - 8;
+  pop.style.top = Math.max(8, top) + "px";
+  pop.style.left = Math.max(8, left) + "px";
+  e.stopPropagation();
+});
+
+/* -------------------------------------------------------- vote and pay */
 window.AOCVOTE = function(v){
   $("vote-card").classList.add("hidden");
   NET.castVote(CODE, MINE, G.round, v);

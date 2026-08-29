@@ -713,7 +713,17 @@ function processPendingDeals(deals){
     var target = dataFor(d.to); if (!target) return;
     var offer = E.DEAL_OPTIONS.filter(function(o){ return o.id === d.id; })[0];
     if (!offer) return;
-    var reply = E.botDealReply(target, { id:offer.id, weight:offer.weight, from:d.from }, r, CODE, G.round);
+
+    var live = STATES.filter(function(x){ return x.name === d.to; })[0];
+    var reply;
+    if (live && !live.isBot) {
+      // A human delegation answers for itself, out loud, in the room. All the
+      // app does is deliver the offer to their screen.
+      reply = { status: "delivered", text: d.to + " is played by students — go and make your case to them.",
+                weight: 0 };
+    } else {
+      reply = E.botDealReply(target, { id:offer.id, weight:offer.weight, from:d.from }, r, CODE, G.round);
+    }
     for (var i=0;i<all.length;i++){
       if (all[i].from===d.from && all[i].to===d.to && all[i].id===d.id && all[i].ts===d.ts){
         all[i] = Object.assign({}, all[i], { status: reply.status, reply: reply.text,
@@ -780,7 +790,14 @@ $("begin-btn").addEventListener("click", function(){ startRound(0); });
 function autoBotUnclaimed(){
   var ups = STATES.filter(function(s){ return !s.isBot && (s.players||[]).length === 0; })
     .map(function(s){ s.isBot = true; return { name:s.name, patch:{ isBot:true } }; });
-  return ups.length ? NET.batchStates(CODE, ups) : Promise.resolve();
+  return (ups.length ? NET.batchStates(CODE, ups) : Promise.resolve());
+}
+
+// Student screens need to know which states a bot is playing, so they can
+// tell "this one will answer my offer instantly" from "go argue with those
+// two in person".
+function botRoster(){
+  return STATES.filter(function(s){ return s.isBot; }).map(function(s){ return s.name; });
 }
 
 function absentFor(idx){
@@ -803,7 +820,7 @@ function absentFor(idx){
 function startRound(idx){
   return autoBotUnclaimed().then(function(){
     return NET.updateGame(CODE, {
-      status:"running", round: idx, phase:"brief",
+      status:"running", round: idx, phase:"brief", activeBots: botRoster(),
       absent: absentFor(idx), result: null, caucusEndsAt: null
     });
   });
@@ -812,7 +829,9 @@ function startRound(idx){
 function doTally(){
   var r = res();
   var pres = present();
-  var deals = (G.deals||[]).filter(function(d){ return d.round === G.round && d.status === "accepted"; });
+  var deals = (G.deals||[]).filter(function(d){
+    return d.round === G.round && d.status === "accepted" && d.weight > 0;
+  });
   var votes = {}, botPatches = [];
   pres.forEach(function(s){
     if (s.isBot) {
@@ -919,7 +938,7 @@ function nextRound(){
     var idx = G.round + 1;
     return autoBotUnclaimed().then(function(){
       return NET.updateGame(CODE, { history: hist, round: idx, phase:"brief",
-        absent: absentFor(idx), result: null, caucusEndsAt: null });
+        activeBots: botRoster(), absent: absentFor(idx), result: null, caucusEndsAt: null });
     });
   };
   (patches.length ? NET.batchStates(CODE, patches) : Promise.resolve()).then(after);

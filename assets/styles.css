@@ -305,3 +305,12 @@ ul.clean li::before{content:"—";position:absolute;left:0;color:var(--gold-dk);
 .tallybar .moneybar{text-align:right;padding-left:16px;border-left:2px solid #4a423a;min-width:150px}
 .tallybar .moneybar .big{font-size:1.6rem;color:#f0c97a;font-variant-numeric:tabular-nums}
 .tallybar .moneybar .lab{color:#b3a795}
+
+/* what a resolution touches for your state (student + solo) */
+.touch{display:flex;align-items:center;gap:9px;padding:5px 0;font-size:.95rem}
+.touch .arrow{font-weight:800;font-size:1rem;width:15px;text-align:center;flex:0 0 auto}
+.touch.pos .arrow{color:#1d5233}
+.touch.neg .arrow{color:#9e2f24}
+.touch .txt{flex:1}
+.touch .mag{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.66rem;font-weight:700;
+  letter-spacing:.07em;text-transform:uppercase;color:var(--ink-faint);white-space:nowrap}

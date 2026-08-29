@@ -115,6 +115,39 @@ node tools/build-map.js        # rewrites assets/map-data.js
 
 ---
 
+## The student screen
+
+Two students share one laptop, so the screen is built to answer three questions without scrolling:
+
+**What am I supposed to be doing right now?** A coloured bar sits pinned to the top of the screen and
+changes with the phase — READ IT, DEBATE NOW (with the same countdown the teacher sees), VOTE NOW, NOW
+PAY — OR DON'T. Students stop asking you what's happening.
+
+**What does my state want?** The secret objective, the two internal factions, the treasury and the score
+live in a rail that is *always on screen*, including while voting. Nothing that drives a decision ever
+scrolls away.
+
+**How does this bill hit me?** Two readouts, on every resolution:
+
+- *What this bill costs you* — your share in dollars, and what percentage of your entire treasury it is.
+- *What this touches for you* — the same dot product the bots use, broken out in plain words: "▲ debts
+  you already owe — strongly for yes", "▼ money out of your treasury — for no". It shows which of their
+  interests are being pulled and how hard, in both directions, without telling them how to vote.
+
+Also: hard words (requisition, tariff, impost, quorum) are tappable for a plain-English definition; a
+record strip shows what they voted and whether they paid in every earlier round, which is what makes
+Round 4 land; and the two factions are numbered as **Delegate 1** and **Delegate 2**, so the pair has an
+argument to have before they agree on a vote.
+
+### Making deals
+
+The deal panel separates the states a **bot** plays ("answers right away") from the ones **other students**
+play ("talk to them in person"). Offers to a bot get an instant in-character reply. Offers to a human
+delegation are delivered to that group's screen as an inbox item and answered out loud — the app never
+puts words in another group's mouth.
+
+---
+
 ## The three pages
 
 | Page | Who | Needs internet? |
@@ -173,6 +206,7 @@ python3 -m http.server 8899 &
 node tests/solo.test.js          # full 4-round solo playthrough
 node tests/multiplayer.test.js   # teacher + student, both tabs, all 4 rounds
 node tests/map.test.js           # map board, roll call, payment reveal
+node tests/deals.test.js         # bot offers answer, human offers are only delivered
 ```
 
 The multiplayer test replaces the Firebase SDK with a small localStorage-backed stand-in

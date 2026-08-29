@@ -216,6 +216,43 @@
     return lines[state.name] || "Come back with a better offer.";
   }
 
+  /* --------------------------------------------------- what this touches
+     The same dot product the bots use, broken out so a student can see WHY
+     a resolution is good or bad for their state. Deliberately shows the
+     pull in both directions without announcing a verdict — the point is to
+     make them weigh it, not to vote for them.                             */
+  var TAG_LABELS = {
+    taxation:          "money out of your treasury",
+    national_power:    "a stronger Congress",
+    state_sovereignty: "your right to govern yourselves",
+    trade_regulation:  "who controls trade",
+    military:          "soldiers and defense",
+    debt_honor:        "debts you already owe",
+    north_economy:     "your shipping and manufacturing",
+    south_economy:     "your farms and exports",
+    small_state:       "the interests of small states",
+    west_expansion:    "your western land"
+  };
+
+  function interestBreakdown(state, resolution) {
+    var w = state.bot ? state.bot.weights : null;
+    if (!w) return [];
+    var out = [];
+    for (var tag in resolution.tags) {
+      var v = resolution.tags[tag] * (w[tag] || 0);
+      if (!v) continue;
+      out.push({
+        tag: tag,
+        label: TAG_LABELS[tag] || tag,
+        value: v,
+        toward: v > 0 ? "Yes" : "No",
+        strength: Math.abs(v) >= 40 ? "strongly" : (Math.abs(v) >= 15 ? "" : "slightly")
+      });
+    }
+    out.sort(function (a, b) { return Math.abs(b.value) - Math.abs(a.value); });
+    return out;
+  }
+
   /* -------------------------------------------------------- vote counting */
   function tally(votes, resolution, presentStates) {
     var yes = 0, no = 0, abstain = 0;
@@ -406,6 +443,8 @@
     complianceExcuse: complianceExcuse,
     DEAL_OPTIONS: DEAL_OPTIONS,
     tally: tally,
+    TAG_LABELS: TAG_LABELS,
+    interestBreakdown: interestBreakdown,
     stateInterestFromVote: stateInterestFromVote,
     stateInterestFromCompliance: stateInterestFromCompliance,
     nationalStabilityChange: nationalStabilityChange,
