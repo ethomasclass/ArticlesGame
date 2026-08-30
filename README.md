@@ -213,8 +213,9 @@ node tools/build-standalone.js standalone.html
 **The classroom version** (teacher panel + student delegations) needs hosting, because the two talk to
 each other through a database. Three steps, about five minutes:
 
-1. **Supabase → SQL Editor → paste `supabase-setup.sql` → Run.** Creates the tables and the functions
-   the game calls. Safe to run twice.
+1. **Supabase → SQL Editor → Run the setup script.** Open the file `supabase-setup.sql` in this repo,
+   select all of it, and paste **the contents** into the editor — not the filename. Press Run. It
+   creates the tables and functions the game calls, and it is safe to run twice.
 2. **Supabase → Project Settings → API.** Copy the Project URL and the `anon` `public` key into
    `assets/config.js`. That is the only file you edit. (The anon key is designed to live in a web page.
    Never paste the `service_role` key — that one is an admin key.)

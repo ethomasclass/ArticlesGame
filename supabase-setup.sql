@@ -1,7 +1,10 @@
 -- =====================================================================
 --  THE CONFEDERATION PROBLEM — Supabase setup
---  Paste this whole file into the Supabase SQL Editor and press Run.
---  It is safe to run twice.
+--
+--  HOW TO USE THIS FILE:
+--    Select everything in it (Ctrl-A / Cmd-A), copy, and paste it into the
+--    Supabase SQL Editor. Paste the CONTENTS, not the filename. Press Run.
+--    It is safe to run more than once.
 -- =====================================================================
 
 -- ---------------------------------------------------------------- tables
