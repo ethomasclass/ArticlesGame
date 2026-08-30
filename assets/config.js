@@ -16,7 +16,7 @@ window.AOC_CONFIG = {
 
   supabase: {
     url:     "https://pszsnmfgpddxhlmmgagb.supabase.co",
-    anonKey: "PASTE_YOUR_ANON_PUBLIC_KEY_HERE"
+    anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzenNubWZncGRkeGhsbW1nYWdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUxMDk1MzUsImV4cCI6MjEwMDY4NTUzNX0.vFgNXEmAmhAGtI1qi6y8RDRX2hh5HBsfUkkG1-Ho60I"
   },
 
   // Kept so the original Firebase project still works if you switch back.
