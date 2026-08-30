@@ -15,7 +15,7 @@ window.AOC_CONFIG = {
   backend: "supabase",
 
   supabase: {
-    url:     "PASTE_YOUR_PROJECT_URL_HERE",     // https://xxxxxxxx.supabase.co
+    url:     "https://pszsnmfgpddxhlmmgagb.supabase.co",
     anonKey: "PASTE_YOUR_ANON_PUBLIC_KEY_HERE"
   },
 

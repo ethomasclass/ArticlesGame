@@ -14,8 +14,19 @@
   "use strict";
 
   var CFG = (window.AOC_CONFIG && window.AOC_CONFIG.supabase) || {};
-  var URL_BASE = (CFG.url || "").replace(/\/+$/, "");
-  var KEY = CFG.anonKey || "";
+
+  // Supabase shows the project URL in a few places, and the one on the API
+  // settings page ends with /rest/v1/. Accept either form rather than
+  // building requests to .../rest/v1/rest/v1/rpc/...
+  function normalizeUrl(u) {
+    return String(u || "").trim()
+      .replace(/\/+$/, "")
+      .replace(/\/rest\/v1$/i, "")
+      .replace(/\/+$/, "");
+  }
+
+  var URL_BASE = normalizeUrl(CFG.url);
+  var KEY = String(CFG.anonKey || "").trim();
 
   // The placeholders in config.js are non-empty strings, so a bare truthiness
   // check would call an untouched project "configured" and then fail on the
