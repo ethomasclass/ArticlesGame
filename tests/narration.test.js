@@ -2,13 +2,13 @@
    after, and Round 4 speaks the live treasury balance. */
 const { chromium } = require('playwright');
 const fs = require('fs');
+const SHIM = require('./shim/supabase');
 const EXE = '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 (async () => {
   const b = await chromium.launch({ executablePath: EXE });
   const ctx = await b.newContext({ viewport:{width:1500,height:1100} });
   const errs = [];
-  await ctx.route('**/firebasejs/**/firebase-app.js', r=>r.fulfill({contentType:'text/javascript',body:fs.readFileSync('tests/shim/firebase-app.js','utf8')}));
-  await ctx.route('**/firebasejs/**/firebase-firestore.js', r=>r.fulfill({contentType:'text/javascript',body:fs.readFileSync('tests/shim/firebase-firestore.js','utf8')}));
+  await SHIM.install(ctx);
 
   const T = await ctx.newPage();
   T.on('pageerror', e => errs.push('TEACHER ' + e.message));

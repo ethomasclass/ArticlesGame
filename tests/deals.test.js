@@ -2,13 +2,13 @@
    reply, an offer to another student group must NOT be auto-answered. */
 const { chromium } = require('playwright');
 const fs = require('fs');
+const SHIM = require('./shim/supabase');
 const EXE = '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 (async () => {
   const b = await chromium.launch({ executablePath: EXE });
   const ctx = await b.newContext({ viewport:{width:1400,height:1000} });
   const errs = [];
-  await ctx.route('**/firebasejs/**/firebase-app.js', r=>r.fulfill({contentType:'text/javascript',body:fs.readFileSync('tests/shim/firebase-app.js','utf8')}));
-  await ctx.route('**/firebasejs/**/firebase-firestore.js', r=>r.fulfill({contentType:'text/javascript',body:fs.readFileSync('tests/shim/firebase-firestore.js','utf8')}));
+  await SHIM.install(ctx);
 
   const T = await ctx.newPage();
   T.on('pageerror', e => errs.push('TEACHER ' + e.message));
@@ -39,14 +39,19 @@ const EXE = '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
   const labels = await VA.$$eval('#deal-targets button', els =>
     els.map(e => e.dataset.name + ' = ' + e.querySelector('.k').textContent));
   console.log('✔ Massachusetts labelled:', labels.find(l => l.startsWith('Massachusetts')));
-  console.log('✔ Delaware labelled     :', labels.find(l => l.startsWith('Delaware')));
+  // a bot state may be randomly absent this round, so take whichever is there
+  const botName = await VA.$$eval('#deal-targets button', els => {
+    const hit = els.find(e => /answers right away/.test(e.querySelector('.k').textContent));
+    return hit ? hit.dataset.name : null;
+  });
+  console.log('✔ bot target chosen     :', botName);
 
   // offer to a BOT -> instant answer
-  await VA.click('#deal-targets button[data-name="Delaware"]');
+  await VA.click(`#deal-targets button[data-name="${botName}"]`);
   await VA.selectOption('#deal-offer', 'pay50');
   await VA.click('#deal-send');
   await VA.waitForTimeout(2200);
-  console.log('✔ offer to bot   →', (await VA.textContent('#deal-log')).replace(/\s+/g,' ').slice(0,120));
+  console.log('✔ offer to bot   →', (await VA.textContent('#deal-log')).replace(/\s+/g,' ').slice(0,125));
 
   // offer to a STUDENT state -> must be delivered, never auto-answered
   await VA.click('#deal-targets button[data-name="Massachusetts"]');

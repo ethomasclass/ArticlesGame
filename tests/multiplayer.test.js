@@ -1,18 +1,16 @@
 const { chromium } = require('playwright');
 const fs = require('fs');
+const SHIM = require('./shim/supabase');
 const EXE = '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 const log = [];
 
 async function stub(ctx) {
-  await ctx.route('**/firebasejs/**/firebase-app.js', r =>
-    r.fulfill({ contentType:'text/javascript', body: fs.readFileSync('tests/shim/firebase-app.js','utf8') }));
-  await ctx.route('**/firebasejs/**/firebase-firestore.js', r =>
-    r.fulfill({ contentType:'text/javascript', body: fs.readFileSync('tests/shim/firebase-firestore.js','utf8') }));
+  await SHIM.install(ctx);
 }
 
 (async () => {
   const b = await chromium.launch({ executablePath: EXE });
-  // ONE context => teacher and student tabs share localStorage => real sync
+  // ONE context, two tabs; the shim holds shared state like the real backend
   const ctx = await b.newContext({ viewport:{width:1500,height:1050} });
   await stub(ctx);
 
@@ -60,7 +58,7 @@ async function stub(ctx) {
   await S.click('#deal-targets button[data-name="Delaware"]');
   await S.selectOption('#deal-offer', 'pay50');
   await S.click('#deal-send');
-  await S.waitForTimeout(1500);
+  await S.waitForTimeout(1800);   // teacher answers, then the student polls it back
   console.log('✔ deal reply →', (await S.textContent('#deal-log')).replace(/\s+/g,' ').slice(0,130));
   console.log('✔ teacher ticker →', (await T.textContent('#deal-ticker')).replace(/\s+/g,' ').slice(0,120));
 
@@ -98,15 +96,18 @@ async function stub(ctx) {
 
   // run out the remaining rounds fast
   for (let r = 2; r <= 4; r++) {
-    await T.click('#next-btn'); await T.waitForTimeout(700);   // next resolution
-    await T.click('#next-btn'); await T.waitForTimeout(500);   // caucus
-    await T.click('#next-btn'); await T.waitForTimeout(500);   // voting
-    if (await S.isVisible('#vote-card')) { await S.click('#vote-card .btn-yes'); await S.waitForTimeout(500); }
+    await T.click('#next-btn'); await T.waitForTimeout(1200);  // next resolution
+    await T.click('#next-btn'); await T.waitForTimeout(1200);  // caucus
+    await T.click('#next-btn');                                // voting
+    // polling sync: give the student's screen a beat to catch up, as a human would
+    await S.waitForSelector('#vote-card:not(.hidden)', { timeout: 8000 }).catch(()=>{});
+    if (await S.isVisible('#vote-card')) { await S.click('#vote-card .btn-yes'); await S.waitForTimeout(900); }
     await T.click('#next-btn'); await T.waitForTimeout(1400);  // tally
     const head = (await T.textContent('#result-headline')).trim();
     await T.click('#next-btn'); await T.waitForTimeout(1000);
-    if (await S.isVisible('#pay-card')) { await S.click('#pay-card .btn.gold'); await S.waitForTimeout(600);
-      await T.click('#next-btn'); await T.waitForTimeout(1500); }
+    await S.waitForSelector('#pay-card:not(.hidden)', { timeout: 6000 }).catch(()=>{});
+    if (await S.isVisible('#pay-card')) { await S.click('#pay-card .btn.gold'); await S.waitForTimeout(900);
+      await T.click('#next-btn'); await T.waitForTimeout(1800); }
     const rec = await S.$$eval('#p-record .rec', e=>e.map(x=>x.textContent.replace(/\s+/g,' ').trim()));
     console.log(`✔ R${r}: ${head}` + (rec.length ? `  | student record: ${rec.join(' / ')}` : ''));
   }

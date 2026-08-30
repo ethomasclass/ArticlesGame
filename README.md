@@ -210,15 +210,37 @@ on a USB stick. It is generated — after editing any content, regenerate it:
 node tools/build-standalone.js standalone.html
 ```
 
-**The classroom version** (teacher panel + student delegations) needs real hosting, because the two
-talk to each other through Firestore. Two steps:
+**The classroom version** (teacher panel + student delegations) needs hosting, because the two talk to
+each other through a database. Three steps, about five minutes:
 
-1. Repo → Settings → Pages → deploy from this branch. You get
+1. **Supabase → SQL Editor → paste `supabase-setup.sql` → Run.** Creates the tables and the functions
+   the game calls. Safe to run twice.
+2. **Supabase → Project Settings → API.** Copy the Project URL and the `anon` `public` key into
+   `assets/config.js`. That is the only file you edit. (The anon key is designed to live in a web page.
+   Never paste the `service_role` key — that one is an admin key.)
+3. **Repo → Settings → Pages → deploy from this branch.** You get
    `https://<your-username>.github.io/ArticlesGame/`.
-2. Firebase console → Firestore → Rules → paste `firestore.rules` → Publish. **Nothing saves until you
-   do this.**
 
-Then `teacher.html` is your projector and `student.html` is the link the groups open.
+Then `teacher.html` is your projector and `student.html` is the link the groups open. If you skip step 1
+or 2, the teacher page says so in plain English on load rather than failing when you try to start.
+
+### Switching backends
+
+`assets/config.js` has a `backend` field: `"supabase"` or `"firebase"`. Both implement the same handful
+of methods, so nothing else in the project knows which one is running. The original Firebase project is
+still wired up if you ever want it back — set `backend: "firebase"` and publish `firestore.rules`.
+
+### How the Supabase sync works
+
+No client library and no CDN script — just `fetch` against PostgREST, so there is nothing extra for a
+school filter to block.
+
+Reads go through one polling loop shared by the whole page. It asks for a few-byte fingerprint about
+once a second and only pulls the full session when that fingerprint moves, so a quiet classroom costs
+almost no bandwidth and a busy one updates in about a second. Writes go through Postgres functions that
+lock the row while they read and rewrite it, so two laptops writing at the same moment cannot clobber
+each other. Deals are their own rows rather than an array inside the game document, because a dozen
+groups appending to one shared array loses some of the offers.
 
 ## The three pages
 

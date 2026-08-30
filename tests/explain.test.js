@@ -3,13 +3,13 @@
    personal stake line even on the rounds with no bill to pay. */
 const { chromium } = require('playwright');
 const fs = require('fs');
+const SHIM = require('./shim/supabase');
 const EXE = '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 (async () => {
   const b = await chromium.launch({ executablePath: EXE });
   const ctx = await b.newContext({ viewport:{width:1500,height:1100} });
   const errs = [];
-  await ctx.route('**/firebasejs/**/firebase-app.js', r=>r.fulfill({contentType:'text/javascript',body:fs.readFileSync('tests/shim/firebase-app.js','utf8')}));
-  await ctx.route('**/firebasejs/**/firebase-firestore.js', r=>r.fulfill({contentType:'text/javascript',body:fs.readFileSync('tests/shim/firebase-firestore.js','utf8')}));
+  await SHIM.install(ctx);
 
   const T = await ctx.newPage();
   T.on('pageerror', e => errs.push('TEACHER ' + e.message));
@@ -28,8 +28,14 @@ const EXE = '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 
   let ok = true;
   for (let round = 1; round <= 4; round++) {
-    await T.waitForTimeout(700);
+    await T.waitForTimeout(400);
     const title = await T.textContent('#res-title');
+    // wait for the student's own screen to catch up to this round rather than
+    // assuming a fixed delay — sync is polled, so it can take about a second
+    await S.waitForFunction(
+      t => document.getElementById('r-title') &&
+           document.getElementById('r-title').textContent.trim() === t,
+      title, { timeout: 10000 });
     const q  = (await S.textContent('#r-question')).trim();
     const yp = (await S.textContent('#r-ifpass')).trim();
     const nf = (await S.textContent('#r-iffail')).trim();

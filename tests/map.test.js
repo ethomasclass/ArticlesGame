@@ -1,11 +1,11 @@
 const { chromium } = require('playwright');
 const fs = require('fs');
+const SHIM = require('./shim/supabase');
 (async () => {
   const b = await chromium.launch({ executablePath:'/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
   const ctx = await b.newContext({ viewport:{width:1600,height:1100} });
   const errs = [];
-  await ctx.route('**/firebasejs/**/firebase-app.js', r => r.fulfill({ contentType:'text/javascript', body: fs.readFileSync('tests/shim/firebase-app.js','utf8')}));
-  await ctx.route('**/firebasejs/**/firebase-firestore.js', r => r.fulfill({ contentType:'text/javascript', body: fs.readFileSync('tests/shim/firebase-firestore.js','utf8')}));
+  await SHIM.install(ctx);
   const T = await ctx.newPage();
   T.on('pageerror', e => errs.push('ERR ' + e.message));
   T.on('console', m => { if (m.type()==='error' && !/favicon/.test(m.text())) errs.push('CON ' + m.text()); });

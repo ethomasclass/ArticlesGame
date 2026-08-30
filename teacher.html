@@ -291,6 +291,9 @@
 <script src="assets/map-data.js"></script>
 <script src="assets/map.js"></script>
 <script src="assets/engine.js"></script>
+<script src="assets/config.js"></script>
+<script src="assets/net-firebase.js"></script>
+<script src="assets/net-supabase.js"></script>
 <script src="assets/net.js"></script>
 <script src="assets/debrief.js"></script>
 <script>
@@ -794,7 +797,7 @@ function processPendingDeals(deals){
       }
     }
   });
-  if (changed) NET.updateGame(CODE, { deals: all });
+  if (changed) NET.updateDeals(CODE, all);
 }
 
 $("begin-btn").addEventListener("click", function(){ startRound(0); });
@@ -852,9 +855,21 @@ $("fill-bots-btn").addEventListener("click", function(){
 // no-show group silently abstains every round, and abstentions sink a vote
 // that needs nine YES.
 function autoBotUnclaimed(){
-  var ups = STATES.filter(function(s){ return !s.isBot && (s.players||[]).length === 0; })
-    .map(function(s){ s.isBot = true; return { name:s.name, patch:{ isBot:true } }; });
-  return (ups.length ? NET.batchStates(CODE, ups) : Promise.resolve());
+  // Read the authoritative roster rather than this screen's copy of it. A
+  // group that claimed a state a moment ago may not have reached us yet, and
+  // turning a real delegation into a bot because of a one-second lag is the
+  // worst thing this function could do.
+  return NET.listStates(CODE).then(function(fresh){
+    var ups = [];
+    fresh.forEach(function(s){
+      if (!s.isBot && (s.players||[]).length === 0) {
+        s.isBot = true;
+        ups.push({ name:s.name, patch:{ isBot:true } });
+      }
+    });
+    STATES = fresh.sort(function(a,b){ return a.name.localeCompare(b.name); });
+    return ups.length ? NET.batchStates(CODE, ups) : Promise.resolve();
+  });
 }
 
 // Student screens need to know which states a bot is playing, so they can
