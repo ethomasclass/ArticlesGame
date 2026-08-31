@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Delegate's Notebook</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%276%27 fill=%27%238a3324%27/%3E%3Ctext x=%2716%27 y=%2723%27 font-size=%2719%27 text-anchor=%27middle%27 fill=%27%23f5ecd8%27 font-family=%27Georgia,serif%27%3E13%3C/text%3E%3C/svg%3E">
+<style>
+  :root{
+    --ink:#16130f; --soft:#5a5148; --faint:#8b8177; --rule:#b9ada0;
+    --accent:#8a3324; --gold:#8f6413; --paper:#fff;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:#3a352f;color:var(--ink);
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+    font-size:15px;line-height:1.4;padding:24px 12px}
+
+  .bar{max-width:8.5in;margin:0 auto 18px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+    background:#221f1c;border-radius:10px;padding:12px 16px;color:#f2e8d4}
+  .bar h1{margin:0;font-size:1.15rem;flex:1;min-width:200px}
+  .bar button{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.76rem;font-weight:700;
+    letter-spacing:.08em;text-transform:uppercase;border:2px solid #574d41;background:#3a332b;
+    color:#f2e8d4;border-radius:7px;padding:.5em .9em;cursor:pointer}
+  .bar button:hover{background:#4a4137}
+  .bar button.on{background:var(--gold);border-color:var(--gold);color:#231a04}
+  .bar .hint{font-size:.82rem;color:#b3a795;width:100%}
+
+  .sheet{background:var(--paper);max-width:8.5in;min-height:11in;margin:0 auto 22px;padding:0.6in 0.65in;
+    box-shadow:0 6px 22px rgba(0,0,0,.35)}
+
+  h2{font-size:1.5rem;margin:0 0 2px;color:var(--accent);letter-spacing:-.01em}
+  .sub{font-size:.9rem;color:var(--soft);margin:0 0 14px}
+  h3{font-size:1.02rem;margin:13px 0 6px;padding-bottom:3px;border-bottom:2px solid var(--ink);
+    display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+  h3 .note{font-size:.78rem;font-weight:400;color:var(--soft);font-style:italic;text-align:right}
+  p{margin:0 0 6px}
+  .small{font-size:.86rem}
+  .muted{color:var(--soft)}
+
+  .namebar{display:flex;gap:16px;align-items:flex-end;margin-bottom:14px;font-size:.94rem}
+  .namebar .f{flex:1}
+  .namebar .f span{font-size:.74rem;text-transform:uppercase;letter-spacing:.1em;color:var(--faint);
+    font-family:ui-sans-serif,system-ui,sans-serif;font-weight:700}
+  .fill{border-bottom:1.5px solid var(--rule);height:1.5em;display:block}
+
+  .round{border:1.5px solid var(--ink);border-radius:7px;padding:8px 11px;margin-bottom:8px;
+    break-inside:avoid}
+  .round .top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;
+    border-bottom:1px solid var(--rule);padding-bottom:5px;margin-bottom:7px}
+  .round .n{font-family:ui-sans-serif,system-ui,sans-serif;font-weight:800;font-size:.72rem;
+    letter-spacing:.1em;text-transform:uppercase;color:#fff;background:var(--ink);
+    border-radius:4px;padding:2px 7px}
+  .round .t{font-weight:700;font-size:1.06rem;flex:1}
+  .round .rule{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.68rem;font-weight:700;
+    letter-spacing:.07em;text-transform:uppercase;color:var(--accent);white-space:nowrap}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px}
+  .q{font-size:.9rem;margin-bottom:2px}
+  .circle{font-weight:700;letter-spacing:.06em}
+  .money{display:grid;grid-template-columns:1fr 1fr;gap:10px;background:#f4efe6;
+    border-left:3px solid var(--gold);padding:5px 9px;margin:5px 0}
+  .money .lab{font-size:.76rem;text-transform:uppercase;letter-spacing:.07em;color:var(--soft);
+    font-family:ui-sans-serif,system-ui,sans-serif;font-weight:700}
+
+  table{width:100%;border-collapse:collapse;margin-bottom:6px}
+  th,td{text-align:left;padding:4px 7px;border:1px solid var(--rule);vertical-align:top}
+  th{background:#f0ebe3;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.72rem;
+    text-transform:uppercase;letter-spacing:.08em}
+  td.w{width:44%;font-weight:700}
+  .bank{background:#f4efe6;border:1px dashed var(--rule);border-radius:6px;padding:5px 10px;
+    font-size:.86rem;margin-bottom:7px}
+  .bank b{display:inline;margin-right:6px}
+  .bank b{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.7rem;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--soft);display:block;margin-bottom:3px}
+
+  .lines div{border-bottom:1.5px solid var(--rule);height:1.5em}
+  .box{border:1.5px solid var(--ink);border-radius:7px;padding:10px 12px;margin-bottom:11px}
+
+  /* answer key — hidden until the teacher turns it on */
+  .key{display:none;color:var(--accent);font-style:italic}
+  body.show-key .key{display:inline}
+  body.show-key .keyblock{display:block}
+  /* the teacher's copy does not need blank lines to write on, and losing them
+     keeps the key to the same two pages as the student sheet */
+  body.show-key .lines{display:none}
+  body.show-key .key.small{display:block;margin:2px 0 0}
+  .keyblock{display:none}
+
+  @page{margin:0.5in}
+  @media print{
+    body{background:#fff;padding:0;font-size:10.2pt;line-height:1.32}
+    .bar{display:none}
+    .sheet{box-shadow:none;margin:0;padding:0;min-height:0;max-width:none}
+    .sheet + .sheet{page-break-before:always}
+    .round,.box,table{break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <h1>Delegate's Notebook — print two pages, front and back</h1>
+  <button id="key-btn">Show answer key</button>
+  <button onclick="window.print()">Print</button>
+  <div class="hint">Page 1 is filled in as you play, one box per resolution. Page 2 is filled in
+  afterwards, during the debrief.</div>
+</div>
+
+<!-- ============================ PAGE ONE ============================ -->
+<div class="sheet">
+  <h2>Delegate's Notebook</h2>
+  <p class="sub">The Confederation Congress &middot; 1786</p>
+
+  <div class="namebar">
+    <div class="f"><span>Delegates</span><span class="fill"></span></div>
+    <div class="f"><span>Our state</span><span class="fill"></span></div>
+    <div class="f" style="flex:0 0 90px"><span>Date</span><span class="fill"></span></div>
+  </div>
+
+  <p class="small muted">Fill one box in after each vote. Two lines is plenty.</p>
+
+  <!-- R1 -->
+  <div class="round">
+    <div class="top">
+      <span class="n">1</span>
+      <span class="t">Paying the War Debt</span>
+      <span class="rule">Needs 9 of 13</span>
+    </div>
+    <div class="row2">
+      <div><div class="q">Our state voted:</div><div class="circle small">YES &nbsp; NO &nbsp; ABSTAIN</div></div>
+      <div><div class="q">Did it pass?</div><div class="circle small">YES &nbsp; NO</div></div>
+    </div>
+    <div class="money">
+      <div><div class="lab">Congress asked for</div><span class="fill"></span></div>
+      <div><div class="lab">Congress actually got</div><span class="fill"></span></div>
+    </div>
+    <div class="q">Congress voted yes. Why did the money still not arrive?</div>
+    <div class="lines"><div></div><div></div></div>
+    <p class="key small">Congress could only <em>ask</em> the states for money. There was no president to
+    collect it and no court to punish a state that ignored the request, so states voted yes and then sent
+    nothing.</p>
+  </div>
+
+  <!-- R2 -->
+  <div class="round">
+    <div class="top">
+      <span class="n">2</span>
+      <span class="t">The Trade War</span>
+      <span class="rule">Needs 9 of 13</span>
+    </div>
+    <div class="row2">
+      <div><div class="q">Our state voted:</div><div class="circle small">YES &nbsp; NO &nbsp; ABSTAIN</div></div>
+      <div><div class="q">Did it pass?</div><div class="circle small">YES &nbsp; NO</div></div>
+    </div>
+    <div class="q">New York taxed goods heading to its neighbours. What could Congress actually do about it?</div>
+    <div class="lines"><div></div><div></div></div>
+    <p class="key small">Almost nothing. Congress had no power over trade, so all it could do was politely
+    ask New York to stop. Even passing the resolution changed nothing.</p>
+  </div>
+
+  <!-- R3 -->
+  <div class="round">
+    <div class="top">
+      <span class="n">3</span>
+      <span class="t">The Import Tax Amendment</span>
+      <span class="rule">Needs ALL 13</span>
+    </div>
+    <div class="row2">
+      <div><div class="q">Our state voted:</div><div class="circle small">YES &nbsp; NO &nbsp; ABSTAIN</div></div>
+      <div><div class="q">Did it pass?</div><div class="circle small">YES &nbsp; NO</div></div>
+    </div>
+    <div class="q">How many states voted yes? <span class="fill" style="display:inline-block;width:70px"></span>
+      &nbsp; How many were needed? <span class="fill" style="display:inline-block;width:70px"></span></div>
+    <div class="q" style="margin-top:6px">Which state or states blocked it, and why would they not agree?</div>
+    <div class="lines"><div></div><div></div></div>
+    <p class="key small">Usually Rhode Island. It made money from its own port taxes and refused to hand the
+    power to tax to Congress. In real life Rhode Island blocked this exact plan in 1782, alone.</p>
+  </div>
+
+  <!-- R4 -->
+  <div class="round">
+    <div class="top">
+      <span class="n">4</span>
+      <span class="t">Shays' Rebellion</span>
+      <span class="rule">Needs 9 of 13</span>
+    </div>
+    <div class="row2">
+      <div><div class="q">Our state voted:</div><div class="circle small">YES &nbsp; NO &nbsp; ABSTAIN</div></div>
+      <div><div class="q">Did it pass?</div><div class="circle small">YES &nbsp; NO</div></div>
+    </div>
+    <div class="money">
+      <div><div class="lab">Congress asked for</div><span class="fill"></span></div>
+      <div><div class="lab">Congress actually got</div><span class="fill"></span></div>
+    </div>
+    <div class="q">Armed men were marching on an arsenal. Why couldn't Congress just send an army?</div>
+    <div class="lines"><div></div><div></div></div>
+    <p class="key small">Congress had no army of its own and could not draft a single soldier. It could only
+    ask the states for men and money. In real life a private army paid for by Boston merchants stopped the
+    rebellion.</p>
+  </div>
+</div>
+
+<!-- ============================ PAGE TWO ============================ -->
+<div class="sheet">
+  <h2>What we learned</h2>
+  <p class="sub">Fill this in during the debrief</p>
+
+  <h3>1. The six weaknesses <span class="note">write the round where you saw each one</span></h3>
+  <table>
+    <thead><tr><th class="w">Weakness of the Articles</th><th>Round I saw it</th><th>What happened</th></tr></thead>
+    <tbody>
+      <tr><td class="w">Congress could not tax<span class="key"> — it could only ask</span></td>
+          <td><span class="key">1, 4</span></td><td><span class="key">Voted yes, money never came</span></td></tr>
+      <tr><td class="w">Congress could not control trade</td>
+          <td><span class="key">2</span></td><td><span class="key">NY taxed its neighbours anyway</span></td></tr>
+      <tr><td class="w">There was no president</td>
+          <td><span class="key">1, 2, 4</span></td><td><span class="key">Nobody to enforce anything</span></td></tr>
+      <tr><td class="w">There were no national courts</td>
+          <td><span class="key">2</span></td><td><span class="key">No judge to settle state fights</span></td></tr>
+      <tr><td class="w">Changing the rules needed all 13</td>
+          <td><span class="key">3</span></td><td><span class="key">One state killed the fix</span></td></tr>
+      <tr><td class="w">Congress had no army</td>
+          <td><span class="key">4</span></td><td><span class="key">Could not stop the rebellion</span></td></tr>
+    </tbody>
+  </table>
+
+  <h3>2. What the Articles actually got right <span class="note">it was not all failure</span></h3>
+  <div class="bank"><b>Word bank &mdash; use each once</b>
+    won the war &middot; new states &middot; slavery &middot; king &middot; themselves</div>
+
+  <p class="small">a. The Articles held the country together long enough that we
+    <span class="fill" style="display:inline-block;width:150px"></span><span class="key"> won the war</span>
+    and made peace with Britain.</p>
+  <p class="small">b. The Northwest Ordinance let western land become
+    <span class="fill" style="display:inline-block;width:150px"></span><span class="key"> new states</span>,
+    equal to the original thirteen rather than ruled by them.</p>
+  <p class="small">c. That same law banned
+    <span class="fill" style="display:inline-block;width:150px"></span><span class="key"> slavery</span>
+    in the whole Northwest Territory.</p>
+  <p class="small">d. There was no
+    <span class="fill" style="display:inline-block;width:150px"></span><span class="key"> king</span>,
+    and states kept the right to govern
+    <span class="fill" style="display:inline-block;width:150px"></span><span class="key"> themselves</span>.</p>
+
+  <h3>3. The two numbers that matter</h3>
+  <div class="money" style="grid-template-columns:1fr 1fr 1fr">
+    <div><div class="lab">Congress asked for, in total</div><span class="fill"></span></div>
+    <div><div class="lab">Congress actually received</div><span class="fill"></span></div>
+    <div><div class="lab">That is what percent?</div><span class="fill"></span></div>
+  </div>
+  <p class="small">In real life Congress asked for about $15 million between 1781 and 1786 and received
+  about $2.5 million — roughly <strong>one dollar in six</strong>.</p>
+
+  <h3>4. Think about it</h3>
+  <p class="q">a. Your state probably scored well by refusing to pay. So why did the country end up worse off?</p>
+  <div class="lines"><div></div><div></div></div>
+  <p class="keyblock small key">Every state doing the smart thing for itself added up to a country that
+  could not pay its debts, defend itself, or settle arguments. What is good for one state is not
+  automatically good for all thirteen.</p>
+
+  <p class="q" style="margin-top:10px">b. If you could change <u>one</u> rule of this government, which one —
+  and what problem would it fix?</p>
+  <div class="lines"><div></div><div></div></div>
+
+  <div class="box" style="margin-top:11px;background:#f4efe6">
+    <p class="small" style="margin:0"><strong>Exit ticket.</strong> In one sentence: name a weakness of the
+    Articles you felt today, and say how the Constitution fixed it.</p>
+    <div class="lines" style="margin-top:5px"><div></div></div>
+  </div>
+</div>
+
+<script>
+  var btn = document.getElementById('key-btn');
+  btn.addEventListener('click', function () {
+    var on = document.body.classList.toggle('show-key');
+    btn.textContent = on ? 'Hide answer key' : 'Show answer key';
+    btn.classList.toggle('on', on);
+  });
+</script>
+</body>
+</html>

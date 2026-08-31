@@ -280,6 +280,24 @@ lock the row while they read and rewrite it, so two laptops writing at the same 
 each other. Deals are their own rows rather than an array inside the game document, because a dozen
 groups appending to one shared array loses some of the offers.
 
+## The worksheet
+
+`worksheet.html` prints to two pages — one sheet, front and back — and there are ready-made PDFs in
+`download/`.
+
+**Page one is filled in as they play.** One box per resolution: how their state voted, whether it
+passed, and one question that names the flaw that round exposed. Rounds 1 and 4 also ask for the two
+numbers that matter — what Congress asked for, and what actually arrived.
+
+**Page two is filled in during the debrief.** The six weaknesses with a column for which round showed
+each; a short word-bank section on what the Articles *did* get right, since a unit that only shows
+failure teaches a cartoon; the total asked against the total collected; and two questions, including the
+one that matters most — *your state scored well by refusing to pay, so why did the country end up worse
+off?*
+
+Open the file and hit **Show answer key** for a teacher's copy with suggested answers, which prints to
+the same two pages.
+
 ## The three pages
 
 | Page | Who | Needs internet? |

@@ -9,6 +9,12 @@ alongside it. Double-click to open in a browser.
   confederation-solo.html      One student against twelve bots. Works with
                                no internet at all.
 
+  worksheet-student.pdf        Print two pages, front and back. One per group.
+  worksheet-answer-key.pdf     The same sheet with suggested answers.
+  confederation-worksheet.html The worksheet source, if you want to edit it.
+                               Open it and press Print; the button in the
+                               corner toggles the answer key.
+
 RUNNING A CLASS
   1. Open the teacher file. Click "Create the session".
   2. Write the 4-letter code on the board.
