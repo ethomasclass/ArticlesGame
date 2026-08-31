@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Teacher's Run of Show</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%276%27 fill=%27%238a3324%27/%3E%3Ctext x=%2716%27 y=%2723%27 font-size=%2719%27 text-anchor=%27middle%27 fill=%27%23f5ecd8%27 font-family=%27Georgia,serif%27%3E13%3C/text%3E%3C/svg%3E">
+<style>
+  :root{
+    --ink:#191612; --soft:#544b42; --faint:#867b70; --rule:#cbbfae;
+    --paper:#fbf7ef; --tint:#f2ebdd; --accent:#8a3324; --accent-dk:#5f2117;
+    --gold:#8f6413; --green:#1d5233;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:#33302b;color:var(--ink);
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+    font-size:16px;line-height:1.55;padding:26px 12px}
+  .doc{background:var(--paper);max-width:7.6in;margin:0 auto;padding:0.7in 0.75in;
+    box-shadow:0 8px 30px rgba(0,0,0,.4)}
+
+  .lede-block{border-bottom:3px double var(--rule);padding-bottom:16px;margin-bottom:22px}
+  h1{font-size:2.15rem;margin:0 0 4px;color:var(--accent-dk);letter-spacing:-.015em;line-height:1.1}
+  .kicker{font-family:ui-sans-serif,system-ui,-apple-system,sans-serif;font-size:.72rem;font-weight:800;
+    letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-bottom:6px}
+  .stand{font-size:1.1rem;color:var(--soft);margin:0}
+
+  h2{font-size:1.32rem;margin:30px 0 10px;color:var(--accent-dk);
+    border-bottom:2px solid var(--ink);padding-bottom:4px}
+  h3{font-size:1.04rem;margin:18px 0 6px}
+  p{margin:0 0 10px}
+  ul,ol{margin:0 0 10px;padding-left:1.15em}
+  li{margin-bottom:5px}
+  .small{font-size:.88rem}
+  .muted{color:var(--soft)}
+  strong{font-weight:700}
+
+  /* run of show */
+  .cue{display:grid;grid-template-columns:86px 1fr;gap:14px;padding:11px 0;
+    border-bottom:1px solid var(--rule);break-inside:avoid}
+  .cue:last-child{border-bottom:0}
+  .cue .t{font-family:ui-sans-serif,system-ui,sans-serif;font-weight:800;font-size:.82rem;
+    letter-spacing:.04em;color:var(--accent);padding-top:2px}
+  .cue .t small{display:block;font-weight:600;color:var(--faint);letter-spacing:.06em;
+    text-transform:uppercase;font-size:.62rem;margin-top:2px}
+  .cue h4{margin:0 0 4px;font-size:1.02rem}
+  .cue p{margin:0 0 5px;font-size:.94rem}
+  .press{display:inline-block;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.7rem;
+    font-weight:700;letter-spacing:.05em;background:var(--ink);color:var(--paper);
+    border-radius:4px;padding:2px 7px;margin-right:5px;white-space:nowrap}
+  .say{border-left:3px solid var(--gold);background:var(--tint);padding:7px 11px;margin:6px 0 0;
+    font-size:.93rem;font-style:italic}
+  .say b{font-style:normal;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.64rem;
+    letter-spacing:.12em;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:2px}
+
+  table{width:100%;border-collapse:collapse;margin:0 0 12px;font-size:.9rem}
+  th,td{text-align:left;padding:7px 9px;border:1px solid var(--rule);vertical-align:top}
+  th{background:var(--tint);font-family:ui-sans-serif,system-ui,sans-serif;font-size:.68rem;
+    text-transform:uppercase;letter-spacing:.09em}
+  td.n{white-space:nowrap;font-weight:700}
+
+  .callout{border:2px solid var(--accent);border-radius:8px;padding:12px 15px;margin:14px 0;
+    background:#fbeee9;break-inside:avoid}
+  .callout h3{margin-top:0;color:var(--accent-dk)}
+  .note{border-left:4px solid var(--rule);padding:2px 0 2px 13px;margin:12px 0;color:var(--soft);
+    font-size:.92rem}
+  .check{list-style:none;padding-left:0}
+  .check li{padding-left:26px;position:relative;margin-bottom:7px}
+  .check li::before{content:"";position:absolute;left:0;top:.28em;width:13px;height:13px;
+    border:1.5px solid var(--ink);border-radius:3px}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:640px){.grid2{grid-template-columns:1fr}}
+  .card{border:1px solid var(--rule);border-radius:8px;padding:11px 13px;background:#fff}
+  .card h3{margin:0 0 4px;font-size:.98rem}
+  .card p{margin:0;font-size:.9rem}
+
+  .bar{max-width:7.6in;margin:0 auto 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+    background:#221f1c;border-radius:10px;padding:11px 16px;color:#f2e8d4}
+  .bar span{flex:1;min-width:180px;font-size:.9rem}
+  .bar button{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.74rem;font-weight:700;
+    letter-spacing:.08em;text-transform:uppercase;border:2px solid #574d41;background:#3a332b;
+    color:#f2e8d4;border-radius:7px;padding:.5em .9em;cursor:pointer}
+  .bar button:hover{background:#4a4137}
+
+  @page{margin:0.55in}
+  @media print{
+    body{background:#fff;padding:0;font-size:10.6pt}
+    .bar{display:none}
+    .doc{box-shadow:none;max-width:none;padding:0}
+    h2{page-break-after:avoid}
+    .cue,.callout,.card,table{break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <span>Teacher's guide — about six printed pages. Keep it on your desk or your phone.</span>
+  <button onclick="window.print()">Print</button>
+</div>
+
+<div class="doc">
+
+  <div class="lede-block">
+    <div class="kicker">The Confederation Problem &middot; Teacher's Guide</div>
+    <h1>Run of Show</h1>
+    <p class="stand">A 40-minute simulation in which students play the thirteen states of 1786, discover
+    that a government designed to be weak cannot do anything, and argue about it.</p>
+  </div>
+
+  <h2>What students actually learn</h2>
+
+  <p>Most versions of this activity have students vote on resolutions and score them on the outcome. That
+  teaches "the states disagreed," which they already suspect. This one is built around the thing that
+  actually killed the Articles:</p>
+
+  <div class="callout">
+    <h3>Passing a law and something happening are different events</h3>
+    <p>After a money resolution passes, every delegation privately decides whether to <em>actually pay</em>.
+    Nobody can make them — there is no president to collect and no court to sue. The projector then shows
+    the gap. Your class will vote to raise $1,000,000 and collect somewhere around $300,000.</p>
+    <p class="small muted" style="margin-top:7px">Between 1781 and 1786 the real Congress asked the states
+    for about $15 million and received about $2.5 million. Roughly one dollar in six.</p>
+  </div>
+
+  <p>Scoring sets two numbers against each other. <strong>State Interest</strong> is private and rewards
+  looking after yourself — refusing to pay is worth points. <strong>National Stability</strong> is shared
+  and falls when Congress cannot act. The highest State Interest wins, <em>unless</em> National Stability
+  drops below 30, at which point every state loses twenty points including the leader.</p>
+
+  <p>So the class plays correctly and loses collectively. That is the argument for the Constitution, and
+  they make it themselves rather than hearing you make it.</p>
+
+  <h2>Before the bell</h2>
+
+  <ul class="check">
+    <li><strong>Print the worksheet</strong> — two pages, front and back, one per group. Keep the answer
+      key for yourself.</li>
+    <li><strong>Open the teacher page</strong> on the projector machine. Name the session (for example
+      "Period 3") and create it. You get a four-letter code.</li>
+    <li><strong>Write the code on the board.</strong> Big. You will be asked for it eleven times.</li>
+    <li><strong>Choose your student states.</strong> Six groups is the sweet spot. The recommended six are
+      pre-selected.</li>
+    <li><strong>Leave Rhode Island unchecked.</strong> Round 3 needs a state to block the amendment, and a
+      bot does it without a student taking the blame.</li>
+    <li><strong>Put students in pairs</strong>, one laptop each pair, and give them the student link.</li>
+  </ul>
+
+  <div class="note">Anything nobody claims is played by a bot, so a class of ten and a class of thirty both
+  work. You can start before every group has joined.</div>
+
+  <h2>The run of show</h2>
+
+  <div class="cue">
+    <div class="t">0–5 min<small>Setup</small></div>
+    <div>
+      <h4>Get them in and reading</h4>
+      <p>Groups join with the code and claim a state. As they land, they get a short tour of their own
+      screen automatically.</p>
+      <p>Read the framing paragraph on your lobby screen while they settle.</p>
+      <div class="say"><b>Say</b>Three rules. One: every state gets one vote, whether you are Virginia with
+      700,000 people or Delaware with 59,000. Two: nine of thirteen have to agree to pass anything. Three:
+      there is no president and there are no courts. Nobody can make any state do anything.</div>
+    </div>
+  </div>
+
+  <div class="cue">
+    <div class="t">5–7 min<small>Open</small></div>
+    <div>
+      <h4>Read the opening aloud</h4>
+      <p><span class="press">Begin Resolution 1</span> Each round opens with a short scene, about
+      45 seconds. It appears on your screen in large type and on every student screen at the same time.
+      <strong>Bigger text</strong> is there if the back row needs it.</p>
+      <p>Read it properly. It is written to be performed, and it sets the tone for everything after.</p>
+      <div class="say"><b>Say</b>The letter from Paris came this morning. It is extremely polite, and it is
+      a threat.</div>
+    </div>
+  </div>
+
+  <div class="cue">
+    <div class="t">7–9 min<small>Debate</small></div>
+    <div>
+      <h4>Two minutes of chaos</h4>
+      <p><span class="press">Open debate</span> Get them out of their seats. The timer runs on your screen
+      and theirs.</p>
+      <p>Watch the <strong>deal ticker</strong> in your sidebar. When a good offer lands, read it out.
+      Nothing makes the room louder than hearing "Virginia offers Delaware fifty thousand dollars."</p>
+      <p class="small muted">Bots answer offers instantly. Student-run states have to be argued with in
+      person — the app will not answer for them.</p>
+    </div>
+  </div>
+
+  <div class="cue">
+    <div class="t">9–10 min<small>Vote</small></div>
+    <div>
+      <h4>Call the vote</h4>
+      <p><span class="press">Close debate — open voting</span> Silence. Every delegation votes. Your
+      sidebar shows who still hasn't.</p>
+      <p>Remind them abstaining is not neutral: nine <em>yes</em> votes are needed, so abstaining helps a
+      resolution fail.</p>
+    </div>
+  </div>
+
+  <div class="cue">
+    <div class="t">10–12 min<small>Reveal</small></div>
+    <div>
+      <h4>The roll call</h4>
+      <p><span class="press">Close voting — show result</span> The map lights up state by state, north to
+      south, with the count climbing toward nine. Let it play. Do not talk over it.</p>
+      <p>If it passes, <strong>do not celebrate</strong>. Ask what happens next.</p>
+    </div>
+  </div>
+
+  <div class="cue">
+    <div class="t">12–14 min<small>The point</small></div>
+    <div>
+      <h4>Now ask them to pay</h4>
+      <p><span class="press">Now ask them to pay</span> Each group decides privately whether to send the
+      money. Then <span class="press">Reveal who actually paid</span>.</p>
+      <p>The same map runs again and goes dark red. The tally bar still says PASSED while a counter shows
+      the money stalling far short.</p>
+      <div class="say"><b>Say</b>Read the two numbers slowly. "Congress asked for one million dollars.
+      Congress received three hundred thousand." Then stop talking and let them look at it.</div>
+      <p class="small muted">Then read the "What actually happened" box aloud, and have them fill in the
+      round box on their worksheet.</p>
+    </div>
+  </div>
+
+  <div class="cue">
+    <div class="t">14–34 min<small>Repeat</small></div>
+    <div>
+      <h4>Rounds 2, 3 and 4</h4>
+      <p>Same shape, about six minutes each. Rounds 2 and 3 have no payment step, so they run faster.</p>
+      <p>Keep the pace up. The simulation is better slightly rushed than dragged.</p>
+    </div>
+  </div>
+
+  <div class="cue">
+    <div class="t">34–40 min<small>Debrief</small></div>
+    <div>
+      <h4>The turn</h4>
+      <p><span class="press">Show the debrief</span> Final standings, the totals, and the six weaknesses
+      they just lived through — plus what the Articles actually got right.</p>
+      <p>Discussion questions are on your screen. Students finish page two of the worksheet.</p>
+    </div>
+  </div>
+
+  <h2>The four resolutions</h2>
+
+  <table>
+    <thead><tr><th>Round</th><th>What it exposes</th><th>What will probably happen</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="n">1. Paying the War Debt<br><span class="small muted">$1,000,000 &middot; 9 of 13</span></td>
+        <td>Congress could not tax. It could only ask.</td>
+        <td>Usually passes. Then roughly a third of the money arrives. This is the round that does the
+          teaching.</td>
+      </tr>
+      <tr>
+        <td class="n">2. The Trade War<br><span class="small muted">9 of 13</span></td>
+        <td>Congress could not regulate trade between states.</td>
+        <td>Often passes — and changes nothing, because it is only a request. Ask them how it feels to
+          win a vote that does nothing.</td>
+      </tr>
+      <tr>
+        <td class="n">3. The Import Tax Amendment<br><span class="small muted">ALL 13</span></td>
+        <td>Amending the Articles needed every state.</td>
+        <td><strong>It will fail.</strong> Rhode Island refuses. Expect real anger — that is the round
+          working.</td>
+      </tr>
+      <tr>
+        <td class="n">4. Shays' Rebellion<br><span class="small muted">$500,000 &middot; 9 of 13</span></td>
+        <td>No army, no president, and an empty treasury.</td>
+        <td>The opening reads out your class's real treasury balance. If they defected in Round 1, they
+          hear their own number as the rebels march.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <h3>Round 3 is supposed to fail</h3>
+    <p>Students will work the room hard and lose to one stubborn state. When they complain that it is
+    rigged, tell them the truth: this was tried twice in real life. In 1782 twelve states approved the
+    import tax and <strong>Rhode Island alone</strong> rejected it. In 1786 it was tried again and
+    <strong>New York alone</strong> rejected it. One state in thirteen was enough, both times.</p>
+    <p class="small muted" style="margin-top:6px">It is technically winnable — Rhode Island can be bought
+    at an absurd price — so it is a wall they can push on, not one they cannot see.</p>
+  </div>
+
+  <h2>Three moments to slow down for</h2>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>The first payment reveal</h3>
+      <p>The map goes red while the bar still says PASSED. Say nothing for five seconds. Then ask: "You
+      voted for this. What happened?"</p>
+    </div>
+    <div class="card">
+      <h3>Rhode Island blocking the amendment</h3>
+      <p>Click Rhode Island on the map to show its stated reason. Ask whether one state out of thirteen
+      should be able to do that.</p>
+    </div>
+    <div class="card">
+      <h3>The final standings</h3>
+      <p>If stability collapsed, everyone lost twenty points — including whoever finished first. Ask the
+      leader what they did that worked, then whether any of it was good for the country.</p>
+    </div>
+    <div class="card">
+      <h3>And one thing not to skip</h3>
+      <p>The debrief section on what the Articles <em>got right</em>. A unit that only shows failure
+      teaches a cartoon.</p>
+    </div>
+  </div>
+
+  <h2>If something goes wrong</h2>
+
+  <table>
+    <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+    <tbody>
+      <tr><td class="n">A group can't join</td>
+        <td>Check the code. If their laptop is dead, they can share with another group, or you can vote on
+          their behalf — every state is clickable on your List view.</td></tr>
+      <tr><td class="n">A group joined late</td>
+        <td>Any unclaimed state is already a bot. Have them claim any state showing as open; if they need
+          a specific one, they can take it back even if it shows as held.</td></tr>
+      <tr><td class="n">A money resolution gets voted down</td>
+        <td>Use <strong>Congress tries again</strong> in the sidebar. It pushes the class to the payment
+          step, which is where the lesson lives. Historically fair — Congress re-introduced failed
+          requisitions year after year.</td></tr>
+      <tr><td class="n">You're running out of time</td>
+        <td><strong>Skip to the vote</strong> shortens debate. Cutting Round 2 costs you the least.</td></tr>
+      <tr><td class="n">The WiFi dies</td>
+        <td>Keep the solo file on a flash drive. It needs no network at all and runs the whole simulation
+          against bots.</td></tr>
+      <tr><td class="n">You want to break quorum on purpose</td>
+        <td><strong>Send 3 delegations home</strong> drops the room below nine states so no vote can be
+          held. Congress genuinely could not meet for long stretches. Use it once, for effect.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Running it over two days</h2>
+
+  <p>It saves as it goes — every vote, payment and score is stored the moment it happens, so stopping is
+  just stopping. There is no save button because there is nothing to save.</p>
+
+  <p>When the bell goes, press <strong>Stop here — continue another day</strong>. It shows the session
+  name, the code in large type, and where you stopped, so you can photograph it. Next day, open the
+  teacher page and either type that code into <strong>Resume that session</strong> or pick the class out
+  of <strong>Recent sessions</strong>. Everything comes back — states, scores, treasury, voting history —
+  and you can resume on a different computer.</p>
+
+  <div class="note"><strong>Where to break:</strong> after the reveal of Resolution 2. Day two then opens
+  on the import tax amendment, which needs the most argument and lands hardest when they have had a night
+  to stew about Rhode Island. Tell groups on day one to write down which state they are.</div>
+
+  <h2>Assessment</h2>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>During</h3>
+      <p>Worksheet page one, one box per round. Circling and two lines of writing — it should not compete
+      with the game for their attention.</p>
+    </div>
+    <div class="card">
+      <h3>After</h3>
+      <p>Worksheet page two: the six weaknesses, what the Articles got right, the totals, and two
+      reflection questions. Answer key toggles on in the worksheet file.</p>
+    </div>
+    <div class="card">
+      <h3>Exit ticket</h3>
+      <p>One sentence: name a weakness you felt today and say how the Constitution fixed it.</p>
+    </div>
+    <div class="card">
+      <h3>The question worth grading</h3>
+      <p>"Your state scored well by refusing to pay. So why did the country end up worse off?" That is the
+      whole unit in one answer.</p>
+    </div>
+  </div>
+
+  <h2>What is real and what is compressed</h2>
+
+  <p><strong>Real:</strong> the nine-of-thirteen rule and the thirteen-state amendment rule; one vote per
+  state regardless of size; requisitions as requests states routinely ignored; New York taxing goods bound
+  for New Jersey and Connecticut, and New Jersey taxing New York's lighthouse at Sandy Hook; Rhode Island
+  blocking the impost in 1782 and New York in 1786; Shays leading about 1,200 men against the Springfield
+  arsenal on 25 January 1787, four farmers killed, the rebellion ended by a private army of 4,000 paid for
+  by Boston merchants; Britain holding its frontier forts over unpaid debts; Spain closing the Mississippi.</p>
+
+  <p><strong>Compressed:</strong> four resolutions stand in for years of congressional business, and they
+  are placed in one dramatic arc rather than strict chronological order. State treasuries are simplified
+  round numbers. Bot personalities are drawn from each state's real interests but they are models, not
+  transcripts.</p>
+
+  <p><strong>Worth saying out loud:</strong> the western land the Northwest Ordinance organised so neatly
+  was not empty. It was home to the Shawnee, Miami, Delaware and many other nations, none of whom agreed
+  to any of it.</p>
+
+</div>
+</body>
+</html>

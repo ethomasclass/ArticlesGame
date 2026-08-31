@@ -280,6 +280,19 @@ lock the row while they read and rewrite it, so two laptops writing at the same 
 each other. Deals are their own rows rather than an array inside the game document, because a dozen
 groups appending to one shared array loses some of the offers.
 
+## The teacher's guide
+
+`lesson-plan.html` is the run of show — read it before you teach this. It prints to six pages, there is a
+PDF in `download/`, and it is also online at
+https://claude.ai/code/artifact/4a8b48c0-2af1-4510-b37e-b795d8a5d3e6 if you would rather read it on your
+phone while the class files in.
+
+It covers what students are meant to learn and why the game is built the way it is; a pre-class
+checklist; a minute-by-minute run of show with the exact buttons to press and lines to say; what each
+resolution exposes and what will probably happen; three moments worth slowing down for; a
+troubleshooting table (a group cannot join, a money vote fails, the WiFi dies); how to split it over two
+days; assessment; and an honest note on what is historically accurate and what is compressed.
+
 ## The worksheet
 
 `worksheet.html` prints to two pages — one sheet, front and back — and there are ready-made PDFs in

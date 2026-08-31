@@ -9,6 +9,10 @@ alongside it. Double-click to open in a browser.
   confederation-solo.html      One student against twelve bots. Works with
                                no internet at all.
 
+  teacher-run-of-show.pdf      Read this first. Minute by minute: what to press,
+                               what to say, what will probably go wrong.
+  teacher-run-of-show.html     The same guide, with a Print button.
+
   worksheet-student.pdf        Print two pages, front and back. One per group.
   worksheet-answer-key.pdf     The same sheet with suggested answers.
   confederation-worksheet.html The worksheet source, if you want to edit it.
