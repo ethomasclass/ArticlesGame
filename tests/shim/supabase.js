@@ -114,6 +114,16 @@ async function install(ctx, cfg) {
     r.fulfill({ contentType: 'application/javascript',
                 body: 'window.AOC_CONFIG = ' + JSON.stringify(config) + ';' }));
 
+  // the teacher's "recent sessions" list reads the table directly
+  await ctx.route('https://test.supabase.co/rest/v1/aoc_games*', async r => {
+    if (r.request().method() !== 'GET') return r.fallback();
+    const rows = Object.keys(STORE.games).map(code => ({
+      code, data: STORE.games[code].data,
+      updated_at: new Date(1700000000000 + STORE.games[code].t * 1000).toISOString()
+    })).sort((a, b) => b.updated_at.localeCompare(a.updated_at));
+    r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(rows) });
+  });
+
   await ctx.route('https://test.supabase.co/rest/v1/rpc/*', async r => {
     const fn = r.request().url().split('/').pop();
     if (!FN[fn]) return r.fulfill({ status: 404, body: 'no function ' + fn });

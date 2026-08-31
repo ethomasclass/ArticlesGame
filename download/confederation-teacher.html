@@ -441,7 +441,7 @@ ul.clean li::before{content:"—";position:absolute;left:0;color:var(--gold-dk);
     </div>
     <div class="row">
       <div id="code-box" class="hidden center">
-        <div class="eyebrow">Join code</div>
+        <div class="eyebrow" id="code-label">Join code</div>
         <div class="code-chip" id="game-code">----</div>
       </div>
       <div id="clock-box" class="hidden center">
@@ -477,6 +477,12 @@ ul.clean li::before{content:"—";position:absolute;left:0;color:var(--gold-dk);
     <div class="card">
       <div class="eyebrow">Step 2</div>
       <h2>Set the pace</h2>
+      <div class="field">
+        <label for="sess-label">Name this session</label>
+        <input type="text" id="sess-label" placeholder="e.g. Period 3">
+        <p class="small muted" style="margin:6px 0 0">So you can find this exact class again tomorrow.
+        Everything saves automatically as you go — you can stop at any point and pick up where you left off.</p>
+      </div>
       <div class="grid g3">
         <div class="field">
           <label for="caucus-len">Debate time per resolution</label>
@@ -504,6 +510,21 @@ ul.clean li::before{content:"—";position:absolute;left:0;color:var(--gold-dk);
       </div>
       <button class="btn big" id="create-btn">Create the session</button>
       <p class="small muted" style="margin-top:8px">You will get a 4&#8209;letter code to put on the board.</p>
+    </div>
+
+    <div class="card" id="resume-card">
+      <div class="eyebrow">Carrying on from another day</div>
+      <h2>Pick up a class where you left off</h2>
+      <p class="lede">Every vote and payment is saved as it happens. Resume a session and it comes back
+      exactly where it stopped, with the same states, scores and treasury.</p>
+      <div class="row" style="margin-bottom:14px">
+        <input type="text" id="resume-code" placeholder="CODE" maxlength="4"
+               style="text-transform:uppercase;letter-spacing:.28em;text-align:center;max-width:190px;font-size:1.3rem">
+        <button class="btn" id="resume-btn">Resume that session</button>
+        <span class="small" id="resume-msg" style="color:#8a2019"></span>
+      </div>
+      <div class="eyebrow">Recent sessions</div>
+      <div id="recent-list"><p class="small muted">Looking…</p></div>
     </div>
   </section>
 
@@ -673,6 +694,7 @@ ul.clean li::before{content:"—";position:absolute;left:0;color:var(--gold-dk);
           <hr class="rule">
           <div class="eyebrow">Teacher extras</div>
           <button class="btn ghost sm" id="walkout-btn">Send 3 delegations home</button>
+          <button class="btn ghost sm" id="pause-btn">Stop here — continue another day</button>
           <button class="btn ghost sm" id="end-btn">End game &amp; show debrief</button>
         </div>
 
@@ -689,6 +711,31 @@ ul.clean li::before{content:"—";position:absolute;left:0;color:var(--gold-dk);
       </div>
     </div>
   </section>
+
+  <!-- ================= PAUSE ================= -->
+  <div id="pause-modal" class="overlay hidden">
+    <div class="card modal center">
+      <div class="eyebrow">Saved</div>
+      <h1 style="margin-bottom:6px" id="pause-label">This session</h1>
+      <p class="lede">Everything is stored. Come back to this exact class with:</p>
+      <div class="code-chip" style="font-size:3.2rem;display:inline-block;margin:10px 0" id="pause-code">----</div>
+      <p class="lede" id="pause-where">—</p>
+      <hr class="rule">
+      <div class="grid g2" style="text-align:left">
+        <div class="inset">
+          <h3>Tomorrow, you</h3>
+          <p class="small" style="margin:0">Open this page, put the code in <strong>Resume that
+          session</strong>, and carry on. It will still be your states, scores and treasury.</p>
+        </div>
+        <div class="inset">
+          <h3>Tomorrow, them</h3>
+          <p class="small" style="margin:0">Same code, same state. Tell groups to write down which state
+          they are. If they end up on a different laptop they can claim it back by name.</p>
+        </div>
+      </div>
+      <button class="btn big" id="pause-close" style="margin-top:16px">Back to the game</button>
+    </div>
+  </div>
 
   <!-- ================= DEBRIEF ================= -->
   <section id="debrief" class="hidden"></section>
@@ -2060,6 +2107,22 @@ window.AOC_CONFIG = {
     boot: boot
   };
 
+  NET.listGames = function (limit) {
+    return boot().then(function () {
+      return F.getDocs(F.collection(F.db, "games")).then(function (q) {
+        return q.docs.map(function (d) {
+          var g = d.data();
+          return {
+            code: d.id, updatedAt: g.createdAt,
+            label: (g.settings && g.settings.label) || "",
+            status: g.status, round: g.round, phase: g.phase
+          };
+        }).sort(function (a, b) { return (b.updatedAt || 0) - (a.updatedAt || 0); })
+          .slice(0, limit || 25);
+      });
+    }).catch(function () { return []; });
+  };
+
   // Teacher rewrites the whole deal list when it answers pending offers.
   NET.updateDeals = function (code, deals) {
     return NET.updateGame(code, { deals: deals });
@@ -2309,6 +2372,31 @@ window.AOC_CONFIG = {
       ensurePolling(code);
       (poll.subs.state[name] = poll.subs.state[name] || []).push(cb);
       return unsub(poll.subs.state[name], cb);
+    },
+
+    // Recent sessions, newest first. Uses the plain table endpoint rather
+    // than a function, so resuming works without anyone running more SQL.
+    listGames: function (limit) {
+      if (!configured()) return Promise.resolve([]);
+      var url = URL_BASE + "/rest/v1/aoc_games" +
+        "?select=code,data,updated_at&order=updated_at.desc&limit=" + (limit || 25);
+      return fetch(url, {
+        headers: { "apikey": KEY, "Authorization": "Bearer " + KEY }
+      }).then(function (r) {
+        if (!r.ok) return [];
+        return r.json();
+      }).then(function (rows) {
+        return (rows || []).map(function (row) {
+          return {
+            code: row.code,
+            updatedAt: row.updated_at,
+            label: (row.data && row.data.settings && row.data.settings.label) || "",
+            status: row.data && row.data.status,
+            round: row.data && row.data.round,
+            phase: row.data && row.data.phase
+          };
+        });
+      }).catch(function () { return []; });
     },
 
     isConfigured: configured,
@@ -2644,15 +2732,11 @@ $("create-btn").addEventListener("click", function(){
   NET.createGame(picked, {
     caucusLen: parseInt($("caucus-len").value,10),
     dealLimit: parseInt($("deal-limit").value,10),
-    absences: $("absences").value === "on"
+    absences: $("absences").value === "on",
+    label: $("sess-label").value.trim()
   }).then(function(code){
-    CODE = code;
-    $("game-code").textContent = code;
-    $("code-box").classList.remove("hidden");
-    $("setup").classList.add("hidden");
     $("lobby").classList.remove("hidden");
-    try { localStorage.setItem("aoc_teacher_code", code); } catch(e){}
-    subscribe();
+    openSession(code, $("sess-label").value.trim() || "Join code");
   }).catch(function(err){
     b.disabled = false; b.textContent = "Create the session";
     alert("Could not reach the server.\n\n" + err.message +
@@ -3329,18 +3413,106 @@ function nextRound(){
   (patches.length ? NET.batchStates(CODE, patches) : Promise.resolve()).then(after);
 }
 
-/* Recover the session if the teacher's tab reloads mid-class. */
+/* --------------------------------------------------------- resuming
+   A class that runs over two days is the normal case, not an edge case.
+   Nothing important lives in this browser: the session is in the database,
+   so any machine can pick it up with the code. localStorage only saves the
+   teacher from retyping it after an accidental reload.                  */
+function openSession(code, label){
+  CODE = code;
+  $("game-code").textContent = code;
+  $("code-label").textContent = label || "Join code";
+  $("code-box").classList.remove("hidden");
+  $("setup").classList.add("hidden");
+  try { localStorage.setItem("aoc_teacher_code", code); } catch(e){}
+  subscribe();
+}
+
+function describeWhere(g){
+  if (!g) return "";
+  if (g.status === "ended") return "Finished — the debrief was shown";
+  if (g.status === "lobby" || g.round < 0) return "In the lobby, not started yet";
+  var r = D.RESOLUTIONS[g.round];
+  var phase = ({ brief:"about to debate", caucus:"mid-debate", voting:"voting",
+                 tally:"at the result", compliance:"deciding who pays",
+                 reveal:"at the reveal", done:"between rounds" })[g.phase] || g.phase;
+  return "Resolution " + (g.round + 1) + " of " + D.RESOLUTIONS.length +
+         " (" + r.title + ") — " + phase;
+}
+
+function timeAgo(ts){
+  if (!ts) return "";
+  var t = typeof ts === "number" ? ts : Date.parse(ts);
+  if (!t) return "";
+  var mins = Math.round((Date.now() - t) / 60000);
+  if (mins < 2) return "just now";
+  if (mins < 60) return mins + " minutes ago";
+  var hrs = Math.round(mins / 60);
+  if (hrs < 24) return hrs + (hrs === 1 ? " hour ago" : " hours ago");
+  var days = Math.round(hrs / 24);
+  return days === 1 ? "yesterday" : days + " days ago";
+}
+
+$("resume-btn").addEventListener("click", function(){
+  var code = $("resume-code").value.trim().toUpperCase();
+  if (code.length !== 4) { $("resume-msg").textContent = "Enter the 4-letter code."; return; }
+  $("resume-msg").textContent = "Looking…";
+  NET.findGame(code).then(function(g){
+    if (!g) { $("resume-msg").textContent = "No session with that code."; return; }
+    $("resume-msg").textContent = "";
+    openSession(code, (g.settings && g.settings.label) || "Join code");
+  }).catch(function(e){ $("resume-msg").textContent = e.message; });
+});
+$("resume-code").addEventListener("keydown", function(e){
+  if (e.key === "Enter") $("resume-btn").click();
+});
+
+function loadRecent(){
+  if (!NET.listGames) { $("recent-list").innerHTML = ""; return; }
+  NET.listGames(12).then(function(rows){
+    if (!rows.length) {
+      $("recent-list").innerHTML =
+        '<p class="small muted">Nothing saved yet. Sessions you create will show up here.</p>';
+      return;
+    }
+    $("recent-list").innerHTML =
+      '<table><thead><tr><th>Session</th><th>Code</th><th>Where it stopped</th><th></th></tr></thead><tbody>' +
+      rows.map(function(r){
+        return '<tr><td><strong>' + (r.label || "Untitled") + '</strong>' +
+               '<div class="small muted">' + timeAgo(r.updatedAt) + '</div></td>' +
+               '<td><code style="font-size:1.05rem;letter-spacing:.12em">' + r.code + '</code></td>' +
+               '<td class="small">' + describeWhere(r) + '</td>' +
+               '<td><button class="btn sm" data-resume="' + r.code + '" data-label="' +
+                 String(r.label || "Join code").replace(/"/g, "&quot;") + '">Resume</button></td></tr>';
+      }).join("") + '</tbody></table>';
+    Array.prototype.forEach.call($("recent-list").querySelectorAll("[data-resume]"), function(b){
+      b.addEventListener("click", function(){ openSession(b.dataset.resume, b.dataset.label); });
+    });
+  });
+}
+loadRecent();
+
+/* Stopping for the day needs no save button, because it is already saved.
+   This just puts the code somewhere the teacher can photograph before the
+   bell goes. */
+$("pause-btn").addEventListener("click", function(){
+  $("pause-label").textContent = (G.settings && G.settings.label) || "This session";
+  $("pause-code").textContent = CODE;
+  $("pause-where").textContent = "You stopped at: " + describeWhere(G);
+  $("pause-modal").classList.remove("hidden");
+});
+$("pause-close").addEventListener("click", function(){
+  $("pause-modal").classList.add("hidden");
+});
+
 try {
   var saved = localStorage.getItem("aoc_teacher_code");
   if (saved) {
     NET.findGame(saved).then(function(g){
       if (!g) return;
-      if (!confirm("Resume your session " + saved + "?")) return;
-      CODE = saved;
-      $("game-code").textContent = saved;
-      $("code-box").classList.remove("hidden");
-      $("setup").classList.add("hidden");
-      subscribe();
+      var name = (g.settings && g.settings.label) || saved;
+      if (!confirm("Resume \"" + name + "\"?\n\n" + describeWhere(g))) return;
+      openSession(saved, (g.settings && g.settings.label) || "Join code");
     });
   }
 } catch(e){}

@@ -120,6 +120,8 @@
         <label for="names">Your names</label>
         <input type="text" id="names" placeholder="e.g. Maya and Dev" autocomplete="off">
       </div>
+      <p class="small muted" style="margin-top:-6px">Coming back to a session from another day? Use the
+      same code, then pick the same state you had. Taking it back is fine even if it shows as held.</p>
       <div class="field">
         <label for="code">Game code from the board</label>
         <input type="text" id="code" placeholder="ABCD" maxlength="4"
@@ -382,18 +384,31 @@ function renderClaims(){
   if (!open.length) open = ALL;
   open.sort(function(a,b){ return a.name.localeCompare(b.name); }).forEach(function(s){
     var d = D.byName(s.name);
-    var taken = (s.players||[]).length > 0;
+    var held = (s.players||[]).length > 0;
     var b = document.createElement("button");
-    b.className = "claim"; b.disabled = taken;
-    b.innerHTML = '<div class="t">' + s.name + (taken ? ' — taken by ' + s.players.join(", ") : '') + '</div>' +
-                  '<div class="d">' + d.motto + '</div>';
-    b.addEventListener("click", function(){ claim(s.name); });
+    b.className = "claim";
+    // A state that is already held stays clickable, because on the second day
+    // a group is often on a different laptop and has to get its own state
+    // back. Taking someone else's is possible, so it asks first and the
+    // teacher can see every delegation's names on the roster.
+    b.innerHTML = '<div class="t">' + s.name +
+                  (held ? ' <span class="pill">held by ' + s.players.join(", ") + '</span>' : '') + '</div>' +
+                  '<div class="d">' + d.motto + '</div>' +
+                  (held ? '<div class="d" style="color:var(--red-dk);font-weight:700">' +
+                          'Tap to take this state back</div>' : '');
+    b.addEventListener("click", function(){
+      if (held && !confirm(s.name + " is currently held by " + s.players.join(", ") +
+          ".\n\nTake it over as \"" + NAMES + "\"?")) return;
+      claim(s.name);
+    });
     list.appendChild(b);
   });
 }
 
 function claim(name){
   MINE = name;
+  // claimState also clears isBot, which matters when a group returns to a
+  // state that was filled in by a bot while they were away.
   NET.claimState(CODE, name, [NAMES]).then(function(){
     try{ localStorage.setItem("aoc_student", JSON.stringify({code:CODE,names:NAMES,state:name})); }catch(e){}
     startListening();

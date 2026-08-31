@@ -131,6 +131,30 @@ npm install us-atlas topojson-client topojson-simplify d3-geo --no-save
 node tools/build-map.js        # rewrites assets/map-data.js
 ```
 
+### Running it over two days
+
+It saves as it goes. Every vote, payment, score and treasury change is written the moment it happens —
+nothing important lives in a browser — so stopping is just stopping. There is no save button because
+there is nothing to save.
+
+**Name the session** when you create it ("Period 3"), so you can tell your five classes apart.
+
+**When the bell goes**, hit *Stop here — continue another day*. It shows the session name, the code in
+large type, and exactly where you stopped, so you can photograph it. Then close everything.
+
+**Next day**, open the teacher page and either type the code into *Resume that session* or pick the class
+out of **Recent sessions**, which lists every session with its name, its code, and where it stopped
+("Period 3 — Resolution 2 of 4, deciding who pays"). It comes back with the same states, scores,
+treasury and vote history. You can resume on a completely different computer; nothing depends on the
+machine you started on.
+
+**Students** use the same code and pick the same state. If a group ends up on a different laptop, their
+state will show as *held by* their names — tapping it takes it back, and their treasury, score and
+voting record are all still there. Worth telling them on day one to write down which state they are.
+
+A good place to break is after the reveal of Resolution 2. Day two then opens on the import tax
+amendment, which is the round that needs the most argument.
+
 ### Things on the teacher panel worth knowing
 
 - **Resolution text folds away** once the brief is over, so the map is what fills the projector.
@@ -321,6 +345,7 @@ node tests/deals.test.js         # bot offers answer, human offers are only deli
 node tests/narration.test.js     # read-aloud on both screens, live treasury token
 node tests/explain.test.js       # every resolution states the question, both outcomes and the stake
 node tests/tour.test.js          # first-run tour: runs once, yields to the vote, replays on demand
+node tests/resume.test.js        # stop mid-session, come back on a fresh browser, carry on
 ```
 
 The multiplayer test replaces the Firebase SDK with a small localStorage-backed stand-in

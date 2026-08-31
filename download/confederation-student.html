@@ -527,6 +527,8 @@ ul.clean li::before{content:"—";position:absolute;left:0;color:var(--gold-dk);
         <label for="names">Your names</label>
         <input type="text" id="names" placeholder="e.g. Maya and Dev" autocomplete="off">
       </div>
+      <p class="small muted" style="margin-top:-6px">Coming back to a session from another day? Use the
+      same code, then pick the same state you had. Taking it back is fine even if it shows as held.</p>
       <div class="field">
         <label for="code">Game code from the board</label>
         <input type="text" id="code" placeholder="ABCD" maxlength="4"
@@ -1913,6 +1915,22 @@ window.AOC_CONFIG = {
     boot: boot
   };
 
+  NET.listGames = function (limit) {
+    return boot().then(function () {
+      return F.getDocs(F.collection(F.db, "games")).then(function (q) {
+        return q.docs.map(function (d) {
+          var g = d.data();
+          return {
+            code: d.id, updatedAt: g.createdAt,
+            label: (g.settings && g.settings.label) || "",
+            status: g.status, round: g.round, phase: g.phase
+          };
+        }).sort(function (a, b) { return (b.updatedAt || 0) - (a.updatedAt || 0); })
+          .slice(0, limit || 25);
+      });
+    }).catch(function () { return []; });
+  };
+
   // Teacher rewrites the whole deal list when it answers pending offers.
   NET.updateDeals = function (code, deals) {
     return NET.updateGame(code, { deals: deals });
@@ -2162,6 +2180,31 @@ window.AOC_CONFIG = {
       ensurePolling(code);
       (poll.subs.state[name] = poll.subs.state[name] || []).push(cb);
       return unsub(poll.subs.state[name], cb);
+    },
+
+    // Recent sessions, newest first. Uses the plain table endpoint rather
+    // than a function, so resuming works without anyone running more SQL.
+    listGames: function (limit) {
+      if (!configured()) return Promise.resolve([]);
+      var url = URL_BASE + "/rest/v1/aoc_games" +
+        "?select=code,data,updated_at&order=updated_at.desc&limit=" + (limit || 25);
+      return fetch(url, {
+        headers: { "apikey": KEY, "Authorization": "Bearer " + KEY }
+      }).then(function (r) {
+        if (!r.ok) return [];
+        return r.json();
+      }).then(function (rows) {
+        return (rows || []).map(function (row) {
+          return {
+            code: row.code,
+            updatedAt: row.updated_at,
+            label: (row.data && row.data.settings && row.data.settings.label) || "",
+            status: row.data && row.data.status,
+            round: row.data && row.data.round,
+            phase: row.data && row.data.phase
+          };
+        });
+      }).catch(function () { return []; });
     },
 
     isConfigured: configured,
@@ -2620,18 +2663,31 @@ function renderClaims(){
   if (!open.length) open = ALL;
   open.sort(function(a,b){ return a.name.localeCompare(b.name); }).forEach(function(s){
     var d = D.byName(s.name);
-    var taken = (s.players||[]).length > 0;
+    var held = (s.players||[]).length > 0;
     var b = document.createElement("button");
-    b.className = "claim"; b.disabled = taken;
-    b.innerHTML = '<div class="t">' + s.name + (taken ? ' — taken by ' + s.players.join(", ") : '') + '</div>' +
-                  '<div class="d">' + d.motto + '</div>';
-    b.addEventListener("click", function(){ claim(s.name); });
+    b.className = "claim";
+    // A state that is already held stays clickable, because on the second day
+    // a group is often on a different laptop and has to get its own state
+    // back. Taking someone else's is possible, so it asks first and the
+    // teacher can see every delegation's names on the roster.
+    b.innerHTML = '<div class="t">' + s.name +
+                  (held ? ' <span class="pill">held by ' + s.players.join(", ") + '</span>' : '') + '</div>' +
+                  '<div class="d">' + d.motto + '</div>' +
+                  (held ? '<div class="d" style="color:var(--red-dk);font-weight:700">' +
+                          'Tap to take this state back</div>' : '');
+    b.addEventListener("click", function(){
+      if (held && !confirm(s.name + " is currently held by " + s.players.join(", ") +
+          ".\n\nTake it over as \"" + NAMES + "\"?")) return;
+      claim(s.name);
+    });
     list.appendChild(b);
   });
 }
 
 function claim(name){
   MINE = name;
+  // claimState also clears isBot, which matters when a group returns to a
+  // state that was filled in by a bot while they were away.
   NET.claimState(CODE, name, [NAMES]).then(function(){
     try{ localStorage.setItem("aoc_student", JSON.stringify({code:CODE,names:NAMES,state:name})); }catch(e){}
     startListening();

@@ -239,6 +239,31 @@
       return unsub(poll.subs.state[name], cb);
     },
 
+    // Recent sessions, newest first. Uses the plain table endpoint rather
+    // than a function, so resuming works without anyone running more SQL.
+    listGames: function (limit) {
+      if (!configured()) return Promise.resolve([]);
+      var url = URL_BASE + "/rest/v1/aoc_games" +
+        "?select=code,data,updated_at&order=updated_at.desc&limit=" + (limit || 25);
+      return fetch(url, {
+        headers: { "apikey": KEY, "Authorization": "Bearer " + KEY }
+      }).then(function (r) {
+        if (!r.ok) return [];
+        return r.json();
+      }).then(function (rows) {
+        return (rows || []).map(function (row) {
+          return {
+            code: row.code,
+            updatedAt: row.updated_at,
+            label: (row.data && row.data.settings && row.data.settings.label) || "",
+            status: row.data && row.data.status,
+            round: row.data && row.data.round,
+            phase: row.data && row.data.phase
+          };
+        });
+      }).catch(function () { return []; });
+    },
+
     isConfigured: configured,
     boot: function () { return Promise.resolve(); }
   };

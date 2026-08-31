@@ -188,6 +188,22 @@
     boot: boot
   };
 
+  NET.listGames = function (limit) {
+    return boot().then(function () {
+      return F.getDocs(F.collection(F.db, "games")).then(function (q) {
+        return q.docs.map(function (d) {
+          var g = d.data();
+          return {
+            code: d.id, updatedAt: g.createdAt,
+            label: (g.settings && g.settings.label) || "",
+            status: g.status, round: g.round, phase: g.phase
+          };
+        }).sort(function (a, b) { return (b.updatedAt || 0) - (a.updatedAt || 0); })
+          .slice(0, limit || 25);
+      });
+    }).catch(function () { return []; });
+  };
+
   // Teacher rewrites the whole deal list when it answers pending offers.
   NET.updateDeals = function (code, deals) {
     return NET.updateGame(code, { deals: deals });
