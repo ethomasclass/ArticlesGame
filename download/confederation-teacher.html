@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Solo Congress — The Confederation Problem</title>
+<title>Teacher Panel — The Confederation Problem</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%276%27 fill=%27%238a3324%27/%3E%3Ctext x=%2716%27 y=%2723%27 font-size=%2719%27 text-anchor=%27middle%27 fill=%27%23f5ecd8%27 font-family=%27Georgia,serif%27%3E13%3C/text%3E%3C/svg%3E">
 <style>
 /* ============================================================
@@ -381,183 +381,286 @@ ul.clean li::before{content:"—";position:absolute;left:0;color:var(--gold-dk);
 
 
 
-  .vote-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
-  .vote-row .btn{font-size:1.3rem;padding:1em .5em;width:100%}
-  @media(max-width:600px){.vote-row{grid-template-columns:1fr}}
-  .claim{display:block;width:100%;text-align:left;background:var(--parch-2);border:2px solid var(--line);
-    border-radius:9px;padding:11px 13px;cursor:pointer;font-family:inherit;font-size:1rem;margin-bottom:9px;transition:.15s}
-  .claim:hover{border-color:var(--gold);background:var(--parch-3)}
-  .claim .t{font-weight:700;font-size:1.1rem}
-  .claim .d{font-size:.8rem;color:var(--ink-faint);line-height:1.35}
-  .faction{background:var(--parch-2);border:1px solid var(--line);border-left:5px solid var(--gold-dk);
-    border-radius:0 8px 8px 0;padding:11px 14px}
-  .bill{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed var(--line)}
-  .bill:last-child{border:0}
-  .deal-form{display:grid;grid-template-columns:1fr 1fr auto;gap:9px;align-items:end}
-  @media(max-width:700px){.deal-form{grid-template-columns:1fr}}
+  .ctl{position:sticky;top:18px}
+  .ctl .btn{margin-bottom:8px;width:100%}
+  .phase-flag{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.7rem;font-weight:700;
+    letter-spacing:.12em;text-transform:uppercase}
+  .pickgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px}
+  .pick{display:flex;gap:9px;align-items:flex-start;background:var(--parch-2);border:2px solid var(--line);
+    border-radius:8px;padding:9px;cursor:pointer;transition:.15s}
+  .pick:hover{border-color:var(--gold)}
+  .pick.on{background:#e9f0e6;border-color:var(--yes)}
+  .pick input{margin-top:3px;flex:0 0 auto;width:17px;height:17px;accent-color:#2f7d4f}
+  .pick .t{font-weight:700}
+  .pick .d{font-size:.74rem;color:var(--ink-faint);line-height:1.3}
+  .say{background:#2e2a25;color:#f0e6cf;border-radius:8px;padding:14px 16px;font-size:1.05rem;
+    border-left:5px solid var(--gold)}
+  .say .eyebrow{color:var(--gold)}
 
 </style>
 </head>
 <body>
 
-<div class="wrap">
+<div class="wrap-wide">
+
   <div class="masthead">
     <div>
-      <h1 id="mast">The Confederation Problem</h1>
-      <div class="sub" id="sub">Solo Congress — you against twelve bot states. No internet needed.</div>
+      <h1>The Confederation Problem</h1>
+      <div class="sub">Teacher Panel &amp; Projector View</div>
     </div>
-    <div class="row" id="stats"></div>
+    <div class="row">
+      <div id="code-box" class="hidden center">
+        <div class="eyebrow">Join code</div>
+        <div class="code-chip" id="game-code">----</div>
+      </div>
+      <div id="clock-box" class="hidden center">
+        <div class="eyebrow">Caucus</div>
+        <div class="timer" id="timer">2:00</div>
+      </div>
+    </div>
   </div>
 
-  <section id="s-pick">
+  <!-- ================= SETUP ================= -->
+  <section id="setup">
     <div class="card">
-      <h2>Choose the state you will represent</h2>
-      <p class="lede">It is 1786. The war is won and the country is coming apart. You are one delegate out of
-      thirteen, and every state gets exactly one vote — Virginia and Delaware count the same.</p>
-      <div class="callout"><strong>How to win:</strong> protect your own state. That is the only thing your
-      score measures. Keep an eye on the country too, though.</div>
-      <div id="pick-list" style="margin-top:14px"></div>
-    </div>
-  </section>
-
-  <section id="s-play" class="hidden">
-    <div class="card" id="dossier">
-      <div class="eyebrow">Your state</div>
-      <h2 id="d-name"></h2>
-      <p id="d-bg"></p>
-      <div class="callout warn"><div class="eyebrow">Your objective</div><div id="d-obj" style="font-size:1.05rem"></div></div>
-      <div class="grid g2" id="d-fac" style="margin-top:12px"></div>
-    </div>
-
-    <div class="dispatch" id="dispatch">
-      <div class="cuehead">
-        <span class="dateline" id="dsp-dateline"></span>
-        <span class="badge">Read this before you decide</span>
+      <div class="eyebrow">Step 1</div>
+      <h2>Pick the states your students will play</h2>
+      <p class="lede">Each checked state is one student group. Everything you leave unchecked is played by a bot.
+      Six student groups is the sweet spot for a 40&#8209;minute period.</p>
+      <div class="callout">
+        <strong>Leave Rhode Island unchecked.</strong> Rhode Island is the state that killed the national
+        import tax in real life, and Round 3 depends on someone doing that. A bot will do it without a
+        student taking the blame.
       </div>
-      <div id="dsp-body"></div>
-    </div>
-
-    <div class="card">
-      <div class="spread">
-        <div class="eyebrow" id="r-eye">Resolution 1</div>
-        <span class="pill hot" id="r-rule"></span>
-      </div>
-      <h2 id="r-title"></h2>
-      <p class="lede" id="r-brief"></p>
-      <div class="inset" id="r-detail"></div>
-
-      <div class="thequestion">
-        <div class="lab">You are voting on this</div>
-        <div class="q" id="r-question">—</div>
-      </div>
-
-      <div class="outcomes">
-        <div class="outcome pass"><div class="h">If it passes</div><p id="r-ifpass"></p></div>
-        <div class="outcome fail"><div class="h">If it fails</div><p id="r-iffail"></p></div>
-      </div>
-    </div>
-
-    <div class="card" id="cost-card">
-      <div class="grid g2">
-        <div id="cost-wrap">
-          <div class="eyebrow">What this costs you</div>
-          <div id="cost-body"></div>
-        </div>
-        <div>
-          <div class="eyebrow">What this touches for your state</div>
-          <div id="touch-body"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <h3>The argument</h3>
-      <div class="grid g2">
-        <div class="inset" style="border-left:5px solid var(--yes)">
-          <div class="eyebrow" style="color:#1d5233">A reason to vote yes</div><div id="r-yes"></div></div>
-        <div class="inset" style="border-left:5px solid var(--no)">
-          <div class="eyebrow" style="color:#8a2019">A reason to vote no</div><div id="r-no"></div></div>
-      </div>
-    </div>
-
-    <div class="card" id="deal-card">
-      <div class="spread"><h3 style="margin:0">Work the room</h3><span class="pill" id="deal-left"></span></div>
-      <p class="small muted">You need nine states. You cannot get there alone — go buy some votes.</p>
-      <div class="deal-form">
-        <div class="field" style="margin:0"><label for="dt">Offer to</label><select id="dt"></select></div>
-        <div class="field" style="margin:0"><label for="do">You offer</label><select id="do"></select></div>
-        <button class="btn" id="dsend">Send</button>
-      </div>
-      <div class="ticker inset" id="dlog" style="margin-top:12px"></div>
       <hr class="rule">
-      <div class="eyebrow">Where the room stands right now</div>
-      <div class="seats" id="lean"></div>
-      <p class="small muted" style="margin-top:8px">This is your read of the room. Bots can still surprise you.</p>
-    </div>
-
-    <div class="card" id="vote-card">
-      <h3 class="center">How does <span id="vote-state"></span> vote?</h3>
-      <div class="vote-row">
-        <button class="btn btn-yes" onclick="SV('Yes')">YES</button>
-        <button class="btn btn-no" onclick="SV('No')">NO</button>
-        <button class="btn btn-abstain" onclick="SV('Abstain')">ABSTAIN</button>
+      <div class="row" style="margin-bottom:12px">
+        <button class="btn ghost sm" onclick="preset('recommended')">Recommended six</button>
+        <button class="btn ghost sm" onclick="preset('eight')">Eight groups</button>
+        <button class="btn ghost sm" onclick="preset('four')">Four groups</button>
+        <button class="btn ghost sm" onclick="preset('none')">Clear all</button>
+        <span class="pill" id="pick-count">0 student states</span>
       </div>
+      <div class="pickgrid" id="pickgrid"></div>
     </div>
 
-    <div class="card hidden" id="seat-card">
-      <div class="spread"><h3 style="margin:0" id="seat-head">The vote</h3>
-        <div class="row">
-          <span class="pill" id="seat-pill"></span>
-          <button class="btn ghost sm" id="replay-btn">Replay the roll call</button>
+    <div class="card">
+      <div class="eyebrow">Step 2</div>
+      <h2>Set the pace</h2>
+      <div class="grid g3">
+        <div class="field">
+          <label for="caucus-len">Debate time per resolution</label>
+          <select id="caucus-len">
+            <option value="90">90 seconds — very tight</option>
+            <option value="120" selected>2 minutes — recommended</option>
+            <option value="180">3 minutes — roomy</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="deal-limit">Deal offers each group may send per round</label>
+          <select id="deal-limit">
+            <option value="1">1</option>
+            <option value="2" selected>2</option>
+            <option value="3">3</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="absences">Missing delegates</label>
+          <select id="absences">
+            <option value="on" selected>On — bots sometimes skip Congress</option>
+            <option value="off">Off — all 13 states always present</option>
+          </select>
         </div>
       </div>
-      <div class="tallybar" id="tallybar">
-        <div class="grp yes"><div class="big" id="t-yes">0</div><div class="lab">Yes</div></div>
-        <div class="grp no"><div class="big" id="t-no">0</div><div class="lab">No</div></div>
-        <div class="grp ab"><div class="big" id="t-ab">0</div><div class="lab">Abstain</div></div>
-        <div class="track"><div class="fill" id="t-fill"></div><div class="need" id="t-need"></div></div>
-        <div class="verdict" id="t-verdict"></div>
-        <div class="moneybar hidden" id="t-money">
-          <div class="lab">Money actually arriving</div>
-          <div class="big" id="t-money-val">$0</div>
-          <div class="lab" id="t-money-of">of $0</div>
-        </div>
-      </div>
-      <div class="map-wrap" id="map-view"></div>
-      <div class="maplegend" id="map-legend"></div>
-    </div>
-
-    <div class="card hidden" id="pay-card" style="border-color:var(--red);border-width:3px">
-      <div class="eyebrow" style="color:var(--red)">Congress said yes. Now decide for real.</div>
-      <h2>Are you actually going to send the money?</h2>
-      <p class="lede" id="pay-owed"></p>
-      <div class="callout warn"><p style="margin:0"><strong>Nobody can make you pay.</strong> There is no
-      president to enforce this and no national court to take you to. Refuse, and nothing happens to you.</p></div>
-      <div class="vote-row" style="margin-top:14px">
-        <button class="btn btn-yes" onclick="SP('full')">PAY IN FULL</button>
-        <button class="btn gold" onclick="SP('half')">PAY HALF</button>
-        <button class="btn btn-no" onclick="SP('none')">PAY NOTHING</button>
-      </div>
-    </div>
-
-    <div class="card hidden" id="out-card">
-      <h2 id="out-head"></h2>
-      <p class="lede" id="out-narr"></p>
-      <div id="out-money" class="hidden">
-        <div class="grid g3">
-          <div class="stat"><div class="k">Congress asked</div><div class="v" id="o-ask"></div></div>
-          <div class="stat"><div class="k">Congress got</div><div class="v" id="o-got"></div></div>
-          <div class="stat"><div class="k">That is</div><div class="v" id="o-pct"></div></div>
-        </div>
-        <div class="ticker inset" id="o-excuses" style="margin-top:12px"></div>
-      </div>
-      <div class="hist" style="margin-top:14px"><div class="eyebrow">What actually happened</div>
-        <div id="o-hist"></div></div>
-      <button class="btn big wide" id="next-btn" style="margin-top:16px">Continue</button>
+      <button class="btn big" id="create-btn">Create the session</button>
+      <p class="small muted" style="margin-top:8px">You will get a 4&#8209;letter code to put on the board.</p>
     </div>
   </section>
 
-  <section id="s-end" class="hidden"></section>
+  <!-- ================= LOBBY ================= -->
+  <section id="lobby" class="hidden">
+    <div class="split">
+      <div>
+        <div class="card">
+          <div class="spread">
+            <h2 style="margin:0">Waiting for delegations</h2>
+            <span class="pill" id="joined-count">0 joined</span>
+          </div>
+          <p class="lede">Students go to the student page and enter the code above. Each group of two claims one state.</p>
+          <div class="seats" id="lobby-seats"></div>
+        </div>
+        <div class="card">
+          <h3>Read this out before you start</h3>
+          <div class="say">
+            <div class="eyebrow">Say to the class</div>
+            <p>You are delegates to the Confederation Congress. It is 1786. The war is won, and the country is
+            falling apart.</p>
+            <p>Three rules. <strong>One.</strong> Every state gets exactly one vote, whether you are Virginia
+            with 700,000 people or Delaware with 59,000. <strong>Two.</strong> Nine of the thirteen states must
+            agree to pass anything important. <strong>Three.</strong> There is no president and there are no
+            national courts. Nobody can force any state to do anything.</p>
+            <p>Your job is not to save the country. Your job is to protect your state. Read your secret
+            objective and play it honestly.</p>
+          </div>
+        </div>
+      </div>
+      <div class="ctl">
+        <div class="card tight">
+          <div class="eyebrow">Controls</div>
+          <button class="btn gold big" id="begin-btn">Begin Resolution 1</button>
+          <button class="btn ghost sm" id="fill-bots-btn">Turn unclaimed states into bots</button>
+          <hr class="rule">
+          <p class="small muted">You can start before every group joins. Any state nobody claimed is played by a bot.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= GAME ================= -->
+  <section id="game" class="hidden">
+    <div class="split">
+      <div>
+        <!-- national dashboard -->
+        <div class="card tight">
+          <div class="grid" style="grid-template-columns:2fr 1fr 1fr 1fr;gap:12px">
+            <div class="stat">
+              <div class="k">National stability</div>
+              <div class="v" id="stab-val">60</div>
+              <div class="meter" style="margin-top:5px"><div class="meter-bar m-stab" id="stab-bar" style="width:60%"></div></div>
+            </div>
+            <div class="stat"><div class="k">In the treasury</div><div class="v" id="nat-treasury">$0</div></div>
+            <div class="stat"><div class="k">States present</div><div class="v" id="present-count">13 / 13</div></div>
+            <div class="stat"><div class="k">Resolution</div><div class="v" id="round-label">1 of 4</div></div>
+          </div>
+        </div>
+
+        <!-- the read-aloud -->
+        <div class="dispatch hidden" id="dispatch">
+          <div class="cuehead">
+            <span class="dateline" id="dsp-dateline"></span>
+            <span class="badge" id="dsp-badge">Read aloud to the class</span>
+          </div>
+          <div id="dsp-body"></div>
+          <div class="tools">
+            <button class="btn sm" id="dsp-big">Bigger text</button>
+            <button class="btn sm" id="dsp-done">Done reading — show the resolution</button>
+          </div>
+        </div>
+        <button class="btn ghost sm replay-narr hidden" id="dsp-again">Read the opening again</button>
+
+        <!-- resolution -->
+        <div class="card" id="res-card">
+          <div class="spread">
+            <div class="eyebrow" id="res-eyebrow">Resolution 1</div>
+            <div class="row">
+              <span class="pill hot" id="rule-pill">Needs 9 of 13</span>
+              <button class="btn ghost sm" id="res-toggle">Hide the text</button>
+            </div>
+          </div>
+          <h2 id="res-title">—</h2>
+          <p class="lede" id="res-brief"></p>
+          <div class="inset" id="res-detail"></div>
+
+          <div class="thequestion" id="res-question-box">
+            <div class="lab">The question before Congress</div>
+            <div class="q" id="res-question">—</div>
+          </div>
+
+          <div class="outcomes" id="res-outcomes">
+            <div class="outcome pass"><div class="h">If it passes</div><p id="res-ifpass"></p></div>
+            <div class="outcome fail"><div class="h">If it fails</div><p id="res-iffail"></p></div>
+          </div>
+
+          <div class="hist" style="margin-top:14px" id="res-teaches">
+            <div class="eyebrow">What this shows</div>
+            <div id="teaches-text"></div>
+          </div>
+        </div>
+
+        <!-- the board -->
+        <div class="card">
+          <div class="spread">
+            <h3 style="margin:0" id="seats-heading">The thirteen states</h3>
+            <div class="row">
+              <div class="viewtabs">
+                <button id="tab-map" class="on">Map</button><button id="tab-list">List</button>
+              </div>
+              <span class="pill" id="votes-in">0 of 13 voted</span>
+              <span class="pill" id="tally-pill"></span>
+              <button class="btn ghost sm hidden" id="replay-btn">Replay the roll call</button>
+            </div>
+          </div>
+
+          <div class="tallybar hidden" id="tallybar">
+            <div class="grp yes"><div class="big" id="t-yes">0</div><div class="lab">Yes</div></div>
+            <div class="grp no"><div class="big" id="t-no">0</div><div class="lab">No</div></div>
+            <div class="grp ab"><div class="big" id="t-ab">0</div><div class="lab">Abstain</div></div>
+            <div class="track"><div class="fill" id="t-fill"></div><div class="need" id="t-need"></div></div>
+            <div class="verdict" id="t-verdict"></div>
+            <div class="moneybar hidden" id="t-money">
+              <div class="lab">Money actually arriving</div>
+              <div class="big" id="t-money-val">$0</div>
+              <div class="lab" id="t-money-of">of $0</div>
+            </div>
+          </div>
+
+          <div class="map-wrap" id="map-view" style="margin-top:4px"></div>
+          <div class="maplegend" id="map-legend"></div>
+          <div class="seats hidden" id="seats" style="margin-top:12px"></div>
+        </div>
+
+        <!-- result -->
+        <div class="card hidden" id="result-card">
+          <h2 id="result-headline">—</h2>
+          <p class="lede" id="result-narrative"></p>
+          <div id="result-money" class="hidden">
+            <hr class="rule">
+            <div class="grid g3">
+              <div class="stat"><div class="k">Congress asked for</div><div class="v" id="asked-val">$0</div></div>
+              <div class="stat"><div class="k">Congress received</div><div class="v" id="got-val">$0</div></div>
+              <div class="stat"><div class="k">That is</div><div class="v" id="pct-val">0%</div></div>
+            </div>
+            <div class="ticker inset" id="excuses" style="margin-top:12px"></div>
+          </div>
+          <div class="hist hidden" id="history-note" style="margin-top:14px">
+            <div class="eyebrow">What actually happened</div>
+            <div id="history-text"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ---------------- sidebar ---------------- -->
+      <div class="ctl">
+        <div class="card tight">
+          <div class="spread" style="margin-bottom:8px">
+            <span class="eyebrow" style="margin:0">Now</span>
+            <span class="phase-flag pill" id="phase-flag">Brief</span>
+          </div>
+          <button class="btn gold big" id="next-btn">Open debate</button>
+          <button class="btn ghost sm" id="add-time-btn">+30 seconds</button>
+          <button class="btn ghost sm" id="skip-btn">Skip to the vote</button>
+          <button class="btn gold hidden" id="force-btn">Congress tries again — force it through</button>
+          <hr class="rule">
+          <div class="eyebrow">Teacher extras</div>
+          <button class="btn ghost sm" id="walkout-btn">Send 3 delegations home</button>
+          <button class="btn ghost sm" id="end-btn">End game &amp; show debrief</button>
+        </div>
+
+        <div class="card tight">
+          <div class="eyebrow">Say to the class</div>
+          <div id="prompt-text" style="font-size:.95rem">—</div>
+        </div>
+
+        <div class="card tight">
+          <div class="spread"><span class="eyebrow" style="margin:0">Deals on the floor</span>
+            <span class="pill" id="deal-count">0</span></div>
+          <div class="ticker" id="deal-ticker"><div class="line muted small">No offers yet.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= DEBRIEF ================= -->
+  <section id="debrief" class="hidden"></section>
 </div>
 <script>
 /* =========================================================================
@@ -1703,6 +1806,549 @@ window.AOC_MAP = {"viewBox":"10 64 910 822","width":910,"height":822,"states":{"
 </script>
 <script>
 /* =========================================================================
+   THE CONFEDERATION PROBLEM — the only file you need to edit
+
+   1. In Supabase: Project Settings -> API
+   2. Copy "Project URL" into url below
+   3. Copy the "anon public" key into anonKey below
+   4. Save. That's it.
+
+   The anon key is meant to be public — it is designed to sit in a web page.
+   Never paste the "service_role" key here; that one is an admin key.
+   ========================================================================= */
+window.AOC_CONFIG = {
+
+  // "supabase" or "firebase"
+  backend: "supabase",
+
+  supabase: {
+    url:     "https://pszsnmfgpddxhlmmgagb.supabase.co",
+    anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzenNubWZncGRkeGhsbW1nYWdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUxMDk1MzUsImV4cCI6MjEwMDY4NTUzNX0.vFgNXEmAmhAGtI1qi6y8RDRX2hh5HBsfUkkG1-Ho60I"
+  },
+
+  // Kept so the original Firebase project still works if you switch back.
+  firebase: {
+    apiKey: "AIzaSyBrgnposdt3upVeXZtu5g0EW0orEmyVy7I",
+    authDomain: "articles-of-confederation-game.firebaseapp.com",
+    projectId: "articles-of-confederation-game",
+    storageBucket: "articles-of-confederation-game.appspot.com",
+    messagingSenderId: "506849426036",
+    appId: "1:506849426036:web:9e2f35f8ef29fda05def21"
+  }
+};
+
+</script>
+<script>
+/* =========================================================================
+   THE CONFEDERATION PROBLEM — Firestore backend
+   Classic script; loads the Firebase SDK with a dynamic import() so the
+   solo/offline page can skip it entirely.
+
+   Data model (kept deliberately shallow to stay inside the free tier):
+     games/{CODE}                 phase, round, stability, treasury, deals,
+                                  result, history, absent, settings
+     games/{CODE}/states/{Name}   players[], isBot, interest, treasuryNow,
+                                  votes{round:vote}, payments{round:choice}
+   ========================================================================= */
+(function () {
+  "use strict";
+
+  var CFG = (window.AOC_CONFIG && window.AOC_CONFIG.firebase) || {};
+
+  var SDK = "https://www.gstatic.com/firebasejs/10.12.2/";
+  var ready = null, F = null;
+
+  function boot() {
+    if (ready) return ready;
+    ready = Promise.all([
+      import(SDK + "firebase-app.js"),
+      import(SDK + "firebase-firestore.js")
+    ]).then(function (mods) {
+      var appMod = mods[0], fs = mods[1];
+      var app = appMod.initializeApp(CFG);
+      F = {
+        db: fs.getFirestore(app),
+        doc: fs.doc, collection: fs.collection, getDoc: fs.getDoc, getDocs: fs.getDocs,
+        setDoc: fs.setDoc, updateDoc: fs.updateDoc, onSnapshot: fs.onSnapshot,
+        deleteDoc: fs.deleteDoc, arrayUnion: fs.arrayUnion, writeBatch: fs.writeBatch,
+        serverTimestamp: fs.serverTimestamp
+      };
+      return F;
+    });
+    return ready;
+  }
+
+  function gameRef(code) { return F.doc(F.db, "games", code); }
+  function statesCol(code) { return F.collection(F.db, "games", code, "states"); }
+  function stateRef(code, name) { return F.doc(F.db, "games", code, "states", name); }
+
+  function makeCode() {
+    // No vowels, no 0/O/1/I — these get read aloud across a classroom.
+    var A = "BCDFGHJKLMNPQRSTVWXYZ23456789", s = "";
+    for (var i = 0; i < 4; i++) s += A[Math.floor(Math.random() * A.length)];
+    return s;
+  }
+
+  var NET = {
+    /* --------------------------------------------------------- teacher */
+    createGame: function (studentStateNames, opts) {
+      return boot().then(function () {
+        var code = makeCode();
+        var batch = F.writeBatch(F.db);
+        batch.set(gameRef(code), {
+          status: "lobby",
+          round: -1,
+          phase: "lobby",
+          stability: 60,
+          nationalTreasury: 0,
+          studentStates: studentStateNames,
+          absent: [],
+          deals: [],
+          history: [],
+          result: null,
+          caucusEndsAt: null,
+          settings: opts || {},
+          createdAt: Date.now()
+        });
+        window.AOC.STATES.forEach(function (s) {
+          batch.set(stateRef(code, s.name), {
+            name: s.name,
+            abbr: s.abbr,
+            isBot: studentStateNames.indexOf(s.name) === -1,
+            players: [],
+            interest: 50,
+            treasuryNow: s.treasury,
+            votes: {},
+            payments: {}
+          });
+        });
+        return batch.commit().then(function () { return code; });
+      });
+    },
+
+    updateGame: function (code, patch) {
+      return boot().then(function () { return F.updateDoc(gameRef(code), patch); });
+    },
+
+    updateState: function (code, name, patch) {
+      return boot().then(function () { return F.updateDoc(stateRef(code, name), patch); });
+    },
+
+    // Write many state docs at once (bot votes, payouts, score updates).
+    batchStates: function (code, updates) {
+      return boot().then(function () {
+        var batch = F.writeBatch(F.db);
+        updates.forEach(function (u) { batch.update(stateRef(code, u.name), u.patch); });
+        return batch.commit();
+      });
+    },
+
+    endGame: function (code) {
+      return NET.updateGame(code, { status: "ended", phase: "debrief" });
+    },
+
+    /* --------------------------------------------------------- student */
+    findGame: function (code) {
+      return boot().then(function () {
+        return F.getDoc(gameRef(code)).then(function (snap) {
+          return snap.exists() ? snap.data() : null;
+        });
+      });
+    },
+
+    listStates: function (code) {
+      return boot().then(function () {
+        return F.getDocs(statesCol(code)).then(function (q) {
+          return q.docs.map(function (d) { return d.data(); });
+        });
+      });
+    },
+
+    claimState: function (code, name, players) {
+      return boot().then(function () {
+        return F.updateDoc(stateRef(code, name), {
+          players: players, isBot: false, claimed: true
+        });
+      });
+    },
+
+    releaseState: function (code, name) {
+      return boot().then(function () {
+        return F.updateDoc(stateRef(code, name), { players: [], isBot: true, claimed: false });
+      });
+    },
+
+    castVote: function (code, name, round, vote) {
+      return boot().then(function () {
+        var p = {}; p["votes." + round] = vote;
+        return F.updateDoc(stateRef(code, name), p);
+      });
+    },
+
+    setPayment: function (code, name, round, choice, amount) {
+      return boot().then(function () {
+        var p = {};
+        p["payments." + round] = { choice: choice, paid: amount };
+        return F.updateDoc(stateRef(code, name), p);
+      });
+    },
+
+    pushDeal: function (code, deal) {
+      return boot().then(function () {
+        return F.updateDoc(gameRef(code), { deals: F.arrayUnion(deal) });
+      });
+    },
+
+    /* ------------------------------------------------------- listeners */
+    onGame: function (code, cb) {
+      var stop = function () {};
+      boot().then(function () {
+        stop = F.onSnapshot(gameRef(code), function (s) { if (s.exists()) cb(s.data()); });
+      });
+      return function () { stop(); };
+    },
+
+    onStates: function (code, cb) {
+      var stop = function () {};
+      boot().then(function () {
+        stop = F.onSnapshot(statesCol(code), function (q) {
+          cb(q.docs.map(function (d) { return d.data(); }));
+        });
+      });
+      return function () { stop(); };
+    },
+
+    onState: function (code, name, cb) {
+      var stop = function () {};
+      boot().then(function () {
+        stop = F.onSnapshot(stateRef(code, name), function (s) { if (s.exists()) cb(s.data()); });
+      });
+      return function () { stop(); };
+    },
+
+    boot: boot
+  };
+
+  // Teacher rewrites the whole deal list when it answers pending offers.
+  NET.updateDeals = function (code, deals) {
+    return NET.updateGame(code, { deals: deals });
+  };
+
+  (window.AOC_NET_IMPLS = window.AOC_NET_IMPLS || {}).firebase = NET;
+})();
+
+</script>
+<script>
+/* =========================================================================
+   THE CONFEDERATION PROBLEM — Supabase backend
+
+   Plain fetch against PostgREST. No client library and no CDN script, so
+   there is nothing extra for a school filter to block and nothing to keep
+   up to date.
+
+   Every read goes through one polling loop shared by the whole page: it
+   asks for a few-byte fingerprint about once a second and only pulls the
+   full session when that fingerprint moves. A quiet classroom costs almost
+   no bandwidth; a busy one updates in about a second.
+   ========================================================================= */
+(function () {
+  "use strict";
+
+  var CFG = (window.AOC_CONFIG && window.AOC_CONFIG.supabase) || {};
+
+  // Supabase shows the project URL in a few places, and the one on the API
+  // settings page ends with /rest/v1/. Accept either form rather than
+  // building requests to .../rest/v1/rest/v1/rpc/...
+  function normalizeUrl(u) {
+    return String(u || "").trim()
+      .replace(/\/+$/, "")
+      .replace(/\/rest\/v1$/i, "")
+      .replace(/\/+$/, "");
+  }
+
+  var URL_BASE = normalizeUrl(CFG.url);
+  var KEY = String(CFG.anonKey || "").trim();
+
+  // The placeholders in config.js are non-empty strings, so a bare truthiness
+  // check would call an untouched project "configured" and then fail on the
+  // first request with something unreadable.
+  function configured() {
+    return /^https:\/\/[^\s]+\.supabase\.(co|in)$/.test(URL_BASE) &&
+           KEY.length > 20 &&
+           !/PASTE_/.test(URL_BASE + KEY);
+  }
+
+  function rpc(fn, args) {
+    if (!configured()) {
+      return Promise.reject(new Error(
+        "Supabase is not configured. Open assets/config.js and paste your " +
+        "project URL and anon key."));
+    }
+    return fetch(URL_BASE + "/rest/v1/rpc/" + fn, {
+      method: "POST",
+      headers: {
+        "apikey": KEY,
+        "Authorization": "Bearer " + KEY,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(args || {})
+    }).then(function (r) {
+      if (!r.ok) {
+        return r.text().then(function (t) {
+          throw new Error("Supabase " + r.status + ": " + t.slice(0, 300));
+        });
+      }
+      return r.status === 204 ? null : r.json();
+    });
+  }
+
+  function makeCode() {
+    // No vowels, no 0/O/1/I — these get read aloud across a classroom.
+    var A = "BCDFGHJKLMNPQRSTVWXYZ23456789", s = "";
+    for (var i = 0; i < 4; i++) s += A[Math.floor(Math.random() * A.length)];
+    return s;
+  }
+
+  /* ------------------------------------------------------------ polling
+     One loop per page, however many things are listening. Subscribers are
+     handed the same snapshot and each decides whether anything it cares
+     about actually changed.                                              */
+  var poll = {
+    code: null, timer: null, pulse: null, snap: null,
+    subs: { game: [], states: [], state: {} },
+    last: { game: null, states: null, state: {} }
+  };
+
+  function fanOut(snap) {
+    if (!snap) return;
+    var game = snap.game;
+    if (game) game = Object.assign({}, game, { deals: snap.deals || [] });
+    var states = snap.states || [];
+
+    // Order matters. The state rows are the data; the game document is the
+    // pointer that says "now show it". Deliver the rows first, or a phase
+    // flip to "tally" starts the roll call while the board still holds the
+    // previous round's votes — every state reads as an abstention.
+    var ss = JSON.stringify(states);
+    if (ss !== poll.last.states) {
+      poll.last.states = ss;
+      poll.subs.states.forEach(function (cb) { try { cb(states); } catch (e) { console.error(e); } });
+    }
+    Object.keys(poll.subs.state).forEach(function (name) {
+      var row = null;
+      for (var i = 0; i < states.length; i++) if (states[i].name === name) { row = states[i]; break; }
+      if (!row) return;
+      var rs = JSON.stringify(row);
+      if (rs === poll.last.state[name]) return;
+      poll.last.state[name] = rs;
+      poll.subs.state[name].forEach(function (cb) { try { cb(row); } catch (e) { console.error(e); } });
+    });
+
+    var gs = JSON.stringify(game);
+    if (game && gs !== poll.last.game) {
+      poll.last.game = gs;
+      poll.subs.game.forEach(function (cb) { try { cb(game); } catch (e) { console.error(e); } });
+    }
+  }
+
+  var INTERVAL = 950;
+
+  function tick() {
+    if (!poll.code) return;
+    rpc("aoc_pulse", { p_code: poll.code }).then(function (p) {
+      if (p === poll.pulse) return null;
+      poll.pulse = p;
+      return rpc("aoc_snapshot", { p_code: poll.code }).then(function (snap) {
+        poll.snap = snap;
+        fanOut(snap);
+      });
+    }).catch(function (e) {
+      // A dropped request on classroom wifi is normal; the next tick retries.
+      console.warn("sync retry:", e.message);
+    });
+  }
+
+  function ensurePolling(code) {
+    if (poll.code !== code) {
+      poll.code = code;
+      poll.pulse = null;
+      poll.last = { game: null, states: null, state: {} };
+    }
+    if (!poll.timer) {
+      poll.timer = setInterval(tick, INTERVAL);
+      tick();
+    }
+  }
+
+  // After we write something, don't make the room wait a second to see it.
+  function nudge() { poll.pulse = null; setTimeout(tick, 60); }
+
+  function unsub(list, cb) {
+    return function () {
+      var i = list.indexOf(cb);
+      if (i >= 0) list.splice(i, 1);
+    };
+  }
+
+  /* -------------------------------------------------------------- api */
+  var NET = {
+    createGame: function (studentStateNames, opts) {
+      var code = makeCode();
+      var game = {
+        status: "lobby", round: -1, phase: "lobby",
+        stability: 60, nationalTreasury: 0,
+        studentStates: studentStateNames,
+        absent: [], history: [], result: null, caucusEndsAt: null,
+        settings: opts || {}, createdAt: Date.now()
+      };
+      var states = window.AOC.STATES.map(function (s) {
+        return {
+          name: s.name, abbr: s.abbr,
+          isBot: studentStateNames.indexOf(s.name) === -1,
+          players: [], interest: 50, treasuryNow: s.treasury,
+          votes: {}, payments: {}
+        };
+      });
+      return rpc("aoc_create_game", { p_code: code, p_game: game, p_states: states })
+        .then(function () { return code; });
+    },
+
+    updateGame: function (code, patch) {
+      return rpc("aoc_patch_game", { p_code: code, p_patch: patch }).then(nudge);
+    },
+    updateState: function (code, name, patch) {
+      return rpc("aoc_patch_state", { p_code: code, p_name: name, p_patch: patch }).then(nudge);
+    },
+    batchStates: function (code, updates) {
+      return rpc("aoc_patch_states", { p_code: code, p_updates: updates }).then(nudge);
+    },
+    endGame: function (code) {
+      return NET.updateGame(code, { status: "ended", phase: "debrief" });
+    },
+
+    findGame: function (code) {
+      return rpc("aoc_snapshot", { p_code: code }).then(function (snap) {
+        if (!snap || !snap.game) return null;
+        return Object.assign({}, snap.game, { deals: snap.deals || [] });
+      });
+    },
+    listStates: function (code) {
+      return rpc("aoc_snapshot", { p_code: code }).then(function (snap) {
+        return (snap && snap.states) || [];
+      });
+    },
+
+    claimState: function (code, name, players) {
+      return NET.updateState(code, name, { players: players, isBot: false, claimed: true });
+    },
+    releaseState: function (code, name) {
+      return NET.updateState(code, name, { players: [], isBot: true, claimed: false });
+    },
+    castVote: function (code, name, round, vote) {
+      var p = {}; p["votes." + round] = vote;
+      return NET.updateState(code, name, p);
+    },
+    setPayment: function (code, name, round, choice, amount) {
+      var p = {}; p["payments." + round] = { choice: choice, paid: amount };
+      return NET.updateState(code, name, p);
+    },
+
+    pushDeal: function (code, deal) {
+      return rpc("aoc_push_deal", { p_code: code, p_deal: deal }).then(nudge);
+    },
+    updateDeals: function (code, deals) {
+      return rpc("aoc_replace_deals", { p_code: code, p_deals: deals }).then(nudge);
+    },
+
+    onGame: function (code, cb) {
+      ensurePolling(code);
+      poll.subs.game.push(cb);
+      if (poll.snap && poll.snap.game) {
+        cb(Object.assign({}, poll.snap.game, { deals: poll.snap.deals || [] }));
+      }
+      return unsub(poll.subs.game, cb);
+    },
+    onStates: function (code, cb) {
+      ensurePolling(code);
+      poll.subs.states.push(cb);
+      if (poll.snap) cb(poll.snap.states || []);
+      return unsub(poll.subs.states, cb);
+    },
+    onState: function (code, name, cb) {
+      ensurePolling(code);
+      (poll.subs.state[name] = poll.subs.state[name] || []).push(cb);
+      return unsub(poll.subs.state[name], cb);
+    },
+
+    isConfigured: configured,
+    boot: function () { return Promise.resolve(); }
+  };
+
+  (window.AOC_NET_IMPLS = window.AOC_NET_IMPLS || {}).supabase = NET;
+})();
+
+</script>
+<script>
+/* =========================================================================
+   THE CONFEDERATION PROBLEM — backend selector
+
+   Picks whichever backend assets/config.js names and exposes it as
+   window.NET. Both backends present the same handful of methods, so no
+   other file in the project knows or cares which one is running.
+   ========================================================================= */
+(function () {
+  "use strict";
+
+  var want = (window.AOC_CONFIG && window.AOC_CONFIG.backend) || "supabase";
+  var impls = window.AOC_NET_IMPLS || {};
+  var chosen = impls[want];
+
+  if (!chosen) {
+    var available = Object.keys(impls);
+    chosen = impls[available[0]];
+    if (chosen) {
+      console.warn('Backend "' + want + '" is not loaded; using "' + available[0] + '".');
+    }
+  }
+
+  if (!chosen) {
+    // Fail loudly and in plain English rather than with a null reference
+    // twenty lines later.
+    var msg = "No backend loaded. Check that assets/config.js and the " +
+              "net-*.js files are included before net.js.";
+    chosen = new Proxy({}, { get: function () {
+      return function () { return Promise.reject(new Error(msg)); };
+    }});
+    console.error(msg);
+  }
+
+  window.NET = chosen;
+  window.NET.backendName = want;
+
+  // A misconfigured project should say so on the setup screen, not fail
+  // silently the moment a teacher tries to create a session.
+  if (want === "supabase" && chosen.isConfigured && !chosen.isConfigured()) {
+    document.addEventListener("DOMContentLoaded", function () {
+      var host = document.querySelector(".wrap, .wrap-wide, body");
+      if (!host) return;
+      var d = document.createElement("div");
+      d.className = "card";
+      d.style.cssText = "border-color:#8a2019;border-width:3px";
+      d.innerHTML =
+        '<h2 style="color:#8a2019">Supabase is not set up yet</h2>' +
+        '<p class="lede">Open <strong>assets/config.js</strong> and paste your ' +
+        'project URL and anon public key. Both are in Supabase under ' +
+        '<strong>Project Settings &rarr; API</strong>.</p>' +
+        '<p class="small muted">You also need to run <strong>supabase-setup.sql</strong> ' +
+        'once in the Supabase SQL Editor. Until both are done, sessions cannot be created.</p>';
+      host.insertBefore(d, host.firstChild);
+    });
+  }
+})();
+
+</script>
+<script>
+/* =========================================================================
    THE CONFEDERATION PROBLEM — end-of-game debrief
    Shared by teacher.html, student.html and solo.html.
    ========================================================================= */
@@ -1929,325 +2575,744 @@ window.AOC_MAP = {"viewBox":"10 64 910 822","width":910,"height":822,"states":{"
 (function(){
 "use strict";
 var D = window.AOC, E = window.ENGINE;
-var $ = function(i){ return document.getElementById(i); };
 
-var SEED = "SOLO" + Math.floor(Math.random()*100000);
-var MINE=null, ROUND=0, PHASE="deal", S=[], STAB=60, TREAS=0, HIST=[], DEALS=[], RESULT=null;
-var DEAL_LIMIT = 3, lastRequested = 0;
+var CODE = null, G = null, STATES = [], TIMER = null, dealsSeen = 0, tickerCache = "";
+var $ = function(id){ return document.getElementById(id); };
 
-function show(id){ ["s-pick","s-play","s-end"].forEach(function(x){ $(x).classList.toggle("hidden", x!==id); }); }
-function me(){ return S.filter(function(x){ return x.name===MINE; })[0]; }
-function res(){ return D.RESOLUTIONS[ROUND]; }
+/* ---------------------------------------------------------------- setup */
+var PRESETS = {
+  recommended: ["Virginia","Massachusetts","New York","New Jersey","South Carolina","Georgia"],
+  eight: ["Virginia","Massachusetts","New York","New Jersey","South Carolina","Georgia","Maryland","Connecticut"],
+  four: ["Virginia","Massachusetts","New York","New Jersey"],
+  none: []
+};
+var picked = PRESETS.recommended.slice();
 
-/* ------------------------------------------------------------- pick */
-(function(){
-  var l = $("pick-list");
-  D.STATES.slice().sort(function(a,b){ return a.name.localeCompare(b.name); }).forEach(function(s){
-    var b = document.createElement("button");
-    b.className = "claim";
-    b.innerHTML = '<div class="t">' + s.name + '</div><div class="d">' + s.motto + '</div>';
-    b.addEventListener("click", function(){ begin(s.name); });
-    l.appendChild(b);
+function drawPicks(){
+  var g = $("pickgrid"); g.innerHTML = "";
+  D.STATES.forEach(function(s){
+    var on = picked.indexOf(s.name) !== -1;
+    var l = document.createElement("label");
+    l.className = "pick" + (on ? " on" : "");
+    l.innerHTML = '<input type="checkbox" ' + (on?"checked":"") + '>' +
+      '<span><span class="t">' + s.name + '</span><br><span class="d">' + s.motto + '</span></span>';
+    l.querySelector("input").addEventListener("change", function(e){
+      if (e.target.checked) { if (picked.indexOf(s.name)===-1) picked.push(s.name); }
+      else picked = picked.filter(function(n){ return n !== s.name; });
+      drawPicks();
+    });
+    g.appendChild(l);
   });
-})();
-
-function begin(name){
-  MINE = name;
-  S = D.STATES.map(function(s){
-    return { name:s.name, abbr:s.abbr, isBot: s.name !== name, interest:50,
-             treasuryNow:s.treasury, vote:null, pay:null };
-  });
-  var d = D.byName(name);
-  $("mast").textContent = d.name;
-  $("sub").textContent = "Solo Congress · you are one vote out of thirteen";
-  $("d-name").textContent = d.name;
-  $("d-bg").textContent = d.background;
-  $("d-obj").textContent = d.objective;
-  $("d-fac").innerHTML = d.factions.map(function(f){
-    return '<div class="faction"><div style="font-weight:700">' + f.name + '</div><div class="small">' + f.wants + '</div></div>';
-  }).join("");
-  show("s-play");
-  startRound();
+  $("pick-count").textContent = picked.length + " student state" + (picked.length===1?"":"s");
 }
+window.preset = function(k){ picked = PRESETS[k].slice(); drawPicks(); };
+drawPicks();
 
-/* ------------------------------------------------------------ round */
-function startRound(){
-  PHASE = "deal"; DEALS = []; RESULT = null;
-  S.forEach(function(s){ s.vote = null; s.pay = null; s.absent = false; });
-  // Cap absences at two: with a 9-of-13 bar, more than that silently turns the
-  // vote into a unanimity requirement among whoever bothered to show up.
-  var skipped = 0;
-  S.forEach(function(s){
-    if (s.isBot && skipped < 2 && !E.botAttends(D.byName(s.name), SEED, ROUND+1)) {
-      s.absent = true; skipped++;
-    }
+$("create-btn").addEventListener("click", function(){
+  var b = $("create-btn"); b.disabled = true; b.textContent = "Creating…";
+  NET.createGame(picked, {
+    caucusLen: parseInt($("caucus-len").value,10),
+    dealLimit: parseInt($("deal-limit").value,10),
+    absences: $("absences").value === "on"
+  }).then(function(code){
+    CODE = code;
+    $("game-code").textContent = code;
+    $("code-box").classList.remove("hidden");
+    $("setup").classList.add("hidden");
+    $("lobby").classList.remove("hidden");
+    try { localStorage.setItem("aoc_teacher_code", code); } catch(e){}
+    subscribe();
+  }).catch(function(err){
+    b.disabled = false; b.textContent = "Create the session";
+    alert("Could not reach the server.\n\n" + err.message +
+      "\n\nIf your school blocks Firebase, use the Solo page instead — it needs no internet.");
   });
-  var r = res();
-  var narr = E.narration(r, { treasury: TREAS });
-  if (narr) {
-    $("dsp-dateline").textContent = narr.dateline;
-    $("dsp-body").innerHTML = narr.lines.map(function(l){ return "<p>" + l + "</p>"; }).join("");
-  }
-  $("r-eye").textContent = "Resolution " + r.number + " of " + D.RESOLUTIONS.length + " — " + r.subtitle;
-  $("r-rule").textContent = r.voteRule === "unanimous" ? "Needs ALL 13 states" : "Needs 9 of 13 states";
-  $("r-title").textContent = r.title;
-  $("r-brief").textContent = r.brief;
-  $("r-detail").innerHTML = r.detail.split("\n\n").map(function(p){ return "<p>"+p+"</p>"; }).join("");
-  $("r-question").textContent = r.question;
-  $("r-ifpass").textContent = r.ifPasses;
-  $("r-iffail").textContent = r.ifFails;
-  $("r-yes").textContent = r.yesCase;
-  $("r-no").textContent = r.noCase;
-  $("vote-state").textContent = MINE;
-
-  var owed = E.amountOwed(D.byName(MINE), r);
-  $("cost-wrap").classList.remove("hidden");
-  if (!owed) $("cost-body").innerHTML = '<div class="nocost">This one does not take a penny out ' +
-    'of your treasury. It costs you something harder to measure — look at what it touches.</div>';
-  $("touch-body").innerHTML = E.interestBreakdown(D.byName(MINE), r).slice(0,5).map(function(b){
-    return '<div class="touch ' + (b.value > 0 ? "pos" : "neg") + '">' +
-      '<span class="arrow">' + (b.value > 0 ? "▲" : "▼") + '</span>' +
-      '<span class="txt">' + b.label + '</span>' +
-      '<span class="mag">' + (b.strength ? b.strength + " " : "") + "for " + b.toward.toLowerCase() + '</span>' +
-    '</div>';
-  }).join("");
-  if (owed) {
-    $("cost-body").innerHTML =
-      '<div class="bill"><span>Your share of ' + E.money(r.complianceTotal) + '</span><strong>' + E.money(owed) + '</strong></div>' +
-      '<div class="bill"><span>Your treasury</span><strong>' + E.money(me().treasuryNow) + '</strong></div>' +
-      '<div class="bill"><span>Paying in full costs you</span><strong style="color:#8a2019">' +
-        Math.round(owed/me().treasuryNow*100) + '% of everything you have</strong></div>';
-  }
-
-  var t = $("dt"); t.innerHTML = "";
-  S.filter(function(s){ return s.name !== MINE && !s.absent; }).forEach(function(s){
-    var o = document.createElement("option"); o.value = s.name; o.textContent = s.name; t.appendChild(o);
-  });
-  var off = $("do"); off.innerHTML = "";
-  E.DEAL_OPTIONS.forEach(function(o){
-    var el = document.createElement("option"); el.value = o.id; el.textContent = o.label; off.appendChild(el);
-  });
-
-  lastRequested = 0;
-  $("deal-card").classList.remove("hidden");
-  $("vote-card").classList.remove("hidden");
-  $("seat-card").classList.add("hidden");
-  $("t-money").classList.add("hidden");
-  $("pay-card").classList.add("hidden");
-  $("out-card").classList.add("hidden");
-  refresh();
-}
-
-function refresh(){
-  var m = me();
-  $("stats").innerHTML =
-    '<div class="stat"><div class="k">Treasury</div><div class="v">' + E.money(m.treasuryNow) + '</div></div>' +
-    '<div class="stat"><div class="k">Your interest</div><div class="v">' + Math.round(m.interest) + '</div></div>' +
-    '<div class="stat"><div class="k">Nation</div><div class="v">' + Math.round(STAB) + '</div></div>';
-  var left = DEAL_LIMIT - DEALS.length;
-  $("deal-left").textContent = left + " offer" + (left===1?"":"s") + " left";
-  $("dsend").disabled = left <= 0;
-  $("dlog").innerHTML = DEALS.length ? DEALS.slice().reverse().map(function(x){
-    return '<div class="line ' + (x.status==="accepted"?"ok":"bad") + '"><strong>To ' + x.to + ':</strong> ' +
-      x.label + "<br>" + x.reply + "</div>";
-  }).join("") : '<div class="line muted small">No offers yet.</div>';
-  renderLean();
-}
-
-/* A read of the room: shows which way each bot is leaning, so the player
-   learns to spend offers on states that are actually persuadable. */
-function renderLean(){
-  var r = res();
-  $("lean").innerHTML = S.map(function(s){
-    if (s.name === MINE) return '<div class="seat you"><div class="ab">' + s.abbr +
-      '</div><div class="nm">' + s.name + '</div><div class="vt">you</div></div>';
-    if (s.absent) return '<div class="seat absent"><div class="ab">' + s.abbr +
-      '</div><div class="nm">' + s.name + '</div><div class="vt">no delegate</div></div>';
-    var sc = E.botVoteScore(D.byName(s.name), r, DEALS.filter(function(d){ return d.status==="accepted"; }));
-    var v = sc.total + (r.isAmendment ? 0 : 2.6);
-    var cls = v > 1.2 ? "yes" : (v < -1.2 ? "no" : "abstain");
-    var lbl = v > 1.2 ? "leaning yes" : (v < -1.2 ? "leaning no" : "undecided");
-    return '<div class="seat ' + cls + '"><div class="ab">' + s.abbr + '</div><div class="nm">' +
-      s.name + '</div><div class="vt">' + lbl + '</div></div>';
-  }).join("");
-}
-
-$("dsend").addEventListener("click", function(){
-  var to = $("dt").value, id = $("do").value;
-  var opt = E.DEAL_OPTIONS.filter(function(o){ return o.id===id; })[0];
-  var reply = E.botDealReply(D.byName(to), { id:id, weight:opt.weight, from:MINE }, res(), SEED+DEALS.length, ROUND);
-  DEALS.push({ to:to, id:id, label:opt.label, status:reply.status, reply:reply.text, weight: reply.status==="accepted"?opt.weight:0 });
-  if (reply.status === "accepted" && opt.cost) {
-    var m = me(); m.treasuryNow = Math.max(0, m.treasuryNow - opt.cost);
-  }
-  refresh();
 });
 
-window.SV = function(v){
-  var r = res();
-  me().vote = v;
-  var accepted = DEALS.filter(function(d){ return d.status==="accepted"; });
-  S.forEach(function(s){
-    if (!s.isBot || s.absent) return;
-    s.vote = E.botVote(D.byName(s.name), r, accepted, SEED, ROUND+1).vote;
+function subscribe(){
+  NET.onGame(CODE, function(g){ G = g; render(); });
+  NET.onStates(CODE, function(list){
+    STATES = list.sort(function(a,b){ return a.name.localeCompare(b.name); });
+    render();
   });
-  var pres = S.filter(function(s){ return !s.absent; });
-  var votes = {}; pres.forEach(function(s){ votes[s.name] = s.vote; });
-  var t = E.tally(votes, r, pres.map(function(s){ return s.name; }));
-  RESULT = t; RESULT.votes = votes;
+}
 
-  $("deal-card").classList.add("hidden");
-  $("vote-card").classList.add("hidden");
-  $("seat-card").classList.remove("hidden");
-  $("seat-pill").textContent = t.present + " states present";
-  $("seat-head").textContent = "The roll is called";
-  $("seat-card").scrollIntoView({ behavior:"smooth", block:"start" });
+/* ------------------------------------------------------------- helpers */
+function res(){ return (G && G.round >= 0) ? D.RESOLUTIONS[G.round] : null; }
+function present(){ return STATES.filter(function(s){ return (G.absent||[]).indexOf(s.name) === -1; }); }
+function dataFor(n){ return D.byName(n); }
 
-  rollCall("votes", function(){
-    $("seat-head").textContent = !t.quorum ? "Fewer than nine states came. No vote is possible."
-      : (t.passed ? "PASSED" : "FAILED — " + t.needed + " yes votes were needed");
-    if (t.passed && r.compliance) {
-      $("pay-card").classList.remove("hidden");
-      var owed = E.amountOwed(D.byName(MINE), r);
-      $("pay-owed").innerHTML = "You owe <strong>" + E.money(owed) + "</strong>. Your treasury holds " +
-        E.money(me().treasuryNow) + ".";
-      $("pay-card").scrollIntoView({ behavior:"smooth", block:"center" });
-    } else {
-      finish(0, 0, []);
-    }
-  });
-};
+function seatHTML(s, opts){
+  opts = opts || {};
+  var absent = (G.absent||[]).indexOf(s.name) !== -1;
+  var vote = s.votes ? s.votes[G.round] : null;
+  var cls = "seat";
+  if (absent) cls += " absent";
+  else if (opts.showVotes && vote) cls += " " + vote.toLowerCase();
+  else if (opts.showVotes) cls += " waiting";
+  var pay = "";
+  if (opts.showPay && s.payments && s.payments[G.round]) {
+    var p = s.payments[G.round];
+    var lbl = p.choice === "full" ? "PAID IN FULL" : (p.choice === "half" ? "PAID HALF" : "PAID NOTHING");
+    pay = '<div class="paid ' + p.choice + '">' + lbl + '</div>';
+  }
+  var tag = absent ? "" :
+    '<span class="tag ' + (s.isBot ? "bot" : "stu") + '">' + (s.isBot ? "bot" : "you") + '</span>';
+  var line = absent ? "no delegate" : (opts.showVotes && vote ? vote : (s.isBot ? "" : (s.players||[]).join(", ")));
+  return '<div class="' + cls + '">' + tag +
+    '<div class="ab">' + s.abbr + '</div>' +
+    '<div class="nm">' + s.name + '</div>' +
+    (line ? '<div class="vt">' + line + '</div>' : "") + pay + '</div>';
+}
 
-/* ---------------------------------------------------------- the map board */
-var mapRoot = null, moneySoFar = 0;
+/* ---------------------------------------------------------------- board
+   The map is the projector's centrepiece. On a tally it runs a roll call:
+   states light up one at a time, north to south, with the count climbing
+   toward the nine it needs. On the payment reveal the same map runs again
+   and goes dark red as states refuse to pay — the visual rhyme is the
+   whole lesson in two passes over one picture.                          */
+var mapRoot = null, revealedKey = null, boardView = "map";
+var resCollapsed = false, lastPhase = null, moneySoFar = 0, dspOpen = false, dspRound = null;
+
+/* -------------------------------------------------------- the read-aloud
+   Opens each round with a short scene the teacher performs. It carries the
+   live treasury into Round 4, so the class hears the cost of what it chose
+   back in Round 1 read out as a real number.                             */
+function renderDispatch(r, ph){
+  var n = E.narration(r, { treasury: G.nationalTreasury || 0 });
+  if (!n) { $("dispatch").classList.add("hidden"); $("dsp-again").classList.add("hidden"); return; }
+  if (dspRound !== G.round) {
+    dspRound = G.round;
+    $("dispatch").classList.remove("big");
+    $("dsp-big").textContent = "Bigger text";
+  }
+  $("dsp-dateline").textContent = n.dateline;
+  $("dsp-badge").textContent = "Read aloud · about " + n.seconds + " seconds";
+  $("dsp-body").innerHTML = n.lines.map(function(l){ return "<p>" + l + "</p>"; }).join("");
+  $("dispatch").classList.toggle("hidden", !dspOpen);
+  $("dsp-again").classList.toggle("hidden", dspOpen);
+}
+$("dsp-big").addEventListener("click", function(){
+  var d = $("dispatch"); d.classList.toggle("big");
+  this.textContent = d.classList.contains("big") ? "Normal text" : "Bigger text";
+});
+$("dsp-done").addEventListener("click", function(){ dspOpen = false; renderDispatch(res(), G.phase); });
+$("dsp-again").addEventListener("click", function(){ dspOpen = true; renderDispatch(res(), G.phase); });
+
+function applyResCollapse(){
+  $("res-detail").classList.toggle("hidden", resCollapsed);
+  $("res-teaches").classList.toggle("hidden", resCollapsed);
+  $("res-brief").classList.toggle("hidden", resCollapsed);
+  $("res-outcomes").classList.toggle("hidden", resCollapsed);
+  // The question itself stays up: it is what the room is arguing about.
+  $("res-question-box").classList.remove("hidden");
+  $("res-toggle").textContent = resCollapsed ? "Show the full text" : "Hide the text";
+}
+$("res-toggle").addEventListener("click", function(){
+  resCollapsed = !resCollapsed; applyResCollapse();
+});
+
 function boardRows(){
-  return S.map(function(s){
-    return { name:s.name, abbr:s.abbr, isBot:s.isBot, isYou:s.name===MINE,
-             absent:!!s.absent, vote:s.vote,
-             payment: s.pay ? s.pay.choice : null };
+  return STATES.map(function(s){
+    return {
+      name: s.name,
+      abbr: s.abbr,
+      isBot: s.isBot,
+      isYou: false,
+      absent: (G.absent||[]).indexOf(s.name) !== -1,
+      vote: s.votes ? s.votes[G.round] : null,
+      payment: (s.payments && s.payments[G.round]) ? s.payments[G.round].choice : null
+    };
   });
 }
-function setTally(y,n,a,needed,verdict){
-  $("t-yes").textContent=y; $("t-no").textContent=n; $("t-ab").textContent=a;
-  $("t-fill").style.width = Math.min(100,(y/13)*100)+"%";
-  $("t-need").style.left = ((needed/13)*100)+"%";
-  var v=$("t-verdict"); v.textContent=verdict||"";
-  v.className="verdict"+(verdict==="PASSED"?" pass":(verdict?" fail":""));
+
+function setTally(y, n, a, needed, verdict){
+  $("t-yes").textContent = y; $("t-no").textContent = n; $("t-ab").textContent = a;
+  $("t-fill").style.width = Math.min(100, (y / 13) * 100) + "%";
+  $("t-need").style.left = ((needed / 13) * 100) + "%";
+  var v = $("t-verdict");
+  v.textContent = verdict || "";
+  v.className = "verdict" + (verdict === "PASSED" ? " pass" : (verdict ? " fail" : ""));
 }
+
 var LEGENDS = {
-  vote:[["#3f9160","Voted yes"],["#b8483a","Voted no"],["#8794a3","Abstained"],
-        ["#4a423a","No delegate"],["#b9b2a6","Vermont — not a state"]],
-  pay: [["#3f9160","Paid in full"],["#c8912f","Paid half"],["#7d2019","Paid nothing"],
-        ["#4a423a","No delegate"]]
+  vote: [["#3f9160","Voted yes"],["#b8483a","Voted no"],["#8794a3","Abstained"],
+         ["#4a423a","No delegate"],["#b9b2a6","Vermont — not a state"]],
+  pay:  [["#3f9160","Paid in full"],["#c8912f","Paid half"],["#7d2019","Paid nothing"],
+         ["#4a423a","No delegate"]],
+  wait: [["#efe4cb","Yet to vote"],["#8d7f6b","Vote sealed"],
+         ["#4a423a","No delegate"],["#b9b2a6","Vermont — not a state"]]
 };
-function setLegend(k){
-  $("map-legend").innerHTML = LEGENDS[k].map(function(x){
-    return '<span><i style="background:'+x[0]+'"></i>'+x[1]+"</span>"; }).join("");
+function setLegend(kind){
+  $("map-legend").innerHTML = LEGENDS[kind].map(function(x){
+    return '<span><i style="background:' + x[0] + '"></i>' + x[1] + "</span>";
+  }).join("");
 }
-function rollCall(mode, done){
+
+function renderBoard(r, ph){
   if (!mapRoot) mapRoot = window.AOCMAP.build($("map-view"));
-  var r = res();
+  var rows = boardRows();
   var needed = r.voteRule === "unanimous" ? 13 : 9;
+  var key = G.round + ":" + ph;
+
+  var isTally = (ph === "tally");
+  var isPayReveal = (ph === "reveal" && G.result && G.result.requested > 0);
+  var showTallybar = isTally || ph === "compliance" || ph === "reveal" || ph === "done";
+  $("tallybar").classList.toggle("hidden", !showTallybar);
+  $("replay-btn").classList.toggle("hidden", !(isTally || ph === "reveal" || ph === "done"));
+
+  if (isTally || isPayReveal) {
+    if (revealedKey !== key) {
+      revealedKey = key;
+      runReveal(rows, needed, isPayReveal ? "payment" : "votes");
+    }
+    return;
+  }
+
+  window.AOCMAP.cancel();
+  var payMode = G.result && G.result.requested > 0;
+  $("t-money").classList.toggle("hidden", !(payMode && (ph === "reveal" || ph === "done")));
+  if (payMode && G.result) {
+    $("t-money-val").textContent = E.money(G.result.collected);
+    $("t-money-of").textContent = "of " + E.money(G.result.requested);
+  }
+  if (ph === "reveal" || ph === "done") {
+    setLegend(payMode ? "pay" : "vote");
+    window.AOCMAP.paint(mapRoot, rows, payMode ? "payment" : "votes");
+    if (G.result) setTally(G.result.yes, G.result.no, G.result.abstain, needed,
+      G.result.passed ? "PASSED" : "FAILED");
+  } else if (ph === "compliance") {
+    setLegend("vote");
+    window.AOCMAP.paint(mapRoot, rows, "votes");
+    if (G.result) setTally(G.result.yes, G.result.no, G.result.abstain, needed,
+      G.result.passed ? "PASSED" : "FAILED");
+  } else {
+    setLegend("wait");
+    window.AOCMAP.paint(mapRoot, rows, "voting");
+    revealedKey = null;
+  }
+}
+
+function runReveal(rows, needed, mode){
   setLegend(mode === "payment" ? "pay" : "vote");
   moneySoFar = 0;
+  var R0 = G.result;
   $("t-money").classList.toggle("hidden", mode !== "payment");
-  if (mode === "votes") setTally(0,0,0,needed,"");
-  if (mode === "payment") {
+  if (mode === "payment" && R0) {
     $("t-money-val").textContent = "$0";
-    $("t-money-of").textContent = "of " + E.money(lastRequested);
+    $("t-money-of").textContent = "of " + E.money(R0.requested);
+  }
+  if (boardView === "map") {
+    try { $("tallybar").scrollIntoView({ behavior:"smooth", block:"center" }); } catch(e){}
   }
   $("map-view").classList.add("dim");
-  window.AOCMAP.revealVotes(mapRoot, boardRows(), {
+  if (mode === "votes") setTally(0, 0, 0, needed, "");
+  window.AOCMAP.revealVotes(mapRoot, rows, {
     mode: mode,
     step: mode === "payment" ? 330 : 430,
     onTick: function(t){
-      if (mode === "votes") { setTally(t.yes,t.no,t.abstain,needed,""); return; }
-      var owed = E.amountOwed(D.byName(t.name), r);
-      var c = t.row.payment;
-      moneySoFar += c === "full" ? owed : (c === "half" ? Math.round(owed/2) : 0);
+      if (mode === "votes") { setTally(t.yes, t.no, t.abstain, needed, ""); return; }
+      // Payment pass: watch the total climb and then stall, state by state.
+      var d = dataFor(t.name), r2 = res();
+      var owed = E.amountOwed(d, r2);
+      var choice = t.row.payment;
+      moneySoFar += choice === "full" ? owed : (choice === "half" ? Math.round(owed/2) : 0);
       $("t-money-val").textContent = E.money(moneySoFar);
     },
     onDone: function(t){
       $("map-view").classList.remove("dim");
-      if (mode === "votes") setTally(t.yes,t.no,t.abstain,needed, RESULT.passed ? "PASSED" : "FAILED");
-      if (done) done();
+      var R = G.result;
+      if (mode === "votes") {
+        setTally(t.yes, t.no, t.abstain, needed,
+          R ? (R.passed ? "PASSED" : "FAILED") : (t.yes >= needed ? "PASSED" : "FAILED"));
+      } else if (R) {
+        setTally(R.yes, R.no, R.abstain, needed, R.passed ? "PASSED" : "FAILED");
+      }
     }
   });
 }
+
 $("replay-btn").addEventListener("click", function(){
-  rollCall(lastRequested > 0 && S.some(function(s){return s.pay;}) ? "payment" : "votes");
+  var r = res(); if (!r) return;
+  var needed = r.voteRule === "unanimous" ? 13 : 9;
+  var mode = (G.result && G.result.requested > 0 && (G.phase === "reveal" || G.phase === "done"))
+    ? "payment" : "votes";
+  runReveal(boardRows(), needed, mode);
 });
 
-window.SP = function(choice){
-  var r = res(), requested = 0, collected = 0, excuses = [];
-  S.forEach(function(s){
-    var d = D.byName(s.name);
-    var owed = E.amountOwed(d, r); requested += owed;
-    var c;
-    if (s.name === MINE) {
-      c = { choice: choice, paid: choice==="full"?owed:(choice==="half"?Math.round(owed/2):0) };
-    } else {
-      c = E.botCompliance(Object.assign({}, d, {treasuryNow:s.treasuryNow}), r,
-        RESULT.votes[s.name]==="Yes", SEED, ROUND+1);
-    }
-    s.pay = c; collected += c.paid;
-    s.treasuryNow -= c.paid;
-    s.interest += E.stateInterestFromCompliance(c.choice);
-    excuses.push({ choice:c.choice, text: s.name===MINE
-      ? ("You " + ({full:"paid in full.",half:"paid half and promised the rest later.",none:"sent nothing."})[c.choice])
-      : E.complianceExcuse(d, c.choice, SEED, ROUND+1) });
-  });
-  $("pay-card").classList.add("hidden");
-  lastRequested = requested;
-  $("seat-head").textContent = "Now see who actually paid";
-  $("seat-card").scrollIntoView({ behavior:"smooth", block:"start" });
-  rollCall("payment", function(){ finish(requested, collected, excuses); });
+$("tab-map").addEventListener("click", function(){ setBoardView("map"); });
+$("tab-list").addEventListener("click", function(){ setBoardView("list"); });
+function setBoardView(v){
+  boardView = v;
+  $("tab-map").classList.toggle("on", v === "map");
+  $("tab-list").classList.toggle("on", v === "list");
+  $("map-view").classList.toggle("hidden", v !== "map");
+  $("map-legend").classList.toggle("hidden", v !== "map");
+  $("seats").classList.toggle("hidden", v !== "list");
+}
+
+var PROMPTS = {
+  brief: "Read the resolution out loud. Tell groups to open their own screen and read what it costs their state.",
+  caucus: "Two minutes. Get out of your seats. Argue, threaten, and make deals. Watch the deal ticker — read good offers out loud.",
+  voting: "Silence. Every delegation votes now. Remind them nine of thirteen is the bar.",
+  tally: "Read the result. If it passed, do not celebrate yet — ask what happens next.",
+  compliance: "Now the real question. Congress said yes. Ask each group privately: are you actually going to send the money?",
+  reveal: "Read the numbers out loud, slowly. Then read what actually happened in history.",
+  done: "Move to the next resolution."
 };
 
-function finish(requested, collected, excuses){
-  var r = res();
-  S.forEach(function(s){
-    if (s.absent) return;
-    s.interest += E.stateInterestFromVote(D.byName(s.name), r, s.vote);
-  });
-  var frac = requested > 0 ? collected/requested : 0;
-  STAB = E.clamp(STAB + E.nationalStabilityChange(r, RESULT, frac), 0, 100);
-  TREAS += collected;
+/* -------------------------------------------------------------- render */
+function render(){
+  if (!G || !STATES.length) return;
 
-  $("out-card").classList.remove("hidden");
-  $("out-head").textContent = !RESULT.quorum ? "Congress could not meet"
-    : (RESULT.passed ? "Resolution passed" : "Resolution failed");
-  $("out-head").style.color = RESULT.passed ? "#1d5233" : "#8a2019";
-  $("out-narr").textContent = E.outcomeNarrative(r, RESULT, collected, requested);
-  $("out-money").classList.toggle("hidden", requested === 0);
-  if (requested) {
-    $("o-ask").textContent = E.money(requested);
-    $("o-got").textContent = E.money(collected);
-    $("o-pct").textContent = Math.round(collected/requested*100) + "%";
-    $("o-excuses").innerHTML = excuses.map(function(x){
-      return '<div class="line ' + (x.choice==="full"?"ok":(x.choice==="none"?"bad":"")) + '">' + x.text + "</div>";
-    }).join("");
-  }
-  $("o-hist").innerHTML = (D.HISTORY_NOTES[r.id] || "").split("\n\n")
-    .map(function(x){ return "<p>" + x + "</p>"; }).join("");
-  HIST.push({ id:r.id, title:r.title, passed:RESULT.passed, yes:RESULT.yes, no:RESULT.no,
-    abstain:RESULT.abstain, quorum:RESULT.quorum, requested:requested, collected:collected,
-    stabilityAfter: Math.round(STAB) });
-  $("next-btn").textContent = (ROUND + 1 >= D.RESOLUTIONS.length) ? "See how it all ended" : "Next resolution";
-  refresh();
-  $("out-card").scrollIntoView({ behavior:"smooth", block:"start" });
-}
-
-$("next-btn").addEventListener("click", function(){
-  if (ROUND + 1 >= D.RESOLUTIONS.length) {
-    show("s-end");
-    window.DEBRIEF.render($("s-end"), { stability: STAB, history: HIST }, S, { you: MINE });
-    window.scrollTo({ top:0, behavior:"smooth" });
+  if (G.status === "ended") {
+    $("lobby").classList.add("hidden"); $("game").classList.add("hidden");
+    $("clock-box").classList.add("hidden");
+    $("debrief").classList.remove("hidden");
+    window.DEBRIEF.render($("debrief"), G, STATES, { teacher:true });
     return;
   }
-  ROUND++; startRound();
-  window.scrollTo({ top:0, behavior:"smooth" });
+  if (G.status === "lobby") return renderLobby();
+
+  $("lobby").classList.add("hidden");
+  $("game").classList.remove("hidden");
+
+  var r = res(); if (!r) return;
+
+  $("stab-val").textContent = Math.round(G.stability);
+  $("stab-bar").style.width = E.clamp(G.stability,0,100) + "%";
+  $("nat-treasury").textContent = E.money(G.nationalTreasury || 0);
+  $("present-count").textContent = present().length + " / 13";
+  $("round-label").textContent = (G.round+1) + " of " + D.RESOLUTIONS.length;
+
+  $("res-eyebrow").textContent = "Resolution " + r.number + " — " + r.subtitle;
+  $("rule-pill").textContent = r.voteRule === "unanimous" ? "Needs ALL 13" : "Needs 9 of 13";
+  $("res-title").textContent = r.title;
+  $("res-brief").textContent = r.brief;
+  $("res-detail").innerHTML = r.detail.split("\n\n").map(function(p){ return "<p>"+p+"</p>"; }).join("");
+  $("teaches-text").textContent = r.teaches;
+  $("res-question").textContent = r.question;
+  $("res-ifpass").textContent = r.ifPasses;
+  $("res-iffail").textContent = r.ifFails;
+
+  var ph = G.phase;
+  $("phase-flag").textContent = ({brief:"Brief",caucus:"Debate",voting:"Voting",tally:"Result",
+    compliance:"Payment",reveal:"Reveal",done:"Between rounds"})[ph] || ph;
+  $("prompt-text").textContent = PROMPTS[ph] || "";
+
+  // The class reads the resolution during the brief. After that the map is
+  // what belongs on the projector, so fold the wall of text away by default.
+  if (ph !== lastPhase) {
+    resCollapsed = (ph !== "brief");
+    dspOpen = (ph === "brief");
+    lastPhase = ph;
+  }
+  applyResCollapse();
+  renderDispatch(r, ph);
+
+  var showVotes = (ph === "tally" || ph === "compliance" || ph === "reveal" || ph === "done");
+  var showPay = (ph === "reveal" || ph === "done");
+  $("seats").innerHTML = present().map(function(s){
+    return seatHTML(s, { showVotes: showVotes, showPay: showPay });
+  }).join("") + (G.absent||[]).map(function(n){
+    var s = STATES.filter(function(x){return x.name===n;})[0];
+    return s ? seatHTML(s, {}) : "";
+  }).join("");
+
+  renderBoard(r, ph);
+
+  var voted = present().filter(function(s){ return s.votes && s.votes[G.round]; }).length;
+  $("votes-in").textContent = voted + " of " + present().length + " voted";
+  $("votes-in").className = "pill" + (voted === present().length ? " good" : "");
+
+  $("seats-heading").textContent = ph === "compliance" ? "Who is actually going to pay?" : "The thirteen states";
+
+  // result
+  var rc = $("result-card");
+  if (G.result && (ph === "tally" || ph === "compliance" || ph === "reveal" || ph === "done")) {
+    rc.classList.remove("hidden");
+    var R = G.result;
+    $("tally-pill").textContent = R.yes + " yes · " + R.no + " no · " + R.abstain + " abstain";
+    $("result-headline").textContent = !R.quorum
+      ? "No quorum. Congress cannot vote at all."
+      : (R.forced ? "PASSED on a later attempt"
+        : (R.passed ? "PASSED — " + R.yes + " yes, " + R.needed + " needed"
+                    : "FAILED — " + R.yes + " yes, " + R.needed + " were needed"));
+    $("result-headline").style.color = R.passed ? "#1d5233" : "#8a2019";
+    $("result-narrative").textContent = (ph === "tally" && r.compliance && R.passed)
+      ? r.passText : (R.narrative || "");
+    var showMoney = (ph === "reveal" || ph === "done") && R.requested > 0;
+    $("result-money").classList.toggle("hidden", !showMoney);
+    if (showMoney) {
+      $("asked-val").textContent = E.money(R.requested);
+      $("got-val").textContent = E.money(R.collected);
+      $("pct-val").textContent = Math.round(R.collected / R.requested * 100) + "%";
+      $("excuses").innerHTML = (R.excuses||[]).map(function(x){
+        return '<div class="line ' + (x.choice==="full"?"ok":(x.choice==="none"?"bad":"")) + '">' + x.text + "</div>";
+      }).join("");
+    }
+    var hn = (ph === "reveal" || ph === "done");
+    $("history-note").classList.toggle("hidden", !hn);
+    if (hn) $("history-text").innerHTML = (D.HISTORY_NOTES[r.id] || "").split("\n\n")
+      .map(function(x){ return "<p>" + x + "</p>"; }).join("");
+  } else {
+    rc.classList.add("hidden"); $("tally-pill").textContent = "";
+  }
+
+  renderDeals();
+  renderTimer();
+  renderNextButton();
+}
+
+function renderLobby(){
+  $("lobby").classList.remove("hidden");
+  var claimed = STATES.filter(function(s){ return (s.players||[]).length > 0; });
+  $("joined-count").textContent = claimed.length + " of " + (G.studentStates||[]).length + " groups joined";
+  $("lobby-seats").innerHTML = STATES.map(function(s){
+    var isStudentSlot = (G.studentStates||[]).indexOf(s.name) !== -1;
+    var has = (s.players||[]).length > 0;
+    return '<div class="seat' + (has ? " yes" : (isStudentSlot ? " waiting" : "")) + '">' +
+      '<span class="tag ' + (isStudentSlot ? "stu" : "bot") + '">' + (isStudentSlot ? "group" : "bot") + '</span>' +
+      '<div class="ab">' + s.abbr + '</div><div class="nm">' + s.name + '</div>' +
+      '<div class="vt">' + (has ? (s.players||[]).join(", ") : (isStudentSlot ? "open" : "")) + '</div></div>';
+  }).join("");
+}
+
+function renderDeals(){
+  var deals = (G.deals||[]).filter(function(d){ return d.round === G.round; });
+  $("deal-count").textContent = deals.length;
+  var html = deals.length ? deals.slice().reverse().map(function(d){
+    return '<div class="line ' + (d.status==="accepted"?"ok":(d.status==="rejected"?"bad":"")) + '">' +
+      "<strong>" + d.from + " → " + d.to + ":</strong> " + d.label +
+      (d.reply ? '<br><span class="muted">' + d.reply + "</span>" : ' <span class="muted">(waiting)</span>') +
+      "</div>";
+  }).join("") : '<div class="line muted small">No offers yet.</div>';
+  if (html !== tickerCache) { $("deal-ticker").innerHTML = html; tickerCache = html; }
+  processPendingDeals(deals);
+}
+
+function renderTimer(){
+  var show = G.phase === "caucus" && G.caucusEndsAt;
+  $("clock-box").classList.toggle("hidden", !show);
+  if (TIMER) { clearInterval(TIMER); TIMER = null; }
+  if (!show) return;
+  var tick = function(){
+    var left = Math.max(0, Math.round((G.caucusEndsAt - Date.now())/1000));
+    var m = Math.floor(left/60), s = left % 60;
+    $("timer").textContent = m + ":" + (s<10?"0":"") + s;
+    $("timer").classList.toggle("low", left <= 20);
+  };
+  tick(); TIMER = setInterval(tick, 250);
+}
+
+var FLOW = {
+  brief:      { label:"Open debate",              next:"caucus" },
+  caucus:     { label:"Close debate — open voting",next:"voting" },
+  voting:     { label:"Close voting — show result",next:"tally" },
+  tally:      { label:"Continue",                 next:"compliance" },
+  compliance: { label:"Reveal who actually paid", next:"reveal" },
+  reveal:     { label:"Next resolution",          next:"done" },
+  done:       { label:"Next resolution",          next:"done" }
+};
+
+function renderNextButton(){
+  var b = $("next-btn"), r = res(), ph = G.phase;
+  var f = FLOW[ph] || FLOW.brief;
+  var label = f.label;
+  if (ph === "tally") {
+    var needsPay = r.compliance && G.result && G.result.passed;
+    label = needsPay ? "Now ask them to pay" : ((G.round + 1 >= D.RESOLUTIONS.length) ? "Show the debrief" : "Next resolution");
+  }
+  if (ph === "reveal" && G.round + 1 >= D.RESOLUTIONS.length) label = "Show the debrief";
+  b.textContent = label;
+  var waitingOnVotes = ph === "voting" &&
+    present().filter(function(s){ return !s.isBot && !(s.votes && s.votes[G.round]); }).length > 0;
+  b.disabled = false;
+  $("add-time-btn").disabled = ph !== "caucus";
+  $("skip-btn").disabled = ph !== "caucus";
+  b.title = waitingOnVotes ? "Some groups have not voted yet — they will be recorded as abstaining." : "";
+
+  // Safety valve. If a money resolution is voted down, the class never reaches
+  // the payment step — which is the whole point of the lesson. Congress really
+  // did re-introduce failed requisitions year after year until one carried, so
+  // pushing it through is historically honest, not a cheat.
+  var canForce = ph === "tally" && r.compliance && G.result && !G.result.passed && G.result.quorum;
+  $("force-btn").classList.toggle("hidden", !canForce);
+}
+
+/* --------------------------------------------------------- deal replies
+   Students send offers; the teacher's machine is authoritative and writes
+   the bot's answer back so every screen sees the same reply.             */
+function processPendingDeals(deals){
+  var pending = deals.filter(function(d){ return d.status === "pending"; });
+  if (!pending.length) return;
+  var r = res(); if (!r) return;
+  var all = (G.deals||[]).slice();
+  var changed = false;
+  pending.forEach(function(d){
+    var target = dataFor(d.to); if (!target) return;
+    var offer = E.DEAL_OPTIONS.filter(function(o){ return o.id === d.id; })[0];
+    if (!offer) return;
+
+    var live = STATES.filter(function(x){ return x.name === d.to; })[0];
+    var reply;
+    if (live && !live.isBot) {
+      // A human delegation answers for itself, out loud, in the room. All the
+      // app does is deliver the offer to their screen.
+      reply = { status: "delivered", text: d.to + " is played by students — go and make your case to them.",
+                weight: 0 };
+    } else {
+      reply = E.botDealReply(target, { id:offer.id, weight:offer.weight, from:d.from }, r, CODE, G.round);
+    }
+    for (var i=0;i<all.length;i++){
+      if (all[i].from===d.from && all[i].to===d.to && all[i].id===d.id && all[i].ts===d.ts){
+        all[i] = Object.assign({}, all[i], { status: reply.status, reply: reply.text,
+          weight: reply.status === "accepted" ? offer.weight : 0 });
+        changed = true;
+      }
+    }
+  });
+  if (changed) NET.updateDeals(CODE, all);
+}
+
+$("begin-btn").addEventListener("click", function(){ startRound(0); });
+
+/* ---------------------------------------------------------- transitions */
+$("next-btn").addEventListener("click", function(){
+  var ph = G.phase, r = res();
+  if (ph === "brief")        return goCaucus();
+  if (ph === "caucus")       return NET.updateGame(CODE, { phase:"voting", caucusEndsAt:null });
+  if (ph === "voting")       return doTally();
+  if (ph === "tally") {
+    if (r.compliance && G.result && G.result.passed) return NET.updateGame(CODE, { phase:"compliance" });
+    return finishRound();
+  }
+  if (ph === "compliance")   return doCompliance();
+  if (ph === "reveal" || ph === "done") return nextRound();
 });
+
+function goCaucus(){
+  var len = (G.settings && G.settings.caucusLen) || 120;
+  NET.updateGame(CODE, { phase:"caucus", caucusEndsAt: Date.now() + len*1000 });
+}
+$("add-time-btn").addEventListener("click", function(){
+  NET.updateGame(CODE, { caucusEndsAt: (G.caucusEndsAt||Date.now()) + 30000 });
+});
+$("skip-btn").addEventListener("click", function(){
+  NET.updateGame(CODE, { phase:"voting", caucusEndsAt:null });
+});
+$("force-btn").addEventListener("click", function(){
+  if (!confirm("Treat this as a later session of Congress that finally approved the request?\n\n" +
+    "The class moves on to the payment step, where states decide whether they will actually pay.")) return;
+  var forced = Object.assign({}, G.result, {
+    passed: true, forced: true,
+    narrative: "Congress brought this back and finally approved it. Now the states decide whether to pay."
+  });
+  NET.updateGame(CODE, { result: forced, phase: "compliance" });
+});
+
+$("walkout-btn").addEventListener("click", function(){
+  if (!confirm("Send three bot delegations home? If fewer than nine states are present, no vote can be held.")) return;
+  var bots = present().filter(function(s){ return s.isBot; }).map(function(s){ return s.name; });
+  NET.updateGame(CODE, { absent: (G.absent||[]).concat(bots.slice(0,3)) });
+});
+$("end-btn").addEventListener("click", function(){
+  if (confirm("End the game now and show the debrief?")) NET.endGame(CODE);
+});
+$("fill-bots-btn").addEventListener("click", function(){
+  var ups = STATES.filter(function(s){ return (s.players||[]).length === 0 && !s.isBot; })
+    .map(function(s){ return { name:s.name, patch:{ isBot:true } }; });
+  if (ups.length) NET.batchStates(CODE, ups);
+});
+
+
+// Any state slot nobody actually claimed is played by a bot. Without this a
+// no-show group silently abstains every round, and abstentions sink a vote
+// that needs nine YES.
+function autoBotUnclaimed(){
+  // Read the authoritative roster rather than this screen's copy of it. A
+  // group that claimed a state a moment ago may not have reached us yet, and
+  // turning a real delegation into a bot because of a one-second lag is the
+  // worst thing this function could do.
+  return NET.listStates(CODE).then(function(fresh){
+    var ups = [];
+    fresh.forEach(function(s){
+      if (!s.isBot && (s.players||[]).length === 0) {
+        s.isBot = true;
+        ups.push({ name:s.name, patch:{ isBot:true } });
+      }
+    });
+    STATES = fresh.sort(function(a,b){ return a.name.localeCompare(b.name); });
+    return ups.length ? NET.batchStates(CODE, ups) : Promise.resolve();
+  });
+}
+
+// Student screens need to know which states a bot is playing, so they can
+// tell "this one will answer my offer instantly" from "go argue with those
+// two in person".
+function botRoster(){
+  return STATES.filter(function(s){ return s.isBot; }).map(function(s){ return s.name; });
+}
+
+function absentFor(idx){
+  var absent = [];
+  if (G.settings && G.settings.absences) {
+    STATES.forEach(function(s){
+      if (!s.isBot) return;
+      var d = dataFor(s.name);
+      if (d && !E.botAttends(d, CODE, idx+1)) absent.push(s.name);
+    });
+  }
+  // Keep at least 11 states in the room. Random absences are flavor; with a
+  // 9-yes bar, three or four no-shows quietly turns every vote into a
+  // unanimity requirement. Breaking quorum is the teacher's deliberate move
+  // ("Send 3 delegations home"), not something the dice should do.
+  while (13 - absent.length < 11) absent.pop();
+  return absent;
+}
+
+function startRound(idx){
+  return autoBotUnclaimed().then(function(){
+    return NET.updateGame(CODE, {
+      status:"running", round: idx, phase:"brief", activeBots: botRoster(),
+      absent: absentFor(idx), result: null, caucusEndsAt: null
+    });
+  });
+}
+
+function doTally(){
+  var r = res();
+  var pres = present();
+  var deals = (G.deals||[]).filter(function(d){
+    return d.round === G.round && d.status === "accepted" && d.weight > 0;
+  });
+  var votes = {}, botPatches = [];
+  pres.forEach(function(s){
+    if (s.isBot) {
+      var bv = E.botVote(dataFor(s.name), r, deals, CODE, G.round+1);
+      votes[s.name] = bv.vote;
+      var p = {}; p["votes."+G.round] = bv.vote;
+      botPatches.push({ name:s.name, patch:p });
+    } else {
+      votes[s.name] = (s.votes && s.votes[G.round]) || "Abstain";
+      if (!(s.votes && s.votes[G.round])) {
+        var q = {}; q["votes."+G.round] = "Abstain";
+        botPatches.push({ name:s.name, patch:q });
+      }
+    }
+  });
+  var t = E.tally(votes, r, pres.map(function(s){ return s.name; }));
+  var result = {
+    yes:t.yes, no:t.no, abstain:t.abstain, present:t.present, needed:t.needed,
+    quorum:t.quorum, passed:t.passed, votes:votes,
+    requested:0, collected:0, excuses:[],
+    narrative: t.quorum ? "" : "Fewer than nine states sent delegates. Congress is legally unable to decide anything today."
+  };
+  if (!t.passed) result.narrative = E.outcomeNarrative(r, t, 0, 0);
+  NET.batchStates(CODE, botPatches).then(function(){
+    return NET.updateGame(CODE, { phase:"tally", result: result });
+  });
+}
+
+function doCompliance(){
+  var r = res(), R = G.result;
+  var requested = 0, collected = 0, excuses = [], patches = [];
+  STATES.forEach(function(s){
+    var d = dataFor(s.name);
+    var owed = E.amountOwed(d, r);
+    requested += owed;
+    var choice, paid;
+    if (s.isBot || (G.absent||[]).indexOf(s.name) !== -1) {
+      var sd = Object.assign({}, d, { treasuryNow: s.treasuryNow });
+      var c = E.botCompliance(sd, r, R.votes[s.name] === "Yes", CODE, G.round+1);
+      choice = c.choice; paid = c.paid;
+      var p = {}; p["payments."+G.round] = { choice:choice, paid:paid };
+      patches.push({ name:s.name, patch:p });
+    } else {
+      var pay = (s.payments && s.payments[G.round]) || { choice:"none", paid:0 };
+      choice = pay.choice; paid = pay.paid || 0;
+    }
+    collected += paid;
+    excuses.push({ choice: choice, text: E.complianceExcuse(d, choice, CODE, G.round+1) });
+    var np = {};
+    np.treasuryNow = (s.treasuryNow || d.treasury) - paid;
+    np.interest = (s.interest || 50) + E.stateInterestFromCompliance(choice);
+    var existing = patches.filter(function(x){ return x.name === s.name; })[0];
+    if (existing) Object.assign(existing.patch, np);
+    else patches.push({ name:s.name, patch:np });
+  });
+  var frac = requested > 0 ? collected/requested : 0;
+  var result = Object.assign({}, R, {
+    requested: requested, collected: collected, excuses: excuses,
+    narrative: E.outcomeNarrative(r, R, collected, requested)
+  });
+  NET.batchStates(CODE, patches).then(function(){
+    return NET.updateGame(CODE, {
+      phase:"reveal", result: result,
+      nationalTreasury: (G.nationalTreasury||0) + collected,
+      stability: E.clamp(G.stability + E.nationalStabilityChange(r, R, frac), 0, 100)
+    });
+  });
+}
+
+/* Ends a round that had no payment step (failed, or no requisition). */
+function finishRound(){
+  var r = res(), R = G.result;
+  var patches = STATES.map(function(s){
+    var d = dataFor(s.name);
+    var v = R.votes[s.name];
+    return { name:s.name, patch:{ interest: (s.interest||50) + E.stateInterestFromVote(d, r, v) } };
+  });
+  NET.batchStates(CODE, patches).then(function(){
+    return NET.updateGame(CODE, {
+      phase:"reveal",
+      result: Object.assign({}, R, { narrative: E.outcomeNarrative(r, R, 0, 0) }),
+      stability: E.clamp(G.stability + E.nationalStabilityChange(r, R, 0), 0, 100)
+    });
+  });
+}
+
+function nextRound(){
+  var r = res(), R = G.result;
+  var entry = { id:r.id, title:r.title, passed:!!(R&&R.passed), yes:R?R.yes:0, no:R?R.no:0,
+    abstain:R?R.abstain:0, requested:R?R.requested:0, collected:R?R.collected:0,
+    quorum:R?R.quorum:true, stabilityAfter: Math.round(G.stability) };
+  var hist = (G.history||[]).concat([entry]);
+  // Vote-based interest was already applied for non-payment rounds; apply it
+  // here for rounds that went through the payment step.
+  var applyVotes = r.compliance && R && R.passed;
+  var patches = applyVotes ? STATES.map(function(s){
+    var d = dataFor(s.name);
+    return { name:s.name, patch:{ interest: (s.interest||50) + E.stateInterestFromVote(d, r, R.votes[s.name]) } };
+  }) : [];
+  var after = function(){
+    if (G.round + 1 >= D.RESOLUTIONS.length) {
+      return NET.updateGame(CODE, { history: hist, status:"ended", phase:"debrief" });
+    }
+    var idx = G.round + 1;
+    return autoBotUnclaimed().then(function(){
+      return NET.updateGame(CODE, { history: hist, round: idx, phase:"brief",
+        activeBots: botRoster(), absent: absentFor(idx), result: null, caucusEndsAt: null });
+    });
+  };
+  (patches.length ? NET.batchStates(CODE, patches) : Promise.resolve()).then(after);
+}
+
+/* Recover the session if the teacher's tab reloads mid-class. */
+try {
+  var saved = localStorage.getItem("aoc_teacher_code");
+  if (saved) {
+    NET.findGame(saved).then(function(g){
+      if (!g) return;
+      if (!confirm("Resume your session " + saved + "?")) return;
+      CODE = saved;
+      $("game-code").textContent = saved;
+      $("code-box").classList.remove("hidden");
+      $("setup").classList.add("hidden");
+      subscribe();
+    });
+  }
+} catch(e){}
 })();
 
 </script>

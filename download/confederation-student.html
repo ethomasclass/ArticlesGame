@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Solo Congress — The Confederation Problem</title>
+<title>Delegation — The Confederation Problem</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%276%27 fill=%27%238a3324%27/%3E%3Ctext x=%2716%27 y=%2723%27 font-size=%2719%27 text-anchor=%27middle%27 fill=%27%23f5ecd8%27 font-family=%27Georgia,serif%27%3E13%3C/text%3E%3C/svg%3E">
 <style>
 /* ============================================================
@@ -381,184 +381,328 @@ ul.clean li::before{content:"—";position:absolute;left:0;color:var(--gold-dk);
 
 
 
+  /* ---- the bar that tells you what to do right now ---- */
+  .actionbar{position:sticky;top:0;z-index:60;display:flex;align-items:center;gap:14px;
+    background:var(--slate);color:var(--parch);border-radius:0 0 12px 12px;padding:12px 18px;
+    box-shadow:0 6px 18px rgba(0,0,0,.35);margin:0 0 16px;flex-wrap:wrap;
+    border-bottom:4px solid var(--gold)}
+  .actionbar.act-vote{border-bottom-color:#5fbf87}
+  .actionbar.act-pay{border-bottom-color:#e0574a}
+  .actionbar.act-debate{border-bottom-color:var(--gold)}
+  .actionbar.act-wait{border-bottom-color:#6b6255}
+  .actionbar .cue{font-family:ui-sans-serif,system-ui,sans-serif;font-weight:800;font-size:1.25rem;
+    letter-spacing:.03em;text-transform:uppercase;line-height:1.1}
+  .actionbar.act-vote .cue{color:#7ee0a4}
+  .actionbar.act-pay .cue{color:#ff9b8d}
+  .actionbar.act-debate .cue{color:#f0c97a}
+  .actionbar.act-wait .cue{color:#b3a795}
+  .actionbar .say{flex:1;min-width:200px;font-size:1rem;color:#e8dcc4}
+  .actionbar .clock{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:2.3rem;font-weight:700;
+    font-variant-numeric:tabular-nums;line-height:1;color:#f0c97a}
+  .actionbar .clock.low{color:#ff9b8d;animation:pulse 1s infinite}
+
+  /* ---- two columns ---- */
+  .deck{display:grid;grid-template-columns:1fr 340px;gap:18px;align-items:start}
+  @media(max-width:960px){.deck{grid-template-columns:1fr}}
+  .rail{position:sticky;top:96px}
+  @media(max-width:960px){.rail{position:static}}
+
+  /* ---- the state panel ---- */
+  .statecard{background:var(--parch);border:2px solid var(--line);border-radius:var(--r);
+    box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px}
+  .statecard .top{background:var(--slate);color:var(--parch);padding:12px 15px}
+  .statecard .top .nm{font-size:1.5rem;font-weight:700;line-height:1.1}
+  .statecard .top .who{font-size:.82rem;color:#b3a795}
+  .statecard .body{padding:14px 15px}
+  .statecard .blk{padding:11px 0;border-bottom:1px dashed var(--line)}
+  .statecard .blk:last-child{border-bottom:0;padding-bottom:0}
+  .statecard .blk:first-child{padding-top:0}
+  .numrow{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+  .obj{background:#f6e2c8;border-left:5px solid var(--red);border-radius:0 7px 7px 0;padding:10px 12px;
+    font-size:1.02rem;line-height:1.4}
+  .delegate{display:flex;gap:9px;align-items:flex-start;margin-bottom:8px}
+  .delegate .pin{flex:0 0 auto;width:22px;height:22px;border-radius:99px;background:var(--gold);
+    color:#2b1f06;font-family:ui-sans-serif,system-ui,sans-serif;font-weight:800;font-size:.76rem;
+    display:flex;align-items:center;justify-content:center;margin-top:1px}
+  .delegate .w{font-weight:700;font-size:.94rem}
+  .delegate .g{font-size:.85rem;color:var(--ink-soft);line-height:1.35}
+
+  /* ---- what this touches ---- */
+  .touch{display:flex;align-items:center;gap:9px;padding:5px 0;font-size:.95rem}
+  .touch .arrow{font-weight:800;font-size:1rem;width:15px;text-align:center;flex:0 0 auto}
+  .touch.pos .arrow{color:#1d5233}
+  .touch.neg .arrow{color:#9e2f24}
+  .touch .txt{flex:1}
+  .touch .mag{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.66rem;font-weight:700;
+    letter-spacing:.07em;text-transform:uppercase;color:var(--ink-faint);white-space:nowrap}
+
+  /* ---- record strip ---- */
+  .record{display:flex;flex-direction:column;gap:6px}
+  .rec{display:flex;gap:8px;align-items:center;font-size:.85rem;padding:5px 8px;border-radius:6px;
+    background:var(--parch-2);border:1px solid var(--line)}
+  .rec .n{font-family:ui-sans-serif,system-ui,sans-serif;font-weight:800;font-size:.7rem;
+    background:var(--slate);color:var(--parch);border-radius:4px;padding:2px 6px}
+  .rec .v{font-weight:700}
+  .rec .v.yes{color:#1d5233}.rec .v.no{color:#9e2f24}.rec .v.abs{color:#4a5563}
+  .rec .p{margin-left:auto;font-size:.74rem;font-family:ui-sans-serif,system-ui,sans-serif;
+    font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+  .rec .p.full{color:#1d5233}.rec .p.half{color:#8f6413}.rec .p.none{color:#9e2f24}
+
+  /* ---- voting ---- */
   .vote-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
-  .vote-row .btn{font-size:1.3rem;padding:1em .5em;width:100%}
+  .vote-row .btn{font-size:1.4rem;padding:1.1em .5em;width:100%}
   @media(max-width:600px){.vote-row{grid-template-columns:1fr}}
-  .claim{display:block;width:100%;text-align:left;background:var(--parch-2);border:2px solid var(--line);
-    border-radius:9px;padding:11px 13px;cursor:pointer;font-family:inherit;font-size:1rem;margin-bottom:9px;transition:.15s}
-  .claim:hover{border-color:var(--gold);background:var(--parch-3)}
-  .claim .t{font-weight:700;font-size:1.1rem}
-  .claim .d{font-size:.8rem;color:var(--ink-faint);line-height:1.35}
-  .faction{background:var(--parch-2);border:1px solid var(--line);border-left:5px solid var(--gold-dk);
-    border-radius:0 8px 8px 0;padding:11px 14px}
-  .bill{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed var(--line)}
-  .bill:last-child{border:0}
-  .deal-form{display:grid;grid-template-columns:1fr 1fr auto;gap:9px;align-items:end}
-  @media(max-width:700px){.deal-form{grid-template-columns:1fr}}
+  .bigcard{border-width:3px}
+  .bigcard.vote{border-color:#2f7d4f}
+  .bigcard.pay{border-color:var(--red)}
+
+  /* ---- deals ---- */
+  .dealgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:7px}
+  .target{text-align:left;background:var(--parch-2);border:2px solid var(--line);border-radius:8px;
+    padding:8px 10px;cursor:pointer;font-family:inherit;transition:.14s}
+  .target:hover:not(:disabled){border-color:var(--gold);background:var(--parch-3)}
+  .target.on{border-color:var(--red);background:#f6e2c8}
+  .target:disabled{opacity:.4;cursor:not-allowed}
+  .target .t{font-weight:700;font-size:.95rem}
+  .target .k{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.62rem;font-weight:700;
+    letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint)}
+  .inbox{background:#f2e6cd;border-left:5px solid var(--gold-dk);border-radius:0 8px 8px 0;
+    padding:10px 13px;margin-bottom:9px}
+
+  .waitbox{text-align:center;padding:26px 16px}
+  .waitbox .h{font-size:1.3rem;font-weight:700;margin-bottom:6px}
+  .dot{animation:blink 1.4s infinite}
+  @keyframes blink{0%,100%{opacity:.25}50%{opacity:1}}
+  .glosspop{position:fixed;z-index:200;max-width:300px;background:var(--slate);color:var(--parch);
+    padding:11px 14px;border-radius:9px;box-shadow:0 8px 24px rgba(0,0,0,.4);font-size:.9rem;line-height:1.45}
+  .glosspop b{color:var(--gold);display:block;margin-bottom:3px}
 
 </style>
 </head>
 <body>
 
-<div class="wrap">
+
+<!-- ============ JOIN / CLAIM ============ -->
+<div class="wrap" id="pre">
   <div class="masthead">
-    <div>
-      <h1 id="mast">The Confederation Problem</h1>
-      <div class="sub" id="sub">Solo Congress — you against twelve bot states. No internet needed.</div>
-    </div>
-    <div class="row" id="stats"></div>
+    <div><h1>The Confederation Problem</h1><div class="sub">Delegation Portal</div></div>
   </div>
 
-  <section id="s-pick">
+  <section id="s-join">
     <div class="card">
-      <h2>Choose the state you will represent</h2>
-      <p class="lede">It is 1786. The war is won and the country is coming apart. You are one delegate out of
-      thirteen, and every state gets exactly one vote — Virginia and Delaware count the same.</p>
-      <div class="callout"><strong>How to win:</strong> protect your own state. That is the only thing your
-      score measures. Keep an eye on the country too, though.</div>
-      <div id="pick-list" style="margin-top:14px"></div>
+      <h2>Join your Congress</h2>
+      <p class="lede">Two delegates share this screen. Put both first names in.</p>
+      <div class="field">
+        <label for="names">Your names</label>
+        <input type="text" id="names" placeholder="e.g. Maya and Dev" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="code">Game code from the board</label>
+        <input type="text" id="code" placeholder="ABCD" maxlength="4"
+               style="text-transform:uppercase;letter-spacing:.3em;font-size:1.6rem;text-align:center"
+               autocomplete="off" autocapitalize="characters">
+      </div>
+      <button class="btn big wide" id="join-btn">Enter Congress</button>
+      <p id="join-err" style="color:#8a2019;font-weight:700;margin-top:10px"></p>
     </div>
   </section>
 
-  <section id="s-play" class="hidden">
-    <div class="card" id="dossier">
-      <div class="eyebrow">Your state</div>
-      <h2 id="d-name"></h2>
-      <p id="d-bg"></p>
-      <div class="callout warn"><div class="eyebrow">Your objective</div><div id="d-obj" style="font-size:1.05rem"></div></div>
-      <div class="grid g2" id="d-fac" style="margin-top:12px"></div>
-    </div>
-
-    <div class="dispatch" id="dispatch">
-      <div class="cuehead">
-        <span class="dateline" id="dsp-dateline"></span>
-        <span class="badge">Read this before you decide</span>
-      </div>
-      <div id="dsp-body"></div>
-    </div>
-
+  <section id="s-claim" class="hidden">
     <div class="card">
-      <div class="spread">
-        <div class="eyebrow" id="r-eye">Resolution 1</div>
-        <span class="pill hot" id="r-rule"></span>
-      </div>
-      <h2 id="r-title"></h2>
-      <p class="lede" id="r-brief"></p>
-      <div class="inset" id="r-detail"></div>
-
-      <div class="thequestion">
-        <div class="lab">You are voting on this</div>
-        <div class="q" id="r-question">—</div>
-      </div>
-
-      <div class="outcomes">
-        <div class="outcome pass"><div class="h">If it passes</div><p id="r-ifpass"></p></div>
-        <div class="outcome fail"><div class="h">If it fails</div><p id="r-iffail"></p></div>
-      </div>
-    </div>
-
-    <div class="card" id="cost-card">
-      <div class="grid g2">
-        <div id="cost-wrap">
-          <div class="eyebrow">What this costs you</div>
-          <div id="cost-body"></div>
-        </div>
-        <div>
-          <div class="eyebrow">What this touches for your state</div>
-          <div id="touch-body"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <h3>The argument</h3>
-      <div class="grid g2">
-        <div class="inset" style="border-left:5px solid var(--yes)">
-          <div class="eyebrow" style="color:#1d5233">A reason to vote yes</div><div id="r-yes"></div></div>
-        <div class="inset" style="border-left:5px solid var(--no)">
-          <div class="eyebrow" style="color:#8a2019">A reason to vote no</div><div id="r-no"></div></div>
-      </div>
-    </div>
-
-    <div class="card" id="deal-card">
-      <div class="spread"><h3 style="margin:0">Work the room</h3><span class="pill" id="deal-left"></span></div>
-      <p class="small muted">You need nine states. You cannot get there alone — go buy some votes.</p>
-      <div class="deal-form">
-        <div class="field" style="margin:0"><label for="dt">Offer to</label><select id="dt"></select></div>
-        <div class="field" style="margin:0"><label for="do">You offer</label><select id="do"></select></div>
-        <button class="btn" id="dsend">Send</button>
-      </div>
-      <div class="ticker inset" id="dlog" style="margin-top:12px"></div>
-      <hr class="rule">
-      <div class="eyebrow">Where the room stands right now</div>
-      <div class="seats" id="lean"></div>
-      <p class="small muted" style="margin-top:8px">This is your read of the room. Bots can still surprise you.</p>
-    </div>
-
-    <div class="card" id="vote-card">
-      <h3 class="center">How does <span id="vote-state"></span> vote?</h3>
-      <div class="vote-row">
-        <button class="btn btn-yes" onclick="SV('Yes')">YES</button>
-        <button class="btn btn-no" onclick="SV('No')">NO</button>
-        <button class="btn btn-abstain" onclick="SV('Abstain')">ABSTAIN</button>
-      </div>
-    </div>
-
-    <div class="card hidden" id="seat-card">
-      <div class="spread"><h3 style="margin:0" id="seat-head">The vote</h3>
-        <div class="row">
-          <span class="pill" id="seat-pill"></span>
-          <button class="btn ghost sm" id="replay-btn">Replay the roll call</button>
-        </div>
-      </div>
-      <div class="tallybar" id="tallybar">
-        <div class="grp yes"><div class="big" id="t-yes">0</div><div class="lab">Yes</div></div>
-        <div class="grp no"><div class="big" id="t-no">0</div><div class="lab">No</div></div>
-        <div class="grp ab"><div class="big" id="t-ab">0</div><div class="lab">Abstain</div></div>
-        <div class="track"><div class="fill" id="t-fill"></div><div class="need" id="t-need"></div></div>
-        <div class="verdict" id="t-verdict"></div>
-        <div class="moneybar hidden" id="t-money">
-          <div class="lab">Money actually arriving</div>
-          <div class="big" id="t-money-val">$0</div>
-          <div class="lab" id="t-money-of">of $0</div>
-        </div>
-      </div>
-      <div class="map-wrap" id="map-view"></div>
-      <div class="maplegend" id="map-legend"></div>
-    </div>
-
-    <div class="card hidden" id="pay-card" style="border-color:var(--red);border-width:3px">
-      <div class="eyebrow" style="color:var(--red)">Congress said yes. Now decide for real.</div>
-      <h2>Are you actually going to send the money?</h2>
-      <p class="lede" id="pay-owed"></p>
-      <div class="callout warn"><p style="margin:0"><strong>Nobody can make you pay.</strong> There is no
-      president to enforce this and no national court to take you to. Refuse, and nothing happens to you.</p></div>
-      <div class="vote-row" style="margin-top:14px">
-        <button class="btn btn-yes" onclick="SP('full')">PAY IN FULL</button>
-        <button class="btn gold" onclick="SP('half')">PAY HALF</button>
-        <button class="btn btn-no" onclick="SP('none')">PAY NOTHING</button>
-      </div>
-    </div>
-
-    <div class="card hidden" id="out-card">
-      <h2 id="out-head"></h2>
-      <p class="lede" id="out-narr"></p>
-      <div id="out-money" class="hidden">
-        <div class="grid g3">
-          <div class="stat"><div class="k">Congress asked</div><div class="v" id="o-ask"></div></div>
-          <div class="stat"><div class="k">Congress got</div><div class="v" id="o-got"></div></div>
-          <div class="stat"><div class="k">That is</div><div class="v" id="o-pct"></div></div>
-        </div>
-        <div class="ticker inset" id="o-excuses" style="margin-top:12px"></div>
-      </div>
-      <div class="hist" style="margin-top:14px"><div class="eyebrow">What actually happened</div>
-        <div id="o-hist"></div></div>
-      <button class="btn big wide" id="next-btn" style="margin-top:16px">Continue</button>
+      <h2>Choose your state</h2>
+      <p class="lede">Read these carefully. The state you pick decides what you want and what you fear.</p>
+      <div id="claim-list"></div>
     </div>
   </section>
-
-  <section id="s-end" class="hidden"></section>
 </div>
+
+<!-- ============ THE GAME ============ -->
+<div id="live" class="hidden">
+  <div class="actionbar act-wait" id="actionbar">
+    <div>
+      <div class="cue" id="cue">Waiting</div>
+    </div>
+    <div class="say" id="say">Waiting for your teacher to begin.</div>
+    <div class="clock hidden" id="clock">2:00</div>
+  </div>
+
+  <div class="wrap-wide">
+    <div class="deck">
+      <!-- MAIN -->
+      <div>
+        <div class="dispatch follow hidden" id="dispatch">
+          <div class="cuehead">
+            <span class="dateline" id="dsp-dateline"></span>
+            <span class="badge">Your teacher is reading this</span>
+          </div>
+          <div id="dsp-body"></div>
+        </div>
+
+        <div class="card" id="res-card">
+          <div class="spread">
+            <div class="eyebrow" id="r-eyebrow">Resolution 1</div>
+            <span class="pill hot" id="r-rule">Needs 9 of 13</span>
+          </div>
+          <h2 id="r-title">—</h2>
+          <p class="lede" id="r-brief"></p>
+          <div class="inset" id="r-detail"></div>
+
+          <div class="thequestion">
+            <div class="lab">You are voting on this</div>
+            <div class="q" id="r-question">—</div>
+          </div>
+
+          <div class="outcomes">
+            <div class="outcome pass">
+              <div class="h">If it passes</div>
+              <p id="r-ifpass"></p>
+            </div>
+            <div class="outcome fail">
+              <div class="h">If it fails</div>
+              <p id="r-iffail"></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>What each side says</h3>
+          <div class="grid g2">
+            <div class="inset" style="border-left:5px solid var(--yes)">
+              <div class="eyebrow" style="color:#1d5233">A reason to vote yes</div>
+              <div id="r-yes"></div>
+            </div>
+            <div class="inset" style="border-left:5px solid var(--no)">
+              <div class="eyebrow" style="color:#8a2019">A reason to vote no</div>
+              <div id="r-no"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- deals -->
+        <div class="card" id="deal-card">
+          <div class="spread">
+            <h3 style="margin:0">Go get votes</h3>
+            <span class="pill" id="deal-left">2 offers left</span>
+          </div>
+          <p class="small muted">Nine states must say yes. You cannot get there alone.</p>
+          <div id="inbox"></div>
+          <div class="eyebrow" style="margin-top:10px">1 · Who are you offering?</div>
+          <div class="dealgrid" id="deal-targets"></div>
+          <div class="eyebrow" style="margin-top:12px">2 · What are you offering?</div>
+          <select id="deal-offer" style="margin-bottom:10px"></select>
+          <button class="btn wide" id="deal-send" disabled>Send the offer</button>
+          <div class="ticker inset" id="deal-log" style="margin-top:12px"></div>
+        </div>
+
+        <!-- vote -->
+        <div class="card bigcard vote" id="vote-card">
+          <h3 class="center" style="font-size:1.4rem">How does <span id="vote-state"></span> vote?</h3>
+          <div class="vote-row">
+            <button class="btn btn-yes" onclick="AOCVOTE('Yes')">YES</button>
+            <button class="btn btn-no" onclick="AOCVOTE('No')">NO</button>
+            <button class="btn btn-abstain" onclick="AOCVOTE('Abstain')">ABSTAIN</button>
+          </div>
+          <p class="small muted center" style="margin-top:10px">Abstaining is not neutral. Nine
+          <em>yes</em> votes are needed, so abstaining helps it fail.</p>
+        </div>
+
+        <!-- payment -->
+        <div class="card bigcard pay hidden" id="pay-card">
+          <div class="eyebrow" style="color:var(--red)">Congress said yes. Now decide for real.</div>
+          <h2>Are you actually going to send the money?</h2>
+          <p class="lede" id="pay-owed">—</p>
+          <div class="callout warn">
+            <p style="margin:0"><strong>Nobody can make you pay.</strong> There is no president to send
+            after you and no national court to take you to. Refuse, and nothing happens to your state.</p>
+          </div>
+          <div class="vote-row" style="margin-top:14px">
+            <button class="btn btn-yes" onclick="AOCPAY('full')">PAY IN FULL</button>
+            <button class="btn gold" onclick="AOCPAY('half')">PAY HALF</button>
+            <button class="btn btn-no" onclick="AOCPAY('none')">PAY NOTHING</button>
+          </div>
+        </div>
+
+        <!-- waiting / result -->
+        <div class="card hidden" id="wait-card">
+          <div class="waitbox">
+            <div class="h" id="wait-h">Locked in</div>
+            <div class="muted" id="wait-p">Waiting for the other states<span class="dot">…</span></div>
+          </div>
+        </div>
+
+        <div class="card hidden" id="out-card">
+          <h2 id="out-head">—</h2>
+          <p class="lede" id="out-narr"></p>
+          <div id="out-money" class="hidden">
+            <div class="grid g3">
+              <div class="stat"><div class="k">Congress asked</div><div class="v" id="o-ask">$0</div></div>
+              <div class="stat"><div class="k">Congress got</div><div class="v" id="o-got">$0</div></div>
+              <div class="stat"><div class="k">That is</div><div class="v" id="o-pct">0%</div></div>
+            </div>
+          </div>
+          <div class="hist hidden" id="out-hist" style="margin-top:14px">
+            <div class="eyebrow">What actually happened</div>
+            <div id="out-hist-text"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RAIL: your state, always here -->
+      <div class="rail">
+        <div class="statecard">
+          <div class="top">
+            <div class="nm" id="p-name">—</div>
+            <div class="who" id="p-who"></div>
+          </div>
+          <div class="body">
+            <div class="blk">
+              <div class="numrow">
+                <div class="stat"><div class="k">Treasury</div><div class="v" id="p-treas">$0</div></div>
+                <div class="stat"><div class="k">Your interest</div><div class="v" id="p-int">50</div></div>
+              </div>
+              <div class="small muted" style="margin-top:7px">Your score is how well you protect
+              <em>your own state</em>. The country's health is a separate number
+              (<strong id="p-nation">60</strong>/100).</div>
+            </div>
+
+            <div class="blk">
+              <div class="eyebrow">Your secret objective</div>
+              <div class="obj" id="p-obj">—</div>
+            </div>
+
+            <div class="blk" id="p-cost-blk">
+              <div class="eyebrow">What this bill costs you</div>
+              <div id="p-cost"></div>
+            </div>
+
+            <div class="blk" id="p-touch-blk">
+              <div class="eyebrow">What this touches for you</div>
+              <div id="p-touch"></div>
+            </div>
+
+            <div class="blk">
+              <div class="eyebrow">The two of you disagree</div>
+              <div id="p-factions"></div>
+              <div class="small muted">Settle it between yourselves before you vote.</div>
+            </div>
+
+            <div class="blk" id="p-rec-blk">
+              <div class="eyebrow">Your record so far</div>
+              <div class="record" id="p-record"></div>
+            </div>
+
+            <div class="blk">
+              <div class="eyebrow">Where you come from</div>
+              <div class="small" id="p-bg"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="s-debrief" class="wrap hidden"></div>
 <script>
 /* =========================================================================
    THE CONFEDERATION PROBLEM  —  Shared Game Data
@@ -1026,199 +1170,6 @@ ul.clean li::before{content:"—";position:absolute;left:0;color:var(--gold-dk);
     HISTORY_NOTES: HISTORY_NOTES,
     byName: function (n) { for (var i = 0; i < STATES.length; i++) if (STATES[i].name === n) return STATES[i]; return null; },
     resolutionById: function (id) { for (var i = 0; i < RESOLUTIONS.length; i++) if (RESOLUTIONS[i].id === id) return RESOLUTIONS[i]; return null; }
-  };
-})();
-
-</script>
-<script>
-/* Generated from us-atlas (US Census cartographic boundaries), projected with
-   d3-geo conic conformal. 1786 borders: Maine is part of Massachusetts and
-   West Virginia is part of Virginia. Vermont is drawn but was not a state.
-   Regenerate with tools/build-map.js. */
-window.AOC_MAP = {"viewBox":"10 64 910 822","width":910,"height":822,"states":{"New Hampshire":{"d":"M536.7,196.3L537,193.6L539,190.9L538.6,190.4L539.7,187.3L538.1,186L540.2,185.4L540.6,184.4L543.1,182.6L545,184.9L548.3,184.9L549.7,182L553.1,212.2L556.3,246.5L556.5,250L557.8,262.4L558.6,263.3L558,266.9L558.5,267.2L557.8,271.3L559,273.4L564.3,278.2L563.6,279.9L563.8,282.6L568.2,285.6L565,292.8L564.8,294.5L563.9,295.1L562,294L557.7,295.5L556.7,298.1L554.4,297.5L552.6,299L552.9,301.5L550.3,301.6L549.2,303.5L533.7,303.8L509.4,303.9L508.2,301.9L507.5,302.3L505.8,298.3L506.8,295.3L506.9,293.1L508.4,292.6L509.3,290.8L508.5,288.7L509.6,287.4L508.9,284.8L509.1,279.3L510.5,276.7L509.7,274.3L510.7,268.9L510,267.5L510.5,264.5L512.3,263.1L512.8,258.8L513.8,257L516,255.2L516.7,253.4L516.4,250.8L518.6,248.1L518.5,244.7L519.8,242.9L521.2,240L521.1,238.2L519.8,235.5L520.4,233.2L519.6,231.9L520.7,229.4L524.8,227.9L526,228.4L527.9,227.5L528.4,225.4L531.2,224.7L532.8,223L533.6,221.2L535.4,220.2L534.6,217.9L535.9,217.3L536,214.4L534.7,212.9L533.2,208.9L534.9,206.8L535.2,204.2L537.2,201.1L535.5,197.6L536.7,196.3Z","ax":533.4,"ay":273.4,"room":23,"neutral":false,"chipX":720,"chipY":114},"Massachusetts":{"d":"M587.8,365.7L589.5,366.6L593.1,366.1L595.3,365.3L596.6,362.4L598.9,366.5L598.8,367.7L597.6,368.4L593.5,368.5L588.2,366.4L587.8,365.7ZM568.3,364.9L570.6,364.7L572.8,361L576,358.4L577.4,359L578.4,361.7L580.3,362.7L581.5,361L581.6,364.3L576.5,364.6L572.6,365.2L570.5,367.2L568.3,364.9ZM482,304L509.4,303.9L533.7,303.8L549.2,303.5L550.3,301.6L552.9,301.5L552.6,299L554.4,297.5L556.7,298.1L557.7,295.5L562,294L563.9,295.1L564.8,294.5L565.2,297.4L566.6,302.7L569.8,304.4L571.2,302.7L573,303.9L571.2,307.6L568.4,308.1L563.9,309.7L565.4,311.6L563.3,313.7L562.5,313.4L562,315.8L561.4,314.2L560.2,316.4L561.7,319.3L560.1,318.9L559.5,320.1L560.6,321.1L560,322.2L561.7,322.6L562.4,321.2L564.1,320.8L565.3,322.6L568.3,323.5L569.9,325.1L570.3,326.9L573.1,330.5L573.1,332.4L572.3,334.1L570.8,334.3L571.2,335.3L574,337.1L575.4,336.7L576.5,337.6L577.7,340.9L577.2,342.9L578.9,344.7L581.8,345.9L586.1,346.1L587.2,347L589.5,345.1L591.8,344.6L595.1,343.1L595.7,342L595.4,338.9L594.5,336.5L593,337.9L592.7,334L592,331.9L590,330.6L588.9,331L588.4,332.6L586.9,330.3L588.5,329.8L591.1,330.3L594.1,332.5L596.7,337.2L598.1,341.8L598.7,347.3L597.2,352.5L597.1,354.3L596.2,354L597.4,349.4L596.4,348.6L593.2,349L588,350.9L584.2,350.8L583.4,352L581.3,352.4L579.6,355L575.6,355.6L571.5,358.5L569.6,360.5L567,361.8L564.2,362.5L564.9,361.4L569.2,359.8L571.1,357.9L573.9,355.7L574.5,354.1L573.9,349.5L574.6,347.8L571.3,347L571.4,349.3L570.5,348.8L570.2,350.8L568.4,350.8L568.7,352L564.9,352.7L564.2,354.7L564.5,356.4L563.8,357.6L560.8,358.7L559.2,358.1L558,358.7L557.2,351.3L555,350.7L553.9,349.1L552.5,347.2L550.1,346L549.4,343.8L549.5,340.6L548,340.9L547.7,335.1L533.4,336.3L533.2,335.6L508.3,336.1L505.6,336.4L500.4,336.3L500,337.9L498.3,338.2L498.4,336.4L491.7,336.5L477.1,336.4L475.3,336.5L474.5,334.8L478.2,319L482,304ZM638.6,229.4L639.1,226L640,227.3L642.4,229.3L640.8,231.3L640.1,230L638.6,229.4ZM623.9,232.8L624.8,231.1L627.6,229.1L629.1,231L628,231.4L630,234.3L628.8,236L626.7,236.7L625.1,235.8L625.7,234.8L625.1,232.8L623.9,232.8ZM622.7,226.4L624.1,223.6L624.1,221L625.1,219.9L625.9,220.9L624.9,222.4L625.2,223.8L624.4,226.7L623.3,227.9L622.7,226.4ZM568.2,285.6L563.8,282.6L563.6,279.9L564.3,278.2L559,273.4L557.8,271.3L558.5,267.2L558,266.9L558.6,263.3L557.8,262.4L556.5,250L556.3,246.5L553.1,212.2L549.7,182L552.1,181.3L552.1,180L555.1,181.5L555,183L556,184.7L557.3,185.2L558.6,181.7L558.7,178.3L557.9,177.2L559.2,175.7L560.2,175.7L561.7,177.4L564.2,177.6L564.2,176.1L561.2,172.9L561,171.6L563.3,167.2L564.9,166L566.1,164.2L567,164.2L568.7,162.5L571.4,160.8L570.1,158L572.4,155.2L575,153.2L575.4,151L574.5,149.9L572.9,150L572.7,147.4L573.8,145.8L572.8,145.3L574.5,143.1L574.9,141.2L573.1,139.6L574.6,134.9L575.5,134.1L575.3,132.6L577.2,131.2L578.6,128.7L579.9,128.3L581,115.2L603,77.8L604.5,77.8L607.7,79.1L608.9,78.9L608.7,81.2L609.3,86.9L609.8,87.6L614.2,90.2L616.9,88.2L619.8,86.8L623,86.4L624,84.3L627.4,83.5L630.3,83.8L630.1,81.3L631.8,80.2L634.7,80.2L637.4,81.4L638,82.7L642,85.1L646.5,90L646.6,90.6L650,92.3L651.9,114.1L654.8,141.8L654.9,144.6L656.1,145.7L654.5,147.5L656.4,150.1L654.7,151.6L655.3,157L658.1,157.5L658.4,156.7L659.7,158.8L662.1,159.8L665.6,160.3L667.2,159.4L668.4,161.8L668.7,164L667.1,163.9L665.9,164.9L667,167.5L669.1,169.8L668.3,172.8L667.3,174.6L670.5,179L670.5,179.9L672.8,181.3L674.2,180L674.2,178.2L676.4,179.1L678.6,179L680.4,181.1L681.3,183.1L680.4,183.7L681.7,184.9L683.5,188.7L685.4,190L686,194.7L684.8,196.8L683.6,196.8L683.2,198.2L679.9,203L677.2,204.3L677.7,205.1L676,205.6L676.5,203.9L675.7,200.5L672.7,202L674.3,204.2L673,206.1L671.7,205.7L670.4,208.1L668.8,207.6L667.6,208.1L668,209.5L670,210.9L667.6,213.4L665.9,211.7L665,209.5L663.5,210.1L663.3,211.6L662.3,211.6L661.3,209.3L660.7,211.9L659.6,212.5L659,215.6L658.1,214.9L657.5,216.8L656.9,215.2L654.7,217.5L654,216.4L652.9,220.2L650.9,218.8L650.7,217.4L649.6,218.3L648.3,218.1L648.8,220.7L647.1,223.7L648.5,224.9L644.4,225.9L641.6,224.8L639.3,220.7L639.9,219.5L642.4,218.2L641.2,216.5L639.8,218.1L639.9,216.3L638.7,216.5L639,219.2L638.4,219.2L638.2,216.7L635.6,219.2L636.3,220.5L635.7,222.3L637.6,224.8L637.4,226.6L634.9,229.9L636,230.3L634.7,231.6L636.2,233.7L635.8,236.5L633.9,237.1L633.3,233.7L634,233.5L633.4,231.4L631.3,229.7L630.6,227.2L632.2,225.1L629.8,223.6L630.5,222.5L629.2,222.2L627.2,223.3L626.9,218.7L628.1,216.9L628,214.9L627.2,214.4L626.5,216.3L624.9,218L623.5,216.8L622.8,218.1L621,218.4L622.9,221.5L622.7,223.5L621.4,224.5L620.4,227.4L620.1,230.3L618.8,233.6L621.2,234.6L619.7,235.8L621.1,238L620,239.6L616.8,239.7L615.4,242.7L613.6,242.8L613.6,245.2L612.3,245.6L612.1,243.5L612.9,242L611.7,241.5L611.5,242.7L610.1,243.3L610.5,240.7L608.3,241.2L608.6,243.3L606.8,244.9L606.3,246.9L604.8,245L604.6,246.9L602.9,248.3L601.4,247.4L601.2,250L599.5,248.1L598.2,251.9L595.5,253.1L595,253.9L594.2,250.7L592.2,250.6L590.5,252.4L590,254L587.6,254L586.9,256L584.5,256L583.4,258L583.2,260L583.9,261.1L583,262.5L581.3,261.4L578.8,262.8L577.8,264.7L578.7,267.3L577.8,269.1L576.6,269.8L577.1,271.1L575.5,272.1L573.7,272.1L572.6,273.1L571.5,277.1L572.2,277.8L570.6,281.1L570.8,282L569.3,285L568.2,285.6Z","ax":543.8,"ay":319,"room":15,"neutral":false,"chipX":720,"chipY":232},"Rhode Island":{"d":"M555,350.7L557.2,351.3L558,358.7L555.6,360.7L554.7,356.7L554.8,354.1L553.5,353.3L554.1,359.6L551.9,359.7L551.8,361.1L550.5,361.4L550.3,359.2L552.1,355.4L553,352.6L555,350.7ZM532.8,368.3L533.7,367.1L533.2,364L534.7,363.7L534.7,355.3L534.4,349.4L533.6,340.5L533.4,336.3L547.7,335.1L548,340.9L549.5,340.6L549.4,343.8L550.1,346L552.5,347.2L553.9,349.1L553.6,350.9L552,352.6L551.1,351L551.5,349.6L549.1,347.5L548,346L548.9,351.1L546.1,350.6L547.7,352L548,355L546.5,355.5L547.6,357.6L547.7,360.4L546.6,362.3L545.7,365.2L544.2,365.1L540.9,366L537.6,367.5L532.9,368.9L532.8,368.3Z","ax":541.3,"ay":343.6,"room":7,"neutral":false,"chipX":720,"chipY":351},"Connecticut":{"d":"M475.3,336.5L477.1,336.4L491.7,336.5L498.4,336.4L498.3,338.2L500,337.9L500.4,336.3L505.6,336.4L508.3,336.1L533.2,335.6L533.4,336.3L533.6,340.5L534.4,349.4L534.7,355.3L534.7,363.7L533.2,364L533.7,367.1L532.8,368.3L531.8,367.5L529.7,367.6L527.1,368.6L524.9,368.6L523.3,369.6L521.3,368.6L520.6,370.1L514.5,371.7L514.1,371L512.2,371L508.9,372.5L508.1,371.7L504.9,371.8L504,372.8L501.8,372L496.8,373.2L496.3,370.9L495.2,371.6L493,374.9L491.5,375L488.8,378L487.2,377.1L484.2,379.5L483.3,379L480.5,380.2L481.1,381.1L479.9,382.4L476.3,382.9L473.6,385.1L472.5,384.6L470.6,386L470.7,384.7L468.1,380.7L476.5,375.3L474,371.5L474.3,365.1L474.6,353.3L475.3,336.5Z","ax":507.8,"ay":354,"room":18,"neutral":false,"chipX":720,"chipY":469},"New York":{"d":"M456.5,401.3L457.2,404L456.1,405.6L451.3,408.8L450,408.8L450.3,406.8L451.4,406.2L451.9,402.8L456.5,401.3ZM259.6,324.8L263.7,322.9L270.4,318.7L274.1,315.2L277.9,313.4L281.1,312.5L282.5,309.7L284.2,308.4L284.7,306.3L289.2,304.2L291.6,302.1L291.2,298.9L289.7,297.3L290,295.6L289.2,294.1L286.4,292.6L286.7,288.9L284.5,288.3L285.7,285.2L285.2,280.2L284.9,279.7L288.3,278.9L293,277.4L299.8,275.7L304.7,275.1L308.7,275.1L313.3,275.6L317.7,275.4L328,277.3L330.8,278.1L332.6,280L335.4,281.9L336.8,282.3L341.7,280.4L345.9,280.4L351.2,280L353.7,280.8L356.5,280.9L358.2,279.9L361.8,279.1L364,277.6L365.1,277.5L367.5,274.4L371.1,271.8L372.3,271.5L374.6,269.4L376.3,269.2L378.7,269.8L380.8,269L381.9,266.9L382.1,263.4L381.1,256.3L378.7,254.7L380,252.7L381.7,252.2L381.9,253.5L384.4,251.9L384.1,250.2L381.8,248.3L379.2,248.9L379.8,247.7L378,245.7L376.2,245.7L376.3,242.5L378.2,237.9L380.5,237.7L383.3,236L383.3,234.1L385.4,233.2L388.6,231L389.7,231.2L391.6,230.1L394.6,227.1L395.1,225.2L396.5,223.2L401.4,218.3L405,214.3L411.6,208.6L411.5,208.2L419.5,203.7L422.6,201.2L424.7,201.2L427.3,199.7L430.5,200.8L432.7,200.4L443.5,200.5L449.7,200.4L462.4,199.6L465.2,199.5L476.2,198.8L476.4,203.2L475.6,204.4L475.2,207L476.8,209.2L475.7,211.4L475.6,215.1L475.2,216.4L475.7,219.1L478.1,222.6L478.6,225.3L477.3,228.6L478.3,233.1L477.8,234.5L475.6,237.1L475.1,240.7L474.3,243.9L475.4,244.9L475.4,249L476.6,251.7L476.1,254.3L477.6,256.5L475.8,260.4L475.1,265L476.3,266L477.1,263.3L479.4,263.3L479.7,265.4L481.3,266.5L481.5,280.2L481.3,297L481.3,300L480.9,301.4L482,304L478.2,319L474.5,334.8L475.3,336.5L474.6,353.3L474.3,365.1L474,371.5L476.5,375.3L468.1,380.7L470.7,384.7L470.6,386L469.8,387.7L467.2,389.4L467,392.6L465.4,392.5L466.6,394.9L468.7,391.4L470.1,391.9L471.3,390.2L474,389.1L476.2,389L476.7,387.6L479.5,388.7L479.7,387.1L480.8,388.2L483.4,388.4L485.7,389.3L488.5,388.1L488.7,386.4L490.8,386L492.1,386.4L501.5,386L506.4,385L508.1,384.2L511.8,381.6L512.8,379.9L514.3,379.4L515.9,377.3L518.5,376.4L520,376.4L517.8,378.5L516.7,378.8L518.6,380L519.3,381.7L521.5,382.1L522.8,381L524.9,383.8L526.8,383.1L529.6,381L529.8,379.9L531.9,379.4L533.4,379.8L532.8,380.6L524.6,384.8L515,390L508.8,392.8L498.7,396.8L492.2,400.1L486.8,401.9L483.4,402.5L482.6,402L474.6,404.6L466.9,404.4L461.2,406.7L461.5,405.2L458.6,405.3L459,404.3L457.5,402.8L458.4,401.4L457.3,400L458.1,399.1L458.5,396.5L460,393.9L462.3,386.4L461.9,385.6L445.2,376.2L434.1,369.5L432.4,367.3L432.5,366.1L430.6,366.4L430.2,365.6L427.1,365.7L427.3,365L425.4,363.7L424,363.9L423.9,362.6L420.7,358.1L421.7,357.6L421.4,351.3L419.7,350.5L420.6,349.2L419.4,347.3L416,345.9L414.2,346.1L413.1,342.1L412.5,342.3L410.8,340L397.5,340.1L376.6,340.1L362.9,339.8L349.9,339.8L319.9,339.3L299.2,338.7L289.7,338.6L259.2,337.4L259.6,324.8Z","ax":433.2,"ay":290.8,"room":48,"neutral":false},"New Jersey":{"d":"M404.4,449.8L406.2,447.2L407.3,445.9L407.9,443.5L409.5,441.8L411.6,440L416.5,439L419.6,437.2L419.6,434.4L421.6,433.4L422.5,432.1L426.8,429.2L429.1,428.5L430.6,426.5L431.9,426.8L434,425.2L432.2,422.4L429.6,420.8L428.7,418.8L426,416.6L425.1,414L421.9,413.2L421.4,411.4L421.6,407.7L420.3,406.2L418.2,406.4L417.1,405.9L416.8,402.6L417.6,401.4L416.6,400.5L417.7,396.5L419.1,396.7L422,392.2L418.9,387.4L420.5,385.5L422.8,384.3L424.7,382.1L424.2,381.1L426.3,379.7L427.7,377.7L429.4,372.8L432.1,370L434.1,369.5L445.2,376.2L461.9,385.6L462.3,386.4L460,393.9L458.5,396.5L458.1,399.1L457.3,400L456.5,401.3L451.9,402.8L451.4,406.2L450.3,406.8L450,408.8L450,410.5L452.4,411.6L454.4,410.9L457.5,412.5L459.3,412.9L459.7,411.1L460.3,414.7L460,418.9L458.4,426.2L457,436.1L456.5,443L451.6,452.7L450.2,454.6L449,455L449.4,456.2L448.2,458.5L445.7,461L445.6,461.8L441.6,464L437.6,468.4L434.9,473.1L432.2,479.1L429.6,481.5L427.2,482.1L425.7,481.5L426.5,478L428.4,474.1L428.7,471.4L426,470L423.7,469.8L422.9,468.8L420.6,469L419.7,470.4L418.5,469.5L418.2,467.6L415.9,466.2L415.5,465L414.2,465.5L412.3,462.8L411.4,463.1L409.1,460.8L407.8,458.6L405.3,457.6L406.1,452L404.5,450.9L404.4,449.8Z","ax":432.2,"ay":449.6,"room":17,"neutral":false,"chipX":720,"chipY":588},"Pennsylvania":{"d":"M232.9,337.2L239,335L244.7,332.3L245.8,331.4L247.2,329.1L248.8,329.1L249.1,330.2L253.7,327.5L259.6,324.8L259.1,337.3L289.7,338.6L299.2,338.7L319.9,339.3L349.9,339.8L362.9,339.8L376.6,340.1L397.5,340.1L410.8,340L412.5,342.3L413.1,342.1L414.2,346.1L416,345.9L419.4,347.3L420.6,349.2L419.7,350.5L421.4,351.3L421.7,357.6L420.7,358.1L423.9,362.6L424,363.9L425.4,363.7L427.3,365L427.1,365.7L430.2,365.6L430.6,366.4L432.5,366.1L432.4,367.3L434.1,369.5L432.1,370L429.4,372.8L427.7,377.7L426.3,379.7L424.2,381.1L424.7,382.1L422.8,384.3L420.5,385.5L418.9,387.4L422,392.2L419.1,396.7L417.7,396.5L416.6,400.5L417.6,401.4L416.8,402.6L417.1,405.9L418.2,406.4L420.3,406.2L421.6,407.7L421.4,411.4L421.9,413.2L425.1,414L426,416.6L428.7,418.8L429.6,420.8L432.2,422.4L434,425.2L431.9,426.8L430.6,426.5L429.1,428.5L426.8,429.2L422.5,432.1L421.6,433.4L419.6,434.4L419.6,437.2L416.5,439L411.6,440L409.5,441.8L406.5,440.3L403.7,440.1L400.6,440.9L398.7,442.3L396.2,445.5L368.4,445.5L353.4,445.4L334.1,445.2L303.9,444.4L264.9,443.2L243.6,442.3L227.7,441.6L229.9,399.1L232.9,337.2Z","ax":326.9,"ay":392.1,"room":53,"neutral":false},"Delaware":{"d":"M396.2,445.5L398.7,442.3L400.6,440.9L403.7,440.1L406.5,440.3L409.5,441.8L407.9,443.5L407.3,445.9L406.2,447.2L405.4,446.9L402.6,450.1L402.9,451.7L404.3,452.9L404.4,454.9L403.4,456L403.4,457.6L405.2,459.7L406.1,462L408.8,464.4L410.1,467.1L410.5,469.4L409.9,470.8L410.2,475.8L412.3,477.7L413.2,479.4L413.5,482.4L417.9,487.8L420,488.9L421.3,488L421.8,489.4L422.5,494.5L423.1,504.2L409.5,504.3L399.8,504L399.6,501.1L396.2,449L396.2,445.5Z","ax":409.1,"ay":493.2,"room":10,"neutral":false,"chipX":720,"chipY":825},"Maryland":{"d":"M388.9,527.5L387.1,527.5L386.9,524.6L388,523.5L389.4,525.1L388.9,527.5ZM385.2,519.5L385.5,516.4L386.9,515.8L387.9,517L388.5,521.7L386.5,520.9L387.1,519.8L385.2,519.5ZM264.9,443.2L303.9,444.4L334.1,445.2L353.4,445.4L368.4,445.5L396.2,445.5L396.2,449L399.6,501.1L399.8,504L409.5,504.3L423.1,504.2L423,505.9L421.9,510.1L421.2,510.7L418.7,519.1L416.4,523.9L402.4,525.5L401.6,527.7L400.8,527.6L399.1,526.4L396.6,526.5L393.8,529.1L392.6,529.1L392.4,526.5L393.4,523.7L395.6,522.6L393.4,522.5L393.6,520.7L395,519.1L392.3,518.7L390.7,520.1L390.2,518.9L390.9,516.6L394.3,515.6L393.5,514L392.3,514.5L391.8,513.1L393.7,508.6L391.8,509.6L390.9,511.5L390.9,513.9L389.8,513.9L388.4,510.8L389.8,510.5L389.7,508.4L388.6,508L388.1,509.9L386.9,511.2L387.7,512.3L386.6,514.8L386,513.6L383.8,514.5L382.6,514L380.6,510.7L379.4,510.2L379.6,508.5L376.5,502.5L379.1,501.9L379.8,500.4L378.8,500.7L377.6,498.6L378.6,497L380.2,496.2L381,497.2L382.5,496.1L382.7,497.6L385.5,497.9L387.2,499.5L387.7,499.1L385.7,496.3L383.4,495.8L382.4,494.1L381.5,494.2L379.4,491.2L378.8,492.3L377.2,491.5L377.1,493.8L376.2,493.5L376.6,489.5L378.9,485.8L380.7,487.6L381.8,487.2L381.4,482.3L380.4,481.6L378.2,483.5L376.6,483.3L376.7,485.2L375.2,485.9L375.7,481.8L377.8,477.8L378.7,479.8L381.4,480.2L382.8,479L382.1,476.9L383.5,474.7L381.4,475L381,477.1L381.5,478.3L380,477.6L380.4,475.1L379.6,472.8L378.7,472.2L380.8,466.8L382.3,465.2L382.1,464.2L383.9,463.2L384.8,461.7L388.6,462L387.2,461L389.5,458.2L388.3,458L389.8,453.1L385.3,454.1L384.5,456L386.1,457L386.6,458.2L385,458.8L380.7,462.6L379.8,461.4L380.7,459.3L379.7,458.1L379.7,459.9L378.5,461.9L379.5,463.3L378.6,465.1L377.9,461.3L375.9,460.7L376.7,464.8L375.7,464.5L374.9,466.2L376.4,467L373.7,468.8L372.8,469.9L371.1,469.6L370.9,468.5L368.1,466.7L368.4,468.5L369.6,469L369.8,470.7L373.3,472.8L373.5,475.5L372.9,476.5L374.6,478.4L371.6,480.2L372.5,481.7L372.1,483.3L370.9,483.1L370,485.3L370.8,487.4L368.6,489.7L369.7,491.7L369.4,493.8L370.2,496.7L369.9,500.3L370.8,502.9L373.7,506.1L374.7,508.5L373.5,510.3L371.7,510L372.9,511.7L374,510.8L375.1,511.4L374.2,513.3L374.7,515.2L377,518.8L376.3,519.7L377,523.6L375.8,522.8L374.4,520.5L373.3,520.3L372.7,517.8L371.6,518.1L371.4,520.4L370.5,518.9L369.4,519L368.8,517.1L367.2,515.3L364.2,514.4L359.7,514.2L358.7,509.1L357.6,508.5L357.1,509.8L358.4,512.5L358.1,513.4L355.2,511.6L355,510.3L353.3,509L351.8,504.5L349.2,506.2L344.8,508.4L343.3,507.3L342.5,502.7L343.9,499.4L345.9,497.2L348.5,496L347.9,495.6L347.8,493.8L348.7,492.8L351,491.8L351.2,488.4L355.9,483.8L351.2,479L348.4,481.8L347.3,480.3L344.7,480L343.7,479.3L343.8,477.4L340.5,475.7L336.1,475L335.4,473.5L334.1,472.9L334.3,470.6L335.4,469.9L336.4,468L333.4,466.2L332.7,464.4L330.8,464.4L328.7,463.4L327.1,463.5L325.8,462.9L326.6,460.4L326,458.7L324.8,458.2L325.1,456.9L322.7,455.2L321.2,452.4L323.3,451.9L323.3,450.4L321.5,450.5L319.4,449.6L317.1,450.3L316.1,448.7L313.9,446.7L310.9,445.8L307.2,449.2L304.8,448.2L303.6,449.7L301.8,449.2L303.2,450.5L301.6,450.4L302.4,452.4L300.6,453.9L297,453.6L296.1,452.9L293.9,452.8L291.4,451.4L291.2,450.4L289.5,449.6L291.2,449.1L289.6,448.6L284.5,454.8L283,456.9L279.5,455.3L278.1,455.2L276.3,458.1L272.2,460.4L270.9,463L269.3,462.9L264.9,466.8L263.6,467.1L264.9,443.2Z","ax":352.6,"ay":461.4,"room":16,"neutral":false,"chipX":720,"chipY":706},"Virginia":{"d":"M400.8,527.6L401.6,527.7L402.4,525.5L416.4,523.9L414.3,527.1L412.4,531L411.3,532.1L410.7,531.2L408.7,531.5L406.2,534.7L404.7,537.4L403.3,542.5L403.4,545L400.4,550.1L401.3,550.7L398.9,554.3L397.4,557.5L396.2,557.9L396.3,560.2L394.9,563.6L392.5,566.1L390.4,566.1L390.9,567.5L389.7,567.7L389.6,564.3L388.2,562.1L387.7,559.7L388,556.9L389.2,554.6L389.6,551L390.9,546.8L391.4,543.8L393.5,540.7L395.9,536.3L395.3,534.9L398.1,534.3L400.1,531.7L400.2,530.5L397.6,529.7L400.8,527.6ZM149.6,497.1L151.9,498L156.6,496.8L159.6,496.5L160.4,494.6L161,490.8L162.7,489.8L164.7,490.2L165.6,489L165.5,485L164.5,480.8L167.3,478.9L167.5,476.2L169.5,472.8L171.1,471.9L172,470.5L173.6,472.2L175,472.3L176.3,475.5L175.2,477.1L176.6,477.9L177.8,477.1L178.3,475.5L179.5,474.8L180.6,475.8L181.4,471.5L180.2,470.2L179.9,468.5L182.4,467.9L182.3,464.1L183.4,462.5L184.7,462.1L185.2,460L189.2,460.5L189.8,457.2L193.2,454.4L195.3,455.3L195.9,457.4L197.4,457.3L200.2,455.6L202.4,455.4L203.9,453.4L205.3,453.1L206.5,451.3L208.6,449.1L212.7,445.8L214.7,445.6L215.4,442.3L216.8,441.3L215.5,439.3L217.1,437.5L217.2,435.2L218.5,434.3L218.1,431.9L219.8,432.5L219.6,430.4L220.6,429.6L220.8,424.8L222,423.6L222.1,421.3L223.5,419.5L224.3,417.1L225.6,416.3L226.3,413.7L226.2,409.9L226.8,407.1L225.8,403.7L224.5,401.9L225.8,400L227.5,400.1L229.9,399.1L227.7,441.6L243.6,442.3L264.9,443.2L263.6,467.1L264.9,466.8L269.3,462.9L270.9,463L272.2,460.4L276.3,458.1L278.1,455.2L279.5,455.3L283,456.9L284.5,454.8L289.6,448.6L291.2,449.1L289.5,449.6L291.2,450.4L291.4,451.4L293.9,452.8L296.1,452.9L297,453.6L300.6,453.9L302.4,452.4L301.6,450.4L303.2,450.5L301.8,449.2L303.6,449.7L304.8,448.2L307.2,449.2L310.9,445.8L313.9,446.7L316.1,448.7L317.1,450.3L319.4,449.6L321.5,450.5L323.3,450.4L323.3,451.9L321.2,452.4L322.7,455.2L325.1,456.9L324.8,458.2L326,458.7L326.6,460.4L325.8,462.9L327.1,463.5L328.7,463.4L330.8,464.4L332.7,464.4L333.4,466.2L336.4,468L335.4,469.9L334.3,470.6L334.1,472.9L335.4,473.5L336.1,475L340.5,475.7L343.8,477.4L343.7,479.3L344.7,480L347.3,480.3L348.4,481.8L351.2,484.7L351.2,488.4L351,491.8L348.7,492.8L347.8,493.8L347.9,495.6L345.3,496.4L343.6,495.6L343.6,497.6L341.2,502.1L340.6,504.2L340.8,507.2L342.7,509.6L346.5,509L347.3,508L349.3,508L350.9,506.5L352,507.7L351.2,510.7L353.7,513.2L353.6,515.2L358.2,517.6L361.5,517.7L362.4,518.8L363.2,518L366.3,518.4L366.8,520.1L368.9,521.7L369.9,524L371.6,524.6L373.6,526.8L376.2,527.7L380.1,530.4L379.4,533L377.5,534L377.2,538.2L377.7,539.4L376.3,541.2L378,542.1L375.5,543.3L371.4,540.7L369.9,541.8L369,540.8L369,539.2L367.4,535.9L364.9,534.7L363.8,533.3L362.3,532.8L359.5,528.6L358.1,528.2L357.6,526.4L355.9,525.2L355.6,526.4L359.3,530L361.8,534.5L363.8,535.5L363.9,536.5L366,537.1L367.3,540.9L368.8,543L372.7,543.2L373.6,544.6L377.7,545.6L375.9,546.7L375.7,548.2L377.4,548.5L378,547.7L379,549.3L379.7,553.7L378.6,557.2L376.2,554.7L373.5,552.9L372.3,554.6L373.7,556.2L374.6,558.3L375.8,558.9L372.9,559.9L370.5,560L371.3,561.6L374.2,561.1L373.9,564.2L375.8,563.7L376.3,564.9L377.9,565.7L378.7,567.7L377.5,571.5L377,570.9L374.8,571.6L372.8,573L371.5,570.3L367.7,567.8L365.8,566L366.4,564.1L364.7,561.3L361.8,561.6L360.7,562.6L359.4,560.8L357,560.3L356.5,559.4L353.7,560.7L355.1,562.1L356.7,561.8L359.1,562.3L361.1,564.5L362.3,564.6L363.3,562.3L364.4,567L364.5,569.7L367.4,570.5L370.7,573.8L370.8,576.4L374.4,576.2L375.6,575.2L375.7,576.5L376.9,576.9L376.5,573.5L378.8,573.3L380.5,574.4L385.2,575.9L387.4,574.8L388.9,575.2L390,580.3L391.6,585.9L392.8,588.7L393.7,592.5L374.7,592.4L358.7,592.3L354.6,592.2L354.6,592.6L340.4,592.4L305.1,591.7L295.2,591.6L257.9,590.4L235.2,589.3L228.8,589L213.7,587.4L208.7,587.3L196.1,586L188.8,585.4L177.6,584.1L178.7,583.1L168.5,582.2L168,583.2L147.9,581.8L139.8,581.3L118.9,579.6L118.2,579.4L107.8,578.6L103.4,578.1L104.6,577.1L109.1,575.5L111.9,575.8L117.3,574.2L121.8,573.1L123.9,573.1L124.3,571.2L126.7,568.2L130.6,568.3L134,567.1L134.9,565.4L134.7,563L136.4,561.8L138,561.9L140.2,560.5L140.5,557.1L143.9,555.5L146.6,553.8L149.6,552.3L154.6,551.1L169.7,539.5L167.8,539.6L164.2,538.1L163.9,536.6L162.9,536.5L162.1,534.9L160.9,534.9L160.1,533.1L158.1,532.6L156.8,527.1L155.5,526.3L154,523.7L154.2,522.4L152.3,521.5L151.4,519.9L153,517.8L151.1,516.8L150.1,513.5L149,511.6L147.1,510L147.2,508.5L148.3,508.6L148.8,506.5L148.4,505.6L149.9,504.4L150.2,502.1L149.2,500.6L149.6,497.1Z","ax":231.8,"ay":521.9,"room":63,"neutral":false},"North Carolina":{"d":"M399,620.9L401.4,621.7L403.1,624.6L403.2,626.5L401.2,626.1L401.5,624.3L399,620.9ZM388.2,661.2L389.3,658.8L390.4,658.8L396.8,655.4L398.8,654.9L400.7,653.5L402.4,653.5L404.6,652.1L406.3,651.7L407,648.7L408.4,638.6L408.4,636.5L407.3,632.7L406.5,628.5L406.9,628.6L408.4,632.8L409.1,636.6L408.7,642L406.7,653.4L403.5,653.8L396.7,656.4L390.8,659.5L388.2,661.2ZM177.6,584.1L188.8,585.4L196.1,586L208.7,587.3L213.7,587.4L228.8,589L235.2,589.3L257.9,590.4L295.2,591.6L305.1,591.7L340.4,592.4L354.6,592.6L354.6,592.2L358.7,592.3L374.7,592.4L393.7,592.5L394,594.8L396.3,604.5L398.4,610.8L401.6,617L406.3,627.8L405.1,627.2L402.7,621.4L400.8,618.2L399,617.8L397.8,610.9L395.6,604.7L394.5,603.8L394.9,602.2L394.3,598.7L392.9,597.5L392.4,595.6L389,595.1L388.9,593.5L387.2,594.3L388,596.7L390.1,598.6L391.6,598.2L391.6,600.9L393.6,606.3L394.8,608.7L394.7,609.7L396.2,612.7L396.2,614.6L393.6,612L393.7,610.6L392,608.1L391.6,606.6L390,606.2L390.8,607.7L390.4,608.8L392.3,610.3L388.1,609.3L383.8,604.6L381.8,604.2L384.3,608L385.7,608.7L386.5,610.8L385.3,611.7L382.1,612.2L379.2,609.4L380.2,611.9L381.5,613L380.6,613.6L376.4,611.7L374.7,611.5L374,610.4L371.6,609.4L374.7,612.3L377.5,613.3L376.5,614L373.3,614.3L371.5,616.8L369.4,617.6L367.1,617.6L366,616.4L363.3,615.9L361.8,611L361.8,608.6L363.4,605.5L362.7,605L360.8,608L360.6,611L361.6,614.8L363.1,617.8L362.4,619.5L363.4,620.9L368.8,620.5L373.8,618.7L375,620.6L376.8,620.4L378.5,619.2L382,618.3L386.3,618.3L388.2,619.9L388.2,621.6L386.3,624.8L386.7,626.9L387,633.5L388.2,633.3L389.2,628.7L389.6,622.7L391.5,621.1L390.7,619.8L392.5,619L395.9,619.8L398.1,623.6L399,626.2L398.5,628.2L399.5,632.2L398.4,633.1L398.9,635.3L397.2,637.5L394.9,637.9L394.1,637.1L392.7,637.8L391.9,639.4L390.5,639.7L390.1,641.5L389.2,641.9L388.2,644.7L386.5,645.3L386.1,647.2L383.7,648.1L383.3,649.1L379.8,648.1L375.9,648.2L372.3,647.5L371.7,646.5L370.3,647.1L368.3,645.3L366.5,640.7L370.7,640.6L371.4,638.8L367.6,639.8L366,639.3L364.8,640.6L366,642.9L366.8,646.3L365.8,646.3L361.9,644.4L360,644.8L357.3,643.4L353.1,642.2L350,640.2L349.9,641.4L352.1,643.8L355,644.1L363.5,648.2L369.7,649.4L370.8,650.6L371,652.2L370,654.4L368.2,656.6L368.3,657.7L367.1,659.8L365,661.5L358.2,665.9L351.4,661.3L351.5,663.9L354.8,666.2L359.7,667.9L364.6,664.8L366.4,664.7L370.1,663.5L370.6,661.1L372.1,661.6L372.5,664.3L373.6,665.5L376.1,665.7L374.9,662.7L377.6,663.9L377.8,667.3L375.5,670.3L373,670.8L373,672.1L371.5,672.9L369.6,676.2L368.6,679.1L366.3,678.3L366.5,675.1L365.1,674.3L365.2,677.6L363,677.8L368.8,680.4L371.9,675.5L376.5,670.8L379.8,667.8L386.2,660.8L387.3,661.6L383.5,664.9L379.9,668.8L376.9,671.2L374,674.3L371.5,677.6L368.6,682.1L368.2,683.4L367.7,680.7L362.9,678.5L357.5,678.4L349.3,679.9L345.3,681.1L342.5,682.4L338.1,685.5L332.7,688.5L329.1,690.9L323.9,695.3L321.9,697.5L318.4,702.5L316.4,706.9L314.9,711.4L313.6,714.1L313,716.8L311.2,716.5L310.8,715.2L307.9,714.2L304.7,713.8L300.8,713.8L296.7,714.2L291.8,715.7L290.7,716.4L278.2,702.8L264.4,687.9L260.3,683.1L248.7,670.6L240.3,670.2L230.2,669.5L205.9,667.9L206.8,662.5L201.5,654.3L197.2,657L196.6,656.1L197.6,654.3L197.5,652.1L190,651.2L175.8,649.7L150.3,646.9L147.2,647.5L146.6,645.9L144.8,647.8L143.9,647.4L141.1,648.3L140.3,648L136.2,649.6L132.2,651.7L131.3,650.8L118.7,653.8L99.2,652.6L72.7,650.4L74.9,639.6L78,638L78.3,639L82.2,639.2L85.4,637L84.9,634.7L86.2,633.8L85.8,632L88.3,629.7L90.1,629.3L91.4,627.5L93.6,627.3L95.7,625.7L106.6,626.4L108.2,624.5L111.3,623.5L112,622.5L113.4,622.9L115.7,621.1L116.3,619.8L118.5,619.8L119.7,618.3L122.6,617.4L125.8,618.3L129.6,614L129.4,611.5L130.9,610.4L132.8,612L135.7,608.3L140.4,605.9L141.6,607.5L140.7,610.3L142.7,611.2L146.6,609L148.9,605.5L151,604.2L153.3,603.5L154.9,603.9L156.2,602.6L158.8,603.3L159.2,605.3L161.2,605.4L163.1,604.4L168.1,596.8L171,594.9L172.5,594.5L173.5,595.5L175.8,595.6L174.6,592.6L175.7,590.1L176.6,589.6L176.2,586.4L177.6,584.1Z","ax":297.2,"ay":642.8,"room":51,"neutral":false},"South Carolina":{"d":"M118.7,653.8L131.3,650.8L132.2,651.7L136.2,649.6L140.3,648L141.1,648.3L143.9,647.4L144.8,647.8L146.6,645.9L147.2,647.5L150.3,646.9L175.8,649.7L190,651.2L197.5,652.1L197.6,654.3L196.6,656.1L197.2,657L201.5,654.3L206.8,662.5L205.9,667.9L230.2,669.5L240.3,670.2L248.7,670.6L260.3,683.1L264.4,687.9L278.2,702.8L290.7,716.4L288.9,716.6L283.8,718.5L280,721L275,725.7L272.4,728.8L271.3,730.6L269,732.8L266.9,736.5L264.9,743.3L265.2,745.6L264.2,747.4L262.2,749.2L258.9,750.8L257.5,754.6L255.1,754.1L252.7,754.7L251.2,753L248.9,754.3L247.4,756.7L247.8,758L249,757.6L248.9,759L246.8,759.7L244.2,761.4L242.8,763.4L237.9,765.6L236.6,764L235.1,764.2L234.9,765.5L237.2,766.4L236.4,768.8L232.8,770.7L231.7,772.3L230.3,772L226.9,772.7L224.4,775L223.6,774.2L218.4,777.6L217.3,776.7L215.1,777.7L214.9,776.5L213.1,776.4L212.4,778.1L214.4,781.5L213.2,784.4L208.6,786.7L205.9,787.3L205.7,785.7L203.1,783.9L201.5,784.7L201.1,786L202.8,786.7L204.6,789.1L202.4,791.6L198.7,793.8L197.4,793.7L194.9,796.3L195.6,797.1L194.3,796.9L191.3,793.9L189.7,794.5L186.8,793L186.3,790.5L186.9,789.4L185.5,786.7L187,785L186.3,781.9L185.7,782L183.9,777.7L184.5,776.4L181.5,773L181.5,772.1L178.1,770.8L176.5,768.8L177.3,767.2L176.8,765.2L176,764.9L176.8,763.1L176.3,761.8L176.5,758.4L175.3,757.7L175.2,755.8L173.6,753.1L174.5,750.5L171.9,748.6L169.8,746.1L168.6,746.1L164.9,743.7L163.9,741.8L164.3,740.2L162.8,740.3L161.1,738.5L161.7,737.3L158,733.8L158.7,732.6L158.2,731L159.3,729.3L158.8,728.3L156.8,727.2L154.5,723.3L152.3,721.7L150.6,721.5L148.9,719.8L148.9,718.2L147.7,716.5L147.4,714L143.6,709.8L139.8,707.5L137.3,704.4L136.1,704.3L134.9,700.2L133.1,698.1L132.2,695.4L130.6,694.3L129.8,691.5L130,689.5L128.6,687.3L128.4,685.3L126.8,684L126.6,681.4L125.7,678.8L124.6,678.2L120.7,678.5L117.7,676.3L114.9,671.9L112.6,671.4L108.8,667.8L108.6,665.2L109.7,664.3L109.7,662.9L113.6,659L118,656.6L118.7,653.8Z","ax":210.2,"ay":718.6,"room":48,"neutral":false},"Georgia":{"d":"M24,645.8L29.3,646.4L47.8,648.1L72.7,650.4L99.3,652.8L118.7,653.8L118,656.6L113.6,659L109.7,662.9L109.7,664.3L108.6,665.2L108.8,667.8L112.6,671.4L114.9,671.9L117.7,676.3L120.7,678.5L124.6,678.2L125.7,678.8L126.6,681.4L126.8,684L128.4,685.3L128.6,687.3L130,689.5L129.8,691.5L130.6,694.3L132.2,695.4L133.1,698.1L134.9,700.2L136.1,704.3L137.3,704.4L139.8,707.5L143.6,709.8L147.4,714L147.7,716.5L148.9,718.2L148.9,719.8L150.6,721.5L152.3,721.7L154.5,723.3L156.8,727.2L158.8,728.3L159.3,729.3L158.2,731L158.7,732.6L158,733.8L161.7,737.3L161.1,738.5L162.8,740.3L164.3,740.2L163.9,741.8L164.9,743.7L168.6,746.1L169.8,746.1L171.9,748.6L174.5,750.5L173.6,753.1L175.2,755.8L175.3,757.7L176.5,758.4L176.3,761.8L176.8,763.1L176,764.9L176.8,765.2L177.3,767.2L176.5,768.8L178.1,770.8L181.5,772.1L181.5,773L184.5,776.4L183.9,777.7L185.7,782L186.3,781.9L187,785L185.5,786.7L186.9,789.4L186.3,790.5L186.8,793L189.7,794.5L191.3,793.9L194.3,796.9L195.6,797.1L197.2,797.7L196.4,800.2L194.3,801.3L192.9,800.6L192,802.5L193.4,802.9L191,805.2L188.1,804.1L187.5,806.3L189,806.8L187.6,809.1L185.1,811.1L182.7,810.5L182.2,811.1L183.9,812.5L185,812.4L184.7,815.7L183.6,818.2L179.5,819L179.4,819.9L181.9,819.6L182.7,820.6L179.1,825.7L178,829.3L179,829.8L178.2,831L177.3,834.9L175.4,835.6L174.1,837.9L172.8,838L172.6,840.8L171.5,843.5L170.5,843.4L168.6,845L170.4,846.1L172.1,845.2L172,848.5L169.3,854.8L169.9,857.7L168.1,856.8L166,857.3L163.6,856.4L158.9,855.3L157.9,854.3L155.4,853L153,852.7L152.1,851.3L149.9,850.9L148.5,853.2L146.8,852.7L147.3,853.7L146.1,854.3L146.1,856.3L145.4,858.7L146.9,862.4L146.1,867.2L145.1,869L144.9,872L139.5,872.2L138.1,869L138.8,866.2L137.8,865.1L137.7,862.8L138.5,862.3L119.1,859.5L89.6,855.2L52.2,849.6L32.7,846.8L30.9,844.7L30.3,841.6L30.4,838.2L29,836L28.5,832.7L28.4,830.3L27.7,827.6L25.2,823.7L25.8,821.6L25.3,819.5L26.4,818.7L26.6,815.6L28,812.5L27.9,810.7L29.1,808.6L29.2,803.7L26.8,800L27.3,798.3L27,793.2L27.6,791.5L29.8,788.8L31.2,785.5L31.8,782.1L31.6,779.8L33.6,777.9L35.7,777.3L35.5,776.3L37,776.4L38.7,774.5L37.1,772.7L34.7,771.4L36.6,766.9L35.5,765.3L35.4,762L33.2,759L32.1,756L32,750L30.4,748L31.1,746.6L30,745.2L28.3,716.4L27.5,703.8L26.9,692L26,676.7L24.7,658.7L24,645.8Z","ax":107.3,"ay":780.8,"room":68,"neutral":false},"Vermont":{"d":"M476.2,198.8L484.6,198.4L498.1,197.9L502.9,198.1L510.2,198L516.9,197.7L536.7,196.3L535.5,197.6L537.2,201.1L535.2,204.2L534.9,206.8L533.2,208.9L534.7,212.9L536,214.4L535.9,217.3L534.6,217.9L535.4,220.2L533.6,221.2L532.8,223L531.2,224.7L528.4,225.4L527.9,227.5L526,228.4L524.8,227.9L520.7,229.4L519.6,231.9L520.4,233.2L519.8,235.5L521.1,238.2L521.2,240L519.8,242.9L518.5,244.7L518.6,248.1L516.4,250.8L516.7,253.4L516,255.2L513.8,257L512.8,258.8L512.3,263.1L510.5,264.5L510,267.5L510.7,268.9L509.7,274.3L510.5,276.7L509.1,279.3L508.9,284.8L509.6,287.4L508.5,288.7L509.3,290.8L508.4,292.6L506.9,293.1L506.8,295.3L505.8,298.3L507.5,302.3L508.2,301.9L509.4,303.9L482,304L480.9,301.4L481.3,300L481.3,297L481.5,280.2L481.3,266.5L479.7,265.4L479.4,263.3L477.1,263.3L476.3,266L475.1,265L475.8,260.4L477.6,256.5L476.1,254.3L476.6,251.7L475.4,249L475.4,244.9L474.3,243.9L475.1,240.7L475.6,237.1L477.8,234.5L478.3,233.1L477.3,228.6L478.6,225.3L478.1,222.6L475.7,219.1L475.2,216.4L475.6,215.1L475.7,211.4L476.8,209.2L475.2,207L475.6,204.4L476.4,203.2L476.2,198.8Z","ax":499.7,"ay":223.2,"room":21,"neutral":true}}};
-
-</script>
-<script>
-/* =========================================================================
-   THE CONFEDERATION PROBLEM — the map board
-   Draws the thirteen states and reveals a vote across them one at a time.
-   Used by the teacher's projector view and by solo mode.
-   ========================================================================= */
-(function () {
-  "use strict";
-  var M = window.AOC_MAP, D = window.AOC;
-
-  var ABBR = {};
-  D.STATES.forEach(function (s) { ABBR[s.name] = s.abbr; });
-
-  var VOTE_CLASS = { Yes: "v-yes", No: "v-no", Abstain: "v-abstain" };
-  var PAY_CLASS  = { full: "p-full", half: "p-half", none: "p-none" };
-  var PAY_LABEL  = { full: "PAID", half: "HALF", none: "NOTHING" };
-
-  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) {
-    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
-
-  /* ------------------------------------------------------------- markup */
-  function build(container) {
-    var svg = '<svg class="aoc-map" viewBox="' + (M.viewBox || ("0 0 " + M.width + " " + M.height)) +
-              '" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Map of the thirteen states">';
-
-    svg += '<defs>' +
-      '<pattern id="hatch" width="8" height="8" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">' +
-        '<rect width="8" height="8" fill="#c8912f"/>' +
-        '<line x1="0" y1="0" x2="0" y2="8" stroke="#8f6413" stroke-width="4"/>' +
-      '</pattern>' +
-      '<filter id="mapshadow" x="-8%" y="-8%" width="120%" height="120%">' +
-        '<feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000" flood-opacity=".28"/>' +
-      '</filter>' +
-    '</defs>';
-
-    // Leader lines first so shapes and chips sit on top.
-    svg += '<g class="leaders">';
-    Object.keys(M.states).forEach(function (name) {
-      var s = M.states[name];
-      if (!s.chipX) return;
-      svg += '<line class="leader" data-state="' + esc(name) + '" x1="' + s.ax + '" y1="' + s.ay +
-             '" x2="' + (s.chipX - 6) + '" y2="' + s.chipY + '"/>';
-    });
-    svg += '</g>';
-
-    svg += '<g class="shapes" filter="url(#mapshadow)">';
-    Object.keys(M.states).forEach(function (name) {
-      var s = M.states[name];
-      svg += '<g class="st' + (s.neutral ? " neutral" : "") + '" data-state="' + esc(name) + '">' +
-               '<path class="shape" d="' + s.d + '"/>' +
-             '</g>';
-    });
-    svg += '</g>';
-
-    // Labels for the roomy states go inside the shape.
-    svg += '<g class="inlabels">';
-    Object.keys(M.states).forEach(function (name) {
-      var s = M.states[name];
-      if (s.chipX) return;
-      if (s.neutral) {
-        svg += '<g class="inlabel neutral" data-state="' + esc(name) + '">' +
-               '<text class="ab" x="' + s.ax + '" y="' + (s.ay - 2) + '">VT</text>' +
-               '<text class="sub" x="' + s.ax + '" y="' + (s.ay + 16) + '">not a state</text></g>';
-        return;
-      }
-      svg += '<g class="inlabel" data-state="' + esc(name) + '">' +
-             '<text class="ab" x="' + s.ax + '" y="' + s.ay + '">' + ABBR[name] + '</text>' +
-             '<text class="vt" x="' + s.ax + '" y="' + (s.ay + 27) + '"></text></g>';
-    });
-    svg += '</g>';
-
-    // Cramped states get a chip out in the Atlantic.
-    svg += '<g class="chips">';
-    Object.keys(M.states).forEach(function (name) {
-      var s = M.states[name];
-      if (!s.chipX) return;
-      svg += '<g class="chip" data-state="' + esc(name) + '" transform="translate(' + s.chipX + ',' + s.chipY + ')">' +
-               '<rect class="chipbg" x="0" y="-27" rx="8" width="186" height="54"/>' +
-               '<text class="ab" x="13" y="8">' + ABBR[name] + '</text>' +
-               '<text class="nm" x="60" y="-3">' + esc(name) + '</text>' +
-               '<text class="vt" x="60" y="17"></text>' +
-             '</g>';
-    });
-    svg += '</g>';
-
-    svg += '</svg>';
-    container.innerHTML = svg;
-    return container.querySelector(".aoc-map");
-  }
-
-  /* ------------------------------------------------------------- update */
-  function paint(root, rows, mode) {
-    rows.forEach(function (r) {
-      var sel = '[data-state="' + r.name.replace(/"/g, '\\"') + '"]';
-      var nodes = root.querySelectorAll(sel);
-      var cls = "st";
-      var label = "";
-
-      if (r.absent) {
-        cls += " absent"; label = "NO DELEGATE";
-      } else if (mode === "payment" && r.payment) {
-        cls += " " + PAY_CLASS[r.payment]; label = PAY_LABEL[r.payment];
-      } else if (mode === "votes" && r.vote) {
-        cls += " " + VOTE_CLASS[r.vote]; label = r.vote.toUpperCase();
-      } else if (mode === "voting") {
-        if (r.vote) { cls += " sealed"; label = "VOTE SEALED"; }
-        else { cls += " pending"; label = r.isBot ? "" : "WAITING"; }
-      }
-      if (r.isYou) cls += " you";
-      if (r.isBot) cls += " bot";
-
-      for (var i = 0; i < nodes.length; i++) {
-        var n = nodes[i];
-        if (n.classList.contains("leader")) continue;
-        // keep the element's own base class, swap the state classes
-        var base = n.classList.contains("chip") ? "chip"
-                 : (n.classList.contains("inlabel") ? "inlabel" : "st");
-        n.setAttribute("class", base + " " + cls.replace(/^st\s*/, ""));
-        var vt = n.querySelector(".vt");
-        if (vt) vt.textContent = label;
-      }
-    });
-  }
-
-  /* --------------------------------------------------------- the reveal
-     Votes land one state at a time so the room can react. Order runs
-     north to south, which is also roughly the order the clerk called
-     the roll in the Confederation Congress.                              */
-  var ROLL_ORDER = ["New Hampshire","Massachusetts","Rhode Island","Connecticut","New York",
-                    "New Jersey","Pennsylvania","Delaware","Maryland","Virginia",
-                    "North Carolina","South Carolina","Georgia"];
-
-  var timers = [];
-  function clearTimers() { timers.forEach(clearTimeout); timers = []; }
-
-  function revealVotes(root, rows, opts) {
-    opts = opts || {};
-    var mode = opts.mode || "votes";
-    var step = opts.step || 420;
-    var onTick = opts.onTick || function () {};
-    var onDone = opts.onDone || function () {};
-    clearTimers();
-
-    var byName = {};
-    rows.forEach(function (r) { byName[r.name] = r; });
-    var order = ROLL_ORDER.filter(function (n) { return byName[n]; });
-
-    // start blank
-    paint(root, rows.map(function (r) {
-      return { name: r.name, isBot: r.isBot, isYou: r.isYou, absent: false };
-    }), "blank");
-
-    var yes = 0, no = 0, ab = 0, absent = 0;
-    order.forEach(function (name, i) {
-      timers.push(setTimeout(function () {
-        var r = byName[name];
-        paint(root, [r], mode);
-        var nodes = root.querySelectorAll('[data-state="' + name.replace(/"/g,'\\"') + '"]');
-        for (var k = 0; k < nodes.length; k++) {
-          if (nodes[k].classList.contains("leader")) continue;
-          nodes[k].classList.add("landing");
-          (function (el) { setTimeout(function () { el.classList.remove("landing"); }, 620); })(nodes[k]);
-        }
-        if (r.absent) absent++;
-        else if (r.vote === "Yes") yes++;
-        else if (r.vote === "No") no++;
-        else ab++;
-        onTick({ name: name, row: r, yes: yes, no: no, abstain: ab, absent: absent,
-                 index: i + 1, total: order.length });
-        if (i === order.length - 1) timers.push(setTimeout(function () { onDone({ yes: yes, no: no, abstain: ab }); }, step));
-      }, i * step));
-    });
-    return function cancel() { clearTimers(); };
-  }
-
-  window.AOCMAP = {
-    build: build,
-    paint: paint,
-    revealVotes: revealVotes,
-    cancel: clearTimers,
-    ROLL_ORDER: ROLL_ORDER
   };
 })();
 
@@ -1703,6 +1654,549 @@ window.AOC_MAP = {"viewBox":"10 64 910 822","width":910,"height":822,"states":{"
 </script>
 <script>
 /* =========================================================================
+   THE CONFEDERATION PROBLEM — the only file you need to edit
+
+   1. In Supabase: Project Settings -> API
+   2. Copy "Project URL" into url below
+   3. Copy the "anon public" key into anonKey below
+   4. Save. That's it.
+
+   The anon key is meant to be public — it is designed to sit in a web page.
+   Never paste the "service_role" key here; that one is an admin key.
+   ========================================================================= */
+window.AOC_CONFIG = {
+
+  // "supabase" or "firebase"
+  backend: "supabase",
+
+  supabase: {
+    url:     "https://pszsnmfgpddxhlmmgagb.supabase.co",
+    anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzenNubWZncGRkeGhsbW1nYWdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUxMDk1MzUsImV4cCI6MjEwMDY4NTUzNX0.vFgNXEmAmhAGtI1qi6y8RDRX2hh5HBsfUkkG1-Ho60I"
+  },
+
+  // Kept so the original Firebase project still works if you switch back.
+  firebase: {
+    apiKey: "AIzaSyBrgnposdt3upVeXZtu5g0EW0orEmyVy7I",
+    authDomain: "articles-of-confederation-game.firebaseapp.com",
+    projectId: "articles-of-confederation-game",
+    storageBucket: "articles-of-confederation-game.appspot.com",
+    messagingSenderId: "506849426036",
+    appId: "1:506849426036:web:9e2f35f8ef29fda05def21"
+  }
+};
+
+</script>
+<script>
+/* =========================================================================
+   THE CONFEDERATION PROBLEM — Firestore backend
+   Classic script; loads the Firebase SDK with a dynamic import() so the
+   solo/offline page can skip it entirely.
+
+   Data model (kept deliberately shallow to stay inside the free tier):
+     games/{CODE}                 phase, round, stability, treasury, deals,
+                                  result, history, absent, settings
+     games/{CODE}/states/{Name}   players[], isBot, interest, treasuryNow,
+                                  votes{round:vote}, payments{round:choice}
+   ========================================================================= */
+(function () {
+  "use strict";
+
+  var CFG = (window.AOC_CONFIG && window.AOC_CONFIG.firebase) || {};
+
+  var SDK = "https://www.gstatic.com/firebasejs/10.12.2/";
+  var ready = null, F = null;
+
+  function boot() {
+    if (ready) return ready;
+    ready = Promise.all([
+      import(SDK + "firebase-app.js"),
+      import(SDK + "firebase-firestore.js")
+    ]).then(function (mods) {
+      var appMod = mods[0], fs = mods[1];
+      var app = appMod.initializeApp(CFG);
+      F = {
+        db: fs.getFirestore(app),
+        doc: fs.doc, collection: fs.collection, getDoc: fs.getDoc, getDocs: fs.getDocs,
+        setDoc: fs.setDoc, updateDoc: fs.updateDoc, onSnapshot: fs.onSnapshot,
+        deleteDoc: fs.deleteDoc, arrayUnion: fs.arrayUnion, writeBatch: fs.writeBatch,
+        serverTimestamp: fs.serverTimestamp
+      };
+      return F;
+    });
+    return ready;
+  }
+
+  function gameRef(code) { return F.doc(F.db, "games", code); }
+  function statesCol(code) { return F.collection(F.db, "games", code, "states"); }
+  function stateRef(code, name) { return F.doc(F.db, "games", code, "states", name); }
+
+  function makeCode() {
+    // No vowels, no 0/O/1/I — these get read aloud across a classroom.
+    var A = "BCDFGHJKLMNPQRSTVWXYZ23456789", s = "";
+    for (var i = 0; i < 4; i++) s += A[Math.floor(Math.random() * A.length)];
+    return s;
+  }
+
+  var NET = {
+    /* --------------------------------------------------------- teacher */
+    createGame: function (studentStateNames, opts) {
+      return boot().then(function () {
+        var code = makeCode();
+        var batch = F.writeBatch(F.db);
+        batch.set(gameRef(code), {
+          status: "lobby",
+          round: -1,
+          phase: "lobby",
+          stability: 60,
+          nationalTreasury: 0,
+          studentStates: studentStateNames,
+          absent: [],
+          deals: [],
+          history: [],
+          result: null,
+          caucusEndsAt: null,
+          settings: opts || {},
+          createdAt: Date.now()
+        });
+        window.AOC.STATES.forEach(function (s) {
+          batch.set(stateRef(code, s.name), {
+            name: s.name,
+            abbr: s.abbr,
+            isBot: studentStateNames.indexOf(s.name) === -1,
+            players: [],
+            interest: 50,
+            treasuryNow: s.treasury,
+            votes: {},
+            payments: {}
+          });
+        });
+        return batch.commit().then(function () { return code; });
+      });
+    },
+
+    updateGame: function (code, patch) {
+      return boot().then(function () { return F.updateDoc(gameRef(code), patch); });
+    },
+
+    updateState: function (code, name, patch) {
+      return boot().then(function () { return F.updateDoc(stateRef(code, name), patch); });
+    },
+
+    // Write many state docs at once (bot votes, payouts, score updates).
+    batchStates: function (code, updates) {
+      return boot().then(function () {
+        var batch = F.writeBatch(F.db);
+        updates.forEach(function (u) { batch.update(stateRef(code, u.name), u.patch); });
+        return batch.commit();
+      });
+    },
+
+    endGame: function (code) {
+      return NET.updateGame(code, { status: "ended", phase: "debrief" });
+    },
+
+    /* --------------------------------------------------------- student */
+    findGame: function (code) {
+      return boot().then(function () {
+        return F.getDoc(gameRef(code)).then(function (snap) {
+          return snap.exists() ? snap.data() : null;
+        });
+      });
+    },
+
+    listStates: function (code) {
+      return boot().then(function () {
+        return F.getDocs(statesCol(code)).then(function (q) {
+          return q.docs.map(function (d) { return d.data(); });
+        });
+      });
+    },
+
+    claimState: function (code, name, players) {
+      return boot().then(function () {
+        return F.updateDoc(stateRef(code, name), {
+          players: players, isBot: false, claimed: true
+        });
+      });
+    },
+
+    releaseState: function (code, name) {
+      return boot().then(function () {
+        return F.updateDoc(stateRef(code, name), { players: [], isBot: true, claimed: false });
+      });
+    },
+
+    castVote: function (code, name, round, vote) {
+      return boot().then(function () {
+        var p = {}; p["votes." + round] = vote;
+        return F.updateDoc(stateRef(code, name), p);
+      });
+    },
+
+    setPayment: function (code, name, round, choice, amount) {
+      return boot().then(function () {
+        var p = {};
+        p["payments." + round] = { choice: choice, paid: amount };
+        return F.updateDoc(stateRef(code, name), p);
+      });
+    },
+
+    pushDeal: function (code, deal) {
+      return boot().then(function () {
+        return F.updateDoc(gameRef(code), { deals: F.arrayUnion(deal) });
+      });
+    },
+
+    /* ------------------------------------------------------- listeners */
+    onGame: function (code, cb) {
+      var stop = function () {};
+      boot().then(function () {
+        stop = F.onSnapshot(gameRef(code), function (s) { if (s.exists()) cb(s.data()); });
+      });
+      return function () { stop(); };
+    },
+
+    onStates: function (code, cb) {
+      var stop = function () {};
+      boot().then(function () {
+        stop = F.onSnapshot(statesCol(code), function (q) {
+          cb(q.docs.map(function (d) { return d.data(); }));
+        });
+      });
+      return function () { stop(); };
+    },
+
+    onState: function (code, name, cb) {
+      var stop = function () {};
+      boot().then(function () {
+        stop = F.onSnapshot(stateRef(code, name), function (s) { if (s.exists()) cb(s.data()); });
+      });
+      return function () { stop(); };
+    },
+
+    boot: boot
+  };
+
+  // Teacher rewrites the whole deal list when it answers pending offers.
+  NET.updateDeals = function (code, deals) {
+    return NET.updateGame(code, { deals: deals });
+  };
+
+  (window.AOC_NET_IMPLS = window.AOC_NET_IMPLS || {}).firebase = NET;
+})();
+
+</script>
+<script>
+/* =========================================================================
+   THE CONFEDERATION PROBLEM — Supabase backend
+
+   Plain fetch against PostgREST. No client library and no CDN script, so
+   there is nothing extra for a school filter to block and nothing to keep
+   up to date.
+
+   Every read goes through one polling loop shared by the whole page: it
+   asks for a few-byte fingerprint about once a second and only pulls the
+   full session when that fingerprint moves. A quiet classroom costs almost
+   no bandwidth; a busy one updates in about a second.
+   ========================================================================= */
+(function () {
+  "use strict";
+
+  var CFG = (window.AOC_CONFIG && window.AOC_CONFIG.supabase) || {};
+
+  // Supabase shows the project URL in a few places, and the one on the API
+  // settings page ends with /rest/v1/. Accept either form rather than
+  // building requests to .../rest/v1/rest/v1/rpc/...
+  function normalizeUrl(u) {
+    return String(u || "").trim()
+      .replace(/\/+$/, "")
+      .replace(/\/rest\/v1$/i, "")
+      .replace(/\/+$/, "");
+  }
+
+  var URL_BASE = normalizeUrl(CFG.url);
+  var KEY = String(CFG.anonKey || "").trim();
+
+  // The placeholders in config.js are non-empty strings, so a bare truthiness
+  // check would call an untouched project "configured" and then fail on the
+  // first request with something unreadable.
+  function configured() {
+    return /^https:\/\/[^\s]+\.supabase\.(co|in)$/.test(URL_BASE) &&
+           KEY.length > 20 &&
+           !/PASTE_/.test(URL_BASE + KEY);
+  }
+
+  function rpc(fn, args) {
+    if (!configured()) {
+      return Promise.reject(new Error(
+        "Supabase is not configured. Open assets/config.js and paste your " +
+        "project URL and anon key."));
+    }
+    return fetch(URL_BASE + "/rest/v1/rpc/" + fn, {
+      method: "POST",
+      headers: {
+        "apikey": KEY,
+        "Authorization": "Bearer " + KEY,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(args || {})
+    }).then(function (r) {
+      if (!r.ok) {
+        return r.text().then(function (t) {
+          throw new Error("Supabase " + r.status + ": " + t.slice(0, 300));
+        });
+      }
+      return r.status === 204 ? null : r.json();
+    });
+  }
+
+  function makeCode() {
+    // No vowels, no 0/O/1/I — these get read aloud across a classroom.
+    var A = "BCDFGHJKLMNPQRSTVWXYZ23456789", s = "";
+    for (var i = 0; i < 4; i++) s += A[Math.floor(Math.random() * A.length)];
+    return s;
+  }
+
+  /* ------------------------------------------------------------ polling
+     One loop per page, however many things are listening. Subscribers are
+     handed the same snapshot and each decides whether anything it cares
+     about actually changed.                                              */
+  var poll = {
+    code: null, timer: null, pulse: null, snap: null,
+    subs: { game: [], states: [], state: {} },
+    last: { game: null, states: null, state: {} }
+  };
+
+  function fanOut(snap) {
+    if (!snap) return;
+    var game = snap.game;
+    if (game) game = Object.assign({}, game, { deals: snap.deals || [] });
+    var states = snap.states || [];
+
+    // Order matters. The state rows are the data; the game document is the
+    // pointer that says "now show it". Deliver the rows first, or a phase
+    // flip to "tally" starts the roll call while the board still holds the
+    // previous round's votes — every state reads as an abstention.
+    var ss = JSON.stringify(states);
+    if (ss !== poll.last.states) {
+      poll.last.states = ss;
+      poll.subs.states.forEach(function (cb) { try { cb(states); } catch (e) { console.error(e); } });
+    }
+    Object.keys(poll.subs.state).forEach(function (name) {
+      var row = null;
+      for (var i = 0; i < states.length; i++) if (states[i].name === name) { row = states[i]; break; }
+      if (!row) return;
+      var rs = JSON.stringify(row);
+      if (rs === poll.last.state[name]) return;
+      poll.last.state[name] = rs;
+      poll.subs.state[name].forEach(function (cb) { try { cb(row); } catch (e) { console.error(e); } });
+    });
+
+    var gs = JSON.stringify(game);
+    if (game && gs !== poll.last.game) {
+      poll.last.game = gs;
+      poll.subs.game.forEach(function (cb) { try { cb(game); } catch (e) { console.error(e); } });
+    }
+  }
+
+  var INTERVAL = 950;
+
+  function tick() {
+    if (!poll.code) return;
+    rpc("aoc_pulse", { p_code: poll.code }).then(function (p) {
+      if (p === poll.pulse) return null;
+      poll.pulse = p;
+      return rpc("aoc_snapshot", { p_code: poll.code }).then(function (snap) {
+        poll.snap = snap;
+        fanOut(snap);
+      });
+    }).catch(function (e) {
+      // A dropped request on classroom wifi is normal; the next tick retries.
+      console.warn("sync retry:", e.message);
+    });
+  }
+
+  function ensurePolling(code) {
+    if (poll.code !== code) {
+      poll.code = code;
+      poll.pulse = null;
+      poll.last = { game: null, states: null, state: {} };
+    }
+    if (!poll.timer) {
+      poll.timer = setInterval(tick, INTERVAL);
+      tick();
+    }
+  }
+
+  // After we write something, don't make the room wait a second to see it.
+  function nudge() { poll.pulse = null; setTimeout(tick, 60); }
+
+  function unsub(list, cb) {
+    return function () {
+      var i = list.indexOf(cb);
+      if (i >= 0) list.splice(i, 1);
+    };
+  }
+
+  /* -------------------------------------------------------------- api */
+  var NET = {
+    createGame: function (studentStateNames, opts) {
+      var code = makeCode();
+      var game = {
+        status: "lobby", round: -1, phase: "lobby",
+        stability: 60, nationalTreasury: 0,
+        studentStates: studentStateNames,
+        absent: [], history: [], result: null, caucusEndsAt: null,
+        settings: opts || {}, createdAt: Date.now()
+      };
+      var states = window.AOC.STATES.map(function (s) {
+        return {
+          name: s.name, abbr: s.abbr,
+          isBot: studentStateNames.indexOf(s.name) === -1,
+          players: [], interest: 50, treasuryNow: s.treasury,
+          votes: {}, payments: {}
+        };
+      });
+      return rpc("aoc_create_game", { p_code: code, p_game: game, p_states: states })
+        .then(function () { return code; });
+    },
+
+    updateGame: function (code, patch) {
+      return rpc("aoc_patch_game", { p_code: code, p_patch: patch }).then(nudge);
+    },
+    updateState: function (code, name, patch) {
+      return rpc("aoc_patch_state", { p_code: code, p_name: name, p_patch: patch }).then(nudge);
+    },
+    batchStates: function (code, updates) {
+      return rpc("aoc_patch_states", { p_code: code, p_updates: updates }).then(nudge);
+    },
+    endGame: function (code) {
+      return NET.updateGame(code, { status: "ended", phase: "debrief" });
+    },
+
+    findGame: function (code) {
+      return rpc("aoc_snapshot", { p_code: code }).then(function (snap) {
+        if (!snap || !snap.game) return null;
+        return Object.assign({}, snap.game, { deals: snap.deals || [] });
+      });
+    },
+    listStates: function (code) {
+      return rpc("aoc_snapshot", { p_code: code }).then(function (snap) {
+        return (snap && snap.states) || [];
+      });
+    },
+
+    claimState: function (code, name, players) {
+      return NET.updateState(code, name, { players: players, isBot: false, claimed: true });
+    },
+    releaseState: function (code, name) {
+      return NET.updateState(code, name, { players: [], isBot: true, claimed: false });
+    },
+    castVote: function (code, name, round, vote) {
+      var p = {}; p["votes." + round] = vote;
+      return NET.updateState(code, name, p);
+    },
+    setPayment: function (code, name, round, choice, amount) {
+      var p = {}; p["payments." + round] = { choice: choice, paid: amount };
+      return NET.updateState(code, name, p);
+    },
+
+    pushDeal: function (code, deal) {
+      return rpc("aoc_push_deal", { p_code: code, p_deal: deal }).then(nudge);
+    },
+    updateDeals: function (code, deals) {
+      return rpc("aoc_replace_deals", { p_code: code, p_deals: deals }).then(nudge);
+    },
+
+    onGame: function (code, cb) {
+      ensurePolling(code);
+      poll.subs.game.push(cb);
+      if (poll.snap && poll.snap.game) {
+        cb(Object.assign({}, poll.snap.game, { deals: poll.snap.deals || [] }));
+      }
+      return unsub(poll.subs.game, cb);
+    },
+    onStates: function (code, cb) {
+      ensurePolling(code);
+      poll.subs.states.push(cb);
+      if (poll.snap) cb(poll.snap.states || []);
+      return unsub(poll.subs.states, cb);
+    },
+    onState: function (code, name, cb) {
+      ensurePolling(code);
+      (poll.subs.state[name] = poll.subs.state[name] || []).push(cb);
+      return unsub(poll.subs.state[name], cb);
+    },
+
+    isConfigured: configured,
+    boot: function () { return Promise.resolve(); }
+  };
+
+  (window.AOC_NET_IMPLS = window.AOC_NET_IMPLS || {}).supabase = NET;
+})();
+
+</script>
+<script>
+/* =========================================================================
+   THE CONFEDERATION PROBLEM — backend selector
+
+   Picks whichever backend assets/config.js names and exposes it as
+   window.NET. Both backends present the same handful of methods, so no
+   other file in the project knows or cares which one is running.
+   ========================================================================= */
+(function () {
+  "use strict";
+
+  var want = (window.AOC_CONFIG && window.AOC_CONFIG.backend) || "supabase";
+  var impls = window.AOC_NET_IMPLS || {};
+  var chosen = impls[want];
+
+  if (!chosen) {
+    var available = Object.keys(impls);
+    chosen = impls[available[0]];
+    if (chosen) {
+      console.warn('Backend "' + want + '" is not loaded; using "' + available[0] + '".');
+    }
+  }
+
+  if (!chosen) {
+    // Fail loudly and in plain English rather than with a null reference
+    // twenty lines later.
+    var msg = "No backend loaded. Check that assets/config.js and the " +
+              "net-*.js files are included before net.js.";
+    chosen = new Proxy({}, { get: function () {
+      return function () { return Promise.reject(new Error(msg)); };
+    }});
+    console.error(msg);
+  }
+
+  window.NET = chosen;
+  window.NET.backendName = want;
+
+  // A misconfigured project should say so on the setup screen, not fail
+  // silently the moment a teacher tries to create a session.
+  if (want === "supabase" && chosen.isConfigured && !chosen.isConfigured()) {
+    document.addEventListener("DOMContentLoaded", function () {
+      var host = document.querySelector(".wrap, .wrap-wide, body");
+      if (!host) return;
+      var d = document.createElement("div");
+      d.className = "card";
+      d.style.cssText = "border-color:#8a2019;border-width:3px";
+      d.innerHTML =
+        '<h2 style="color:#8a2019">Supabase is not set up yet</h2>' +
+        '<p class="lede">Open <strong>assets/config.js</strong> and paste your ' +
+        'project URL and anon public key. Both are in Supabase under ' +
+        '<strong>Project Settings &rarr; API</strong>.</p>' +
+        '<p class="small muted">You also need to run <strong>supabase-setup.sql</strong> ' +
+        'once in the Supabase SQL Editor. Until both are done, sessions cannot be created.</p>';
+      host.insertBefore(d, host.firstChild);
+    });
+  }
+})();
+
+</script>
+<script>
+/* =========================================================================
    THE CONFEDERATION PROBLEM — end-of-game debrief
    Shared by teacher.html, student.html and solo.html.
    ========================================================================= */
@@ -1929,325 +2423,409 @@ window.AOC_MAP = {"viewBox":"10 64 910 822","width":910,"height":822,"states":{"
 (function(){
 "use strict";
 var D = window.AOC, E = window.ENGINE;
-var $ = function(i){ return document.getElementById(i); };
+var $ = function(id){ return document.getElementById(id); };
 
-var SEED = "SOLO" + Math.floor(Math.random()*100000);
-var MINE=null, ROUND=0, PHASE="deal", S=[], STAB=60, TREAS=0, HIST=[], DEALS=[], RESULT=null;
-var DEAL_LIMIT = 3, lastRequested = 0;
+var CODE=null, NAMES=null, MINE=null, G=null, ME=null, ALL=[];
+var dealTarget=null, tickTimer=null;
 
-function show(id){ ["s-pick","s-play","s-end"].forEach(function(x){ $(x).classList.toggle("hidden", x!==id); }); }
-function me(){ return S.filter(function(x){ return x.name===MINE; })[0]; }
-function res(){ return D.RESOLUTIONS[ROUND]; }
+function myData(){ return D.byName(MINE); }
+function res(){ return (G && G.round >= 0) ? D.RESOLUTIONS[G.round] : null; }
 
-/* ------------------------------------------------------------- pick */
-(function(){
-  var l = $("pick-list");
-  D.STATES.slice().sort(function(a,b){ return a.name.localeCompare(b.name); }).forEach(function(s){
+/* ---------------------------------------------------------------- join */
+$("join-btn").addEventListener("click", function(){
+  var names = $("names").value.trim();
+  var code = $("code").value.trim().toUpperCase();
+  if (!names || code.length !== 4) { $("join-err").textContent = "Enter both names and the 4-letter code."; return; }
+  $("join-err").textContent = "Connecting…";
+  NET.findGame(code).then(function(g){
+    if (!g) { $("join-err").textContent = "No game with that code. Check the board."; return; }
+    CODE = code; NAMES = names; G = g;
+    $("join-err").textContent = "";
+    return NET.listStates(code).then(function(list){
+      ALL = list;
+      $("s-join").classList.add("hidden");
+      $("s-claim").classList.remove("hidden");
+      renderClaims();
+      try{ localStorage.setItem("aoc_student", JSON.stringify({code:code,names:names})); }catch(e){}
+    });
+  }).catch(function(err){ $("join-err").textContent = "Could not connect: " + err.message; });
+});
+$("code").addEventListener("keydown", function(e){ if (e.key === "Enter") $("join-btn").click(); });
+
+function renderClaims(){
+  var slots = (G.studentStates||[]);
+  var list = $("claim-list"); list.innerHTML = "";
+  var open = ALL.filter(function(s){ return slots.indexOf(s.name) !== -1; });
+  if (!open.length) open = ALL;
+  open.sort(function(a,b){ return a.name.localeCompare(b.name); }).forEach(function(s){
+    var d = D.byName(s.name);
+    var taken = (s.players||[]).length > 0;
     var b = document.createElement("button");
-    b.className = "claim";
-    b.innerHTML = '<div class="t">' + s.name + '</div><div class="d">' + s.motto + '</div>';
-    b.addEventListener("click", function(){ begin(s.name); });
-    l.appendChild(b);
+    b.className = "claim"; b.disabled = taken;
+    b.innerHTML = '<div class="t">' + s.name + (taken ? ' — taken by ' + s.players.join(", ") : '') + '</div>' +
+                  '<div class="d">' + d.motto + '</div>';
+    b.addEventListener("click", function(){ claim(s.name); });
+    list.appendChild(b);
   });
-})();
-
-function begin(name){
-  MINE = name;
-  S = D.STATES.map(function(s){
-    return { name:s.name, abbr:s.abbr, isBot: s.name !== name, interest:50,
-             treasuryNow:s.treasury, vote:null, pay:null };
-  });
-  var d = D.byName(name);
-  $("mast").textContent = d.name;
-  $("sub").textContent = "Solo Congress · you are one vote out of thirteen";
-  $("d-name").textContent = d.name;
-  $("d-bg").textContent = d.background;
-  $("d-obj").textContent = d.objective;
-  $("d-fac").innerHTML = d.factions.map(function(f){
-    return '<div class="faction"><div style="font-weight:700">' + f.name + '</div><div class="small">' + f.wants + '</div></div>';
-  }).join("");
-  show("s-play");
-  startRound();
 }
 
-/* ------------------------------------------------------------ round */
-function startRound(){
-  PHASE = "deal"; DEALS = []; RESULT = null;
-  S.forEach(function(s){ s.vote = null; s.pay = null; s.absent = false; });
-  // Cap absences at two: with a 9-of-13 bar, more than that silently turns the
-  // vote into a unanimity requirement among whoever bothered to show up.
-  var skipped = 0;
-  S.forEach(function(s){
-    if (s.isBot && skipped < 2 && !E.botAttends(D.byName(s.name), SEED, ROUND+1)) {
-      s.absent = true; skipped++;
-    }
+function claim(name){
+  MINE = name;
+  NET.claimState(CODE, name, [NAMES]).then(function(){
+    try{ localStorage.setItem("aoc_student", JSON.stringify({code:CODE,names:NAMES,state:name})); }catch(e){}
+    startListening();
   });
-  var r = res();
-  var narr = E.narration(r, { treasury: TREAS });
-  if (narr) {
+}
+
+function startListening(){
+  var d = myData();
+  $("pre").classList.add("hidden");
+  $("live").classList.remove("hidden");
+  $("p-name").textContent = d.name;
+  $("p-who").textContent = "Delegates: " + NAMES;
+  $("p-obj").textContent = d.objective;
+  $("p-bg").textContent = d.background;
+  $("p-factions").innerHTML = d.factions.map(function(f,i){
+    return '<div class="delegate"><div class="pin">' + (i+1) + '</div><div>' +
+           '<div class="w">' + f.name + '</div><div class="g">' + f.wants + '</div></div></div>';
+  }).join("");
+  document.title = d.name + " — The Confederation Problem";
+  NET.onGame(CODE, function(g){ G = g; render(); });
+  NET.onState(CODE, MINE, function(s){ ME = s; render(); });
+}
+
+/* ------------------------------------------------------------- the cue
+   One line at the top that always answers "what am I supposed to be doing
+   right now". Everything else on the page is reference material.        */
+function setCue(kind, cue, say){
+  var b = $("actionbar");
+  b.className = "actionbar act-" + kind;
+  $("cue").textContent = cue;
+  $("say").textContent = say;
+}
+
+function runClock(){
+  if (tickTimer) { clearInterval(tickTimer); tickTimer = null; }
+  var on = G.phase === "caucus" && G.caucusEndsAt;
+  $("clock").classList.toggle("hidden", !on);
+  if (!on) return;
+  var tick = function(){
+    var left = Math.max(0, Math.round((G.caucusEndsAt - Date.now())/1000));
+    var m = Math.floor(left/60), s = left % 60;
+    $("clock").textContent = m + ":" + (s<10?"0":"") + s;
+    $("clock").classList.toggle("low", left <= 20);
+  };
+  tick(); tickTimer = setInterval(tick, 250);
+}
+
+/* -------------------------------------------------------------- render */
+function render(){
+  if (!G || !ME) return;
+  var d = myData();
+
+  if (G.status === "ended") {
+    $("live").classList.add("hidden");
+    $("s-debrief").classList.remove("hidden");
+    NET.listStates(CODE).then(function(list){
+      window.DEBRIEF.render($("s-debrief"), G, list, { you: MINE });
+    });
+    return;
+  }
+
+  $("p-treas").textContent = E.money(ME.treasuryNow);
+  $("p-int").textContent = Math.round(ME.interest);
+  $("p-nation").textContent = Math.round(G.stability);
+  renderRecord();
+
+  if (G.status === "lobby" || G.round < 0) {
+    setCue("wait", "Get ready", "Read your objective and your two factions on the right. Your teacher will start Resolution 1.");
+    ["res-card","deal-card","vote-card","pay-card","wait-card","out-card","dispatch"].forEach(function(x){
+      $(x).classList.add("hidden"); });
+    $("p-cost-blk").classList.add("hidden");
+    $("p-touch-blk").classList.add("hidden");
+    return;
+  }
+
+  var r = res(); if (!r) return;
+  var ph = G.phase;
+  var myVote = ME.votes && ME.votes[G.round];
+  var myPay  = ME.payments && ME.payments[G.round];
+  var amAbsent = (G.absent||[]).indexOf(MINE) !== -1;
+
+  $("res-card").classList.remove("hidden");
+  $("r-eyebrow").textContent = "Resolution " + r.number + " of " + D.RESOLUTIONS.length + " — " + r.subtitle;
+  $("r-rule").textContent = r.voteRule === "unanimous" ? "Needs ALL 13 states" : "Needs 9 of 13 states";
+  $("r-title").textContent = r.title;
+  $("r-brief").innerHTML = glossify(r.brief, r.glossary);
+  $("r-detail").innerHTML = r.detail.split("\n\n").map(function(p){
+    return "<p>" + glossify(p, r.glossary) + "</p>"; }).join("");
+  $("r-question").textContent = r.question;
+  $("r-ifpass").innerHTML = glossify(r.ifPasses, r.glossary);
+  $("r-iffail").innerHTML = glossify(r.ifFails, r.glossary);
+  $("r-yes").innerHTML = glossify(r.yesCase, r.glossary);
+  $("r-no").innerHTML = glossify(r.noCase, r.glossary);
+  $("vote-state").textContent = MINE;
+
+  renderCost(d, r);
+  renderTouch(d, r);
+
+  // Students follow along on their own screen while the teacher performs it.
+  // Seeing the words as they hear them helps the weaker readers most.
+  var narr = E.narration(r, { treasury: G.nationalTreasury || 0 });
+  $("dispatch").classList.toggle("hidden", !(narr && ph === "brief"));
+  if (narr && ph === "brief") {
     $("dsp-dateline").textContent = narr.dateline;
     $("dsp-body").innerHTML = narr.lines.map(function(l){ return "<p>" + l + "</p>"; }).join("");
   }
-  $("r-eye").textContent = "Resolution " + r.number + " of " + D.RESOLUTIONS.length + " — " + r.subtitle;
-  $("r-rule").textContent = r.voteRule === "unanimous" ? "Needs ALL 13 states" : "Needs 9 of 13 states";
-  $("r-title").textContent = r.title;
-  $("r-brief").textContent = r.brief;
-  $("r-detail").innerHTML = r.detail.split("\n\n").map(function(p){ return "<p>"+p+"</p>"; }).join("");
-  $("r-question").textContent = r.question;
-  $("r-ifpass").textContent = r.ifPasses;
-  $("r-iffail").textContent = r.ifFails;
-  $("r-yes").textContent = r.yesCase;
-  $("r-no").textContent = r.noCase;
-  $("vote-state").textContent = MINE;
 
-  var owed = E.amountOwed(D.byName(MINE), r);
-  $("cost-wrap").classList.remove("hidden");
-  if (!owed) $("cost-body").innerHTML = '<div class="nocost">This one does not take a penny out ' +
-    'of your treasury. It costs you something harder to measure — look at what it touches.</div>';
-  $("touch-body").innerHTML = E.interestBreakdown(D.byName(MINE), r).slice(0,5).map(function(b){
+  // one cue per phase
+  if (amAbsent) {
+    setCue("wait", "Not present", "Your delegation did not make it to Congress this round. Sit tight.");
+  } else if (ph === "brief") {
+    setCue("wait", "Listen", "Follow along while your teacher reads. Then check what this costs you, on the right.");
+  } else if (ph === "caucus") {
+    setCue("debate", "Debate now", "Get up and argue. Send offers to the bot states below — they answer straight away.");
+  } else if (ph === "voting") {
+    setCue(myVote ? "wait" : "vote",
+      myVote ? "Vote locked" : "Vote now",
+      myVote ? "You voted " + myVote.toUpperCase() + ". Waiting for the other states."
+             : "Your delegation must vote. Nine of thirteen states have to agree.");
+  } else if (ph === "compliance") {
+    setCue(myPay ? "wait" : "pay",
+      myPay ? "Decision locked" : "Now pay — or don't",
+      myPay ? "You chose to " + ({full:"pay in full",half:"pay half",none:"pay nothing"})[myPay.choice] + "."
+            : "It passed. Nobody can force you to pay. Decide.");
+  } else {
+    setCue("wait", "Results", "Look at what your Congress actually managed to do.");
+  }
+  runClock();
+
+  $("deal-card").classList.toggle("hidden", ph !== "caucus" || amAbsent);
+  $("vote-card").classList.toggle("hidden", !(ph === "voting" && !myVote && !amAbsent));
+  $("pay-card").classList.toggle("hidden", !(ph === "compliance" && !myPay && !amAbsent));
+  if (ph === "compliance") {
+    var owedNow = E.amountOwed(d, r);
+    $("pay-owed").innerHTML = "You owe <strong>" + E.money(owedNow) + "</strong>. Your treasury holds " +
+      E.money(ME.treasuryNow) + ". Paying in full leaves you with " +
+      E.money(Math.max(0, ME.treasuryNow - owedNow)) + ".";
+  }
+
+  var waiting = (ph === "voting" && myVote) || (ph === "compliance" && myPay) || amAbsent;
+  $("wait-card").classList.toggle("hidden", !waiting);
+  if (waiting) {
+    $("wait-h").textContent = amAbsent ? "No delegate present"
+      : (ph === "voting" ? "You voted " + myVote.toUpperCase()
+                         : "You chose: " + ({full:"PAY IN FULL",half:"PAY HALF",none:"PAY NOTHING"})[myPay.choice]);
+    $("wait-p").innerHTML = amAbsent ? "You cannot vote this round."
+      : 'Waiting for the other states<span class="dot">…</span>';
+  }
+
+  if (ph === "caucus") renderDeals();
+
+  // result
+  var showRes = (ph === "tally" || ph === "reveal" || ph === "done") && G.result;
+  $("out-card").classList.toggle("hidden", !showRes);
+  if (showRes) {
+    var R = G.result;
+    $("out-head").textContent = !R.quorum ? "No quorum — no vote could be held"
+      : (R.passed ? "PASSED  (" + R.yes + " yes of " + R.needed + " needed)"
+                  : "FAILED  (" + R.yes + " yes, " + R.needed + " needed)");
+    $("out-head").style.color = R.passed ? "#1d5233" : "#8a2019";
+    $("out-narr").textContent = (ph === "tally" && r.compliance && R.passed) ? r.passText : (R.narrative || "");
+    var money = (ph === "reveal" || ph === "done") && R.requested > 0;
+    $("out-money").classList.toggle("hidden", !money);
+    if (money) {
+      $("o-ask").textContent = E.money(R.requested);
+      $("o-got").textContent = E.money(R.collected);
+      $("o-pct").textContent = Math.round(R.collected/R.requested*100) + "%";
+    }
+    var hn = (ph === "reveal" || ph === "done");
+    $("out-hist").classList.toggle("hidden", !hn);
+    if (hn) $("out-hist-text").innerHTML = (D.HISTORY_NOTES[r.id] || "").split("\n\n")
+      .map(function(x){ return "<p>" + x + "</p>"; }).join("");
+  }
+}
+
+function renderCost(d, r){
+  var owed = E.amountOwed(d, r);
+  $("p-cost-blk").classList.remove("hidden");
+  if (!owed) {
+    $("p-cost").innerHTML = '<div class="nocost">This one does not take a penny out of your ' +
+      'treasury. It costs you something harder to measure — look at what it touches, below.</div>';
+    return;
+  }
+  var pct = Math.round(owed / Math.max(1, ME.treasuryNow) * 100);
+  $("p-cost").innerHTML =
+    '<div class="spread" style="font-size:1.05rem"><span>Your share</span>' +
+      '<strong>' + E.money(owed) + '</strong></div>' +
+    '<div class="spread small"><span class="muted">You have</span><span>' + E.money(ME.treasuryNow) + '</span></div>' +
+    '<div class="spread small"><span class="muted">Paying in full costs</span>' +
+      '<strong style="color:#8a2019">' + pct + '% of everything</strong></div>' +
+    '<div class="small muted" style="margin-top:6px">Split by ' +
+      (r.complianceBasis === "popShare" ? "how many people live here" : "the value of your land") + '.</div>';
+}
+
+// Same maths the bots use, shown plainly. It does not tell them how to vote —
+// it shows which of their interests are being pulled, and how hard.
+function renderTouch(d, r){
+  var rows = E.interestBreakdown(d, r).slice(0, 5);
+  $("p-touch-blk").classList.toggle("hidden", rows.length === 0);
+  $("p-touch").innerHTML = rows.map(function(b){
     return '<div class="touch ' + (b.value > 0 ? "pos" : "neg") + '">' +
       '<span class="arrow">' + (b.value > 0 ? "▲" : "▼") + '</span>' +
       '<span class="txt">' + b.label + '</span>' +
       '<span class="mag">' + (b.strength ? b.strength + " " : "") + "for " + b.toward.toLowerCase() + '</span>' +
     '</div>';
   }).join("");
-  if (owed) {
-    $("cost-body").innerHTML =
-      '<div class="bill"><span>Your share of ' + E.money(r.complianceTotal) + '</span><strong>' + E.money(owed) + '</strong></div>' +
-      '<div class="bill"><span>Your treasury</span><strong>' + E.money(me().treasuryNow) + '</strong></div>' +
-      '<div class="bill"><span>Paying in full costs you</span><strong style="color:#8a2019">' +
-        Math.round(owed/me().treasuryNow*100) + '% of everything you have</strong></div>';
-  }
-
-  var t = $("dt"); t.innerHTML = "";
-  S.filter(function(s){ return s.name !== MINE && !s.absent; }).forEach(function(s){
-    var o = document.createElement("option"); o.value = s.name; o.textContent = s.name; t.appendChild(o);
-  });
-  var off = $("do"); off.innerHTML = "";
-  E.DEAL_OPTIONS.forEach(function(o){
-    var el = document.createElement("option"); el.value = o.id; el.textContent = o.label; off.appendChild(el);
-  });
-
-  lastRequested = 0;
-  $("deal-card").classList.remove("hidden");
-  $("vote-card").classList.remove("hidden");
-  $("seat-card").classList.add("hidden");
-  $("t-money").classList.add("hidden");
-  $("pay-card").classList.add("hidden");
-  $("out-card").classList.add("hidden");
-  refresh();
 }
 
-function refresh(){
-  var m = me();
-  $("stats").innerHTML =
-    '<div class="stat"><div class="k">Treasury</div><div class="v">' + E.money(m.treasuryNow) + '</div></div>' +
-    '<div class="stat"><div class="k">Your interest</div><div class="v">' + Math.round(m.interest) + '</div></div>' +
-    '<div class="stat"><div class="k">Nation</div><div class="v">' + Math.round(STAB) + '</div></div>';
-  var left = DEAL_LIMIT - DEALS.length;
-  $("deal-left").textContent = left + " offer" + (left===1?"":"s") + " left";
-  $("dsend").disabled = left <= 0;
-  $("dlog").innerHTML = DEALS.length ? DEALS.slice().reverse().map(function(x){
-    return '<div class="line ' + (x.status==="accepted"?"ok":"bad") + '"><strong>To ' + x.to + ':</strong> ' +
-      x.label + "<br>" + x.reply + "</div>";
-  }).join("") : '<div class="line muted small">No offers yet.</div>';
-  renderLean();
-}
-
-/* A read of the room: shows which way each bot is leaning, so the player
-   learns to spend offers on states that are actually persuadable. */
-function renderLean(){
-  var r = res();
-  $("lean").innerHTML = S.map(function(s){
-    if (s.name === MINE) return '<div class="seat you"><div class="ab">' + s.abbr +
-      '</div><div class="nm">' + s.name + '</div><div class="vt">you</div></div>';
-    if (s.absent) return '<div class="seat absent"><div class="ab">' + s.abbr +
-      '</div><div class="nm">' + s.name + '</div><div class="vt">no delegate</div></div>';
-    var sc = E.botVoteScore(D.byName(s.name), r, DEALS.filter(function(d){ return d.status==="accepted"; }));
-    var v = sc.total + (r.isAmendment ? 0 : 2.6);
-    var cls = v > 1.2 ? "yes" : (v < -1.2 ? "no" : "abstain");
-    var lbl = v > 1.2 ? "leaning yes" : (v < -1.2 ? "leaning no" : "undecided");
-    return '<div class="seat ' + cls + '"><div class="ab">' + s.abbr + '</div><div class="nm">' +
-      s.name + '</div><div class="vt">' + lbl + '</div></div>';
+function renderRecord(){
+  var hist = G.history || [];
+  $("p-rec-blk").classList.toggle("hidden", hist.length === 0);
+  if (!hist.length) return;
+  $("p-record").innerHTML = hist.map(function(h, i){
+    var v = (ME.votes && ME.votes[i]) || "—";
+    var p = ME.payments && ME.payments[i];
+    var vc = v === "Yes" ? "yes" : (v === "No" ? "no" : "abs");
+    return '<div class="rec"><span class="n">R' + (i+1) + '</span>' +
+      '<span class="v ' + vc + '">' + v.toUpperCase() + '</span>' +
+      '<span class="muted small">' + (h.passed ? "passed" : "failed") + '</span>' +
+      (p ? '<span class="p ' + p.choice + '">' +
+           ({full:"paid",half:"half",none:"paid nothing"})[p.choice] + '</span>' : '') +
+    '</div>';
   }).join("");
 }
 
-$("dsend").addEventListener("click", function(){
-  var to = $("dt").value, id = $("do").value;
-  var opt = E.DEAL_OPTIONS.filter(function(o){ return o.id===id; })[0];
-  var reply = E.botDealReply(D.byName(to), { id:id, weight:opt.weight, from:MINE }, res(), SEED+DEALS.length, ROUND);
-  DEALS.push({ to:to, id:id, label:opt.label, status:reply.status, reply:reply.text, weight: reply.status==="accepted"?opt.weight:0 });
-  if (reply.status === "accepted" && opt.cost) {
-    var m = me(); m.treasuryNow = Math.max(0, m.treasuryNow - opt.cost);
+/* --------------------------------------------------------------- deals */
+function renderDeals(){
+  var mine = (G.deals||[]).filter(function(x){ return x.round === G.round && x.from === MINE; });
+  var limit = (G.settings && G.settings.dealLimit) || 2;
+  var left = Math.max(0, limit - mine.length);
+  $("deal-left").textContent = left + " offer" + (left===1?"":"s") + " left";
+
+  // offers other delegations have sent US
+  var incoming = (G.deals||[]).filter(function(x){ return x.round === G.round && x.to === MINE; });
+  $("inbox").innerHTML = incoming.length ? incoming.map(function(x){
+    return '<div class="inbox"><strong>' + x.from + ' offers you:</strong> ' + x.label +
+      '<div class="small muted">Answer them out loud. Nothing here votes for you.</div></div>';
+  }).join("") : "";
+
+  var bots = G.activeBots || [];
+  var tg = $("deal-targets");
+  var sig = MINE + "|" + G.round + "|" + bots.join(",") + "|" + (G.absent||[]).join(",");
+  if (tg.dataset.sig !== sig) {
+    tg.dataset.sig = sig;
+    tg.innerHTML = "";
+    D.STATES.filter(function(s){
+      return s.name !== MINE && (G.absent||[]).indexOf(s.name) === -1;
+    }).forEach(function(s){
+      var isBot = bots.indexOf(s.name) !== -1;
+      var b = document.createElement("button");
+      b.className = "target"; b.dataset.name = s.name;
+      b.innerHTML = '<div class="t">' + s.abbr + ' · ' + s.name + '</div>' +
+                    '<div class="k">' + (isBot ? "answers right away" : "talk to them in person") + '</div>';
+      b.addEventListener("click", function(){
+        dealTarget = s.name;
+        Array.prototype.forEach.call(tg.children, function(c){
+          c.classList.toggle("on", c.dataset.name === dealTarget); });
+        updateSend();
+      });
+      tg.appendChild(b);
+    });
+    var off = $("deal-offer"); off.innerHTML = "";
+    E.DEAL_OPTIONS.forEach(function(o){
+      var el = document.createElement("option"); el.value = o.id; el.textContent = o.label; off.appendChild(el);
+    });
   }
-  refresh();
+  updateSend(left);
+
+  $("deal-log").innerHTML = mine.length ? mine.slice().reverse().map(function(x){
+    var cls = x.status==="accepted" ? "ok" : (x.status==="rejected" ? "bad" : "");
+    return '<div class="line ' + cls + '"><strong>To ' + x.to + ':</strong> ' + x.label +
+      (x.reply ? "<br>" + x.reply : ' <span class="muted">(waiting)</span>') + "</div>";
+  }).join("") : '<div class="line muted small">You have not made any offers this round.</div>';
+}
+
+function updateSend(left){
+  if (left === undefined) {
+    var mine = (G.deals||[]).filter(function(x){ return x.round === G.round && x.from === MINE; });
+    left = Math.max(0, ((G.settings && G.settings.dealLimit) || 2) - mine.length);
+  }
+  var b = $("deal-send");
+  b.disabled = !dealTarget || left === 0;
+  b.textContent = left === 0 ? "No offers left this round"
+    : (dealTarget ? "Send the offer to " + dealTarget : "Pick a state first");
+}
+
+$("deal-send").addEventListener("click", function(){
+  if (!dealTarget) return;
+  var id = $("deal-offer").value;
+  var opt = E.DEAL_OPTIONS.filter(function(o){ return o.id === id; })[0];
+  $("deal-send").disabled = true;
+  NET.pushDeal(CODE, { from: MINE, to: dealTarget, id: id, label: opt.label,
+    round: G.round, status: "pending", ts: Date.now() });
+  dealTarget = null;
+  Array.prototype.forEach.call($("deal-targets").children, function(c){ c.classList.remove("on"); });
 });
 
-window.SV = function(v){
-  var r = res();
-  me().vote = v;
-  var accepted = DEALS.filter(function(d){ return d.status==="accepted"; });
-  S.forEach(function(s){
-    if (!s.isBot || s.absent) return;
-    s.vote = E.botVote(D.byName(s.name), r, accepted, SEED, ROUND+1).vote;
+/* ------------------------------------------------------------ glossary */
+function glossify(text, terms){
+  if (!terms || !terms.length) return text;
+  var out = text;
+  terms.forEach(function(t){
+    if (!D.GLOSSARY[t]) return;
+    // Glossary keys are plain words ("requisition", "standing army"),
+    // so a word-boundary match on the first occurrence is enough.
+    var re = new RegExp("\\b(" + t + ")\\b", "i");
+    out = out.replace(re, '<mark class="gloss" data-term="' + t + '">$1</mark>');
   });
-  var pres = S.filter(function(s){ return !s.absent; });
-  var votes = {}; pres.forEach(function(s){ votes[s.name] = s.vote; });
-  var t = E.tally(votes, r, pres.map(function(s){ return s.name; }));
-  RESULT = t; RESULT.votes = votes;
+  return out;
+}
 
-  $("deal-card").classList.add("hidden");
+var pop = null;
+document.addEventListener("click", function(e){
+  if (pop) { pop.remove(); pop = null; }
+  var m = e.target.closest ? e.target.closest("mark.gloss") : null;
+  if (!m) return;
+  var term = m.dataset.term, def = D.GLOSSARY[term];
+  if (!def) return;
+  pop = document.createElement("div");
+  pop.className = "glosspop";
+  pop.innerHTML = "<b>" + term + "</b>" + def;
+  document.body.appendChild(pop);
+  var rect = m.getBoundingClientRect();
+  var top = rect.bottom + 8, left = Math.min(rect.left, window.innerWidth - pop.offsetWidth - 14);
+  if (top + pop.offsetHeight > window.innerHeight) top = rect.top - pop.offsetHeight - 8;
+  pop.style.top = Math.max(8, top) + "px";
+  pop.style.left = Math.max(8, left) + "px";
+  e.stopPropagation();
+});
+
+/* -------------------------------------------------------- vote and pay */
+window.AOCVOTE = function(v){
   $("vote-card").classList.add("hidden");
-  $("seat-card").classList.remove("hidden");
-  $("seat-pill").textContent = t.present + " states present";
-  $("seat-head").textContent = "The roll is called";
-  $("seat-card").scrollIntoView({ behavior:"smooth", block:"start" });
-
-  rollCall("votes", function(){
-    $("seat-head").textContent = !t.quorum ? "Fewer than nine states came. No vote is possible."
-      : (t.passed ? "PASSED" : "FAILED — " + t.needed + " yes votes were needed");
-    if (t.passed && r.compliance) {
-      $("pay-card").classList.remove("hidden");
-      var owed = E.amountOwed(D.byName(MINE), r);
-      $("pay-owed").innerHTML = "You owe <strong>" + E.money(owed) + "</strong>. Your treasury holds " +
-        E.money(me().treasuryNow) + ".";
-      $("pay-card").scrollIntoView({ behavior:"smooth", block:"center" });
-    } else {
-      finish(0, 0, []);
-    }
-  });
+  NET.castVote(CODE, MINE, G.round, v);
 };
-
-/* ---------------------------------------------------------- the map board */
-var mapRoot = null, moneySoFar = 0;
-function boardRows(){
-  return S.map(function(s){
-    return { name:s.name, abbr:s.abbr, isBot:s.isBot, isYou:s.name===MINE,
-             absent:!!s.absent, vote:s.vote,
-             payment: s.pay ? s.pay.choice : null };
-  });
-}
-function setTally(y,n,a,needed,verdict){
-  $("t-yes").textContent=y; $("t-no").textContent=n; $("t-ab").textContent=a;
-  $("t-fill").style.width = Math.min(100,(y/13)*100)+"%";
-  $("t-need").style.left = ((needed/13)*100)+"%";
-  var v=$("t-verdict"); v.textContent=verdict||"";
-  v.className="verdict"+(verdict==="PASSED"?" pass":(verdict?" fail":""));
-}
-var LEGENDS = {
-  vote:[["#3f9160","Voted yes"],["#b8483a","Voted no"],["#8794a3","Abstained"],
-        ["#4a423a","No delegate"],["#b9b2a6","Vermont — not a state"]],
-  pay: [["#3f9160","Paid in full"],["#c8912f","Paid half"],["#7d2019","Paid nothing"],
-        ["#4a423a","No delegate"]]
-};
-function setLegend(k){
-  $("map-legend").innerHTML = LEGENDS[k].map(function(x){
-    return '<span><i style="background:'+x[0]+'"></i>'+x[1]+"</span>"; }).join("");
-}
-function rollCall(mode, done){
-  if (!mapRoot) mapRoot = window.AOCMAP.build($("map-view"));
-  var r = res();
-  var needed = r.voteRule === "unanimous" ? 13 : 9;
-  setLegend(mode === "payment" ? "pay" : "vote");
-  moneySoFar = 0;
-  $("t-money").classList.toggle("hidden", mode !== "payment");
-  if (mode === "votes") setTally(0,0,0,needed,"");
-  if (mode === "payment") {
-    $("t-money-val").textContent = "$0";
-    $("t-money-of").textContent = "of " + E.money(lastRequested);
-  }
-  $("map-view").classList.add("dim");
-  window.AOCMAP.revealVotes(mapRoot, boardRows(), {
-    mode: mode,
-    step: mode === "payment" ? 330 : 430,
-    onTick: function(t){
-      if (mode === "votes") { setTally(t.yes,t.no,t.abstain,needed,""); return; }
-      var owed = E.amountOwed(D.byName(t.name), r);
-      var c = t.row.payment;
-      moneySoFar += c === "full" ? owed : (c === "half" ? Math.round(owed/2) : 0);
-      $("t-money-val").textContent = E.money(moneySoFar);
-    },
-    onDone: function(t){
-      $("map-view").classList.remove("dim");
-      if (mode === "votes") setTally(t.yes,t.no,t.abstain,needed, RESULT.passed ? "PASSED" : "FAILED");
-      if (done) done();
-    }
-  });
-}
-$("replay-btn").addEventListener("click", function(){
-  rollCall(lastRequested > 0 && S.some(function(s){return s.pay;}) ? "payment" : "votes");
-});
-
-window.SP = function(choice){
-  var r = res(), requested = 0, collected = 0, excuses = [];
-  S.forEach(function(s){
-    var d = D.byName(s.name);
-    var owed = E.amountOwed(d, r); requested += owed;
-    var c;
-    if (s.name === MINE) {
-      c = { choice: choice, paid: choice==="full"?owed:(choice==="half"?Math.round(owed/2):0) };
-    } else {
-      c = E.botCompliance(Object.assign({}, d, {treasuryNow:s.treasuryNow}), r,
-        RESULT.votes[s.name]==="Yes", SEED, ROUND+1);
-    }
-    s.pay = c; collected += c.paid;
-    s.treasuryNow -= c.paid;
-    s.interest += E.stateInterestFromCompliance(c.choice);
-    excuses.push({ choice:c.choice, text: s.name===MINE
-      ? ("You " + ({full:"paid in full.",half:"paid half and promised the rest later.",none:"sent nothing."})[c.choice])
-      : E.complianceExcuse(d, c.choice, SEED, ROUND+1) });
-  });
+window.AOCPAY = function(choice){
+  var r = res(), owed = E.amountOwed(myData(), r);
+  var paid = choice === "full" ? owed : (choice === "half" ? Math.round(owed/2) : 0);
   $("pay-card").classList.add("hidden");
-  lastRequested = requested;
-  $("seat-head").textContent = "Now see who actually paid";
-  $("seat-card").scrollIntoView({ behavior:"smooth", block:"start" });
-  rollCall("payment", function(){ finish(requested, collected, excuses); });
+  NET.setPayment(CODE, MINE, G.round, choice, paid);
 };
 
-function finish(requested, collected, excuses){
-  var r = res();
-  S.forEach(function(s){
-    if (s.absent) return;
-    s.interest += E.stateInterestFromVote(D.byName(s.name), r, s.vote);
-  });
-  var frac = requested > 0 ? collected/requested : 0;
-  STAB = E.clamp(STAB + E.nationalStabilityChange(r, RESULT, frac), 0, 100);
-  TREAS += collected;
-
-  $("out-card").classList.remove("hidden");
-  $("out-head").textContent = !RESULT.quorum ? "Congress could not meet"
-    : (RESULT.passed ? "Resolution passed" : "Resolution failed");
-  $("out-head").style.color = RESULT.passed ? "#1d5233" : "#8a2019";
-  $("out-narr").textContent = E.outcomeNarrative(r, RESULT, collected, requested);
-  $("out-money").classList.toggle("hidden", requested === 0);
-  if (requested) {
-    $("o-ask").textContent = E.money(requested);
-    $("o-got").textContent = E.money(collected);
-    $("o-pct").textContent = Math.round(collected/requested*100) + "%";
-    $("o-excuses").innerHTML = excuses.map(function(x){
-      return '<div class="line ' + (x.choice==="full"?"ok":(x.choice==="none"?"bad":"")) + '">' + x.text + "</div>";
-    }).join("");
+/* ------------------------------------------------------- reconnecting */
+try {
+  var saved = JSON.parse(localStorage.getItem("aoc_student") || "null");
+  if (saved && saved.code && saved.state) {
+    NET.findGame(saved.code).then(function(g){
+      if (!g) return;
+      CODE = saved.code; NAMES = saved.names; MINE = saved.state; G = g;
+      startListening();
+    });
+  } else if (saved && saved.names) {
+    $("names").value = saved.names;
   }
-  $("o-hist").innerHTML = (D.HISTORY_NOTES[r.id] || "").split("\n\n")
-    .map(function(x){ return "<p>" + x + "</p>"; }).join("");
-  HIST.push({ id:r.id, title:r.title, passed:RESULT.passed, yes:RESULT.yes, no:RESULT.no,
-    abstain:RESULT.abstain, quorum:RESULT.quorum, requested:requested, collected:collected,
-    stabilityAfter: Math.round(STAB) });
-  $("next-btn").textContent = (ROUND + 1 >= D.RESOLUTIONS.length) ? "See how it all ended" : "Next resolution";
-  refresh();
-  $("out-card").scrollIntoView({ behavior:"smooth", block:"start" });
-}
-
-$("next-btn").addEventListener("click", function(){
-  if (ROUND + 1 >= D.RESOLUTIONS.length) {
-    show("s-end");
-    window.DEBRIEF.render($("s-end"), { stability: STAB, history: HIST }, S, { you: MINE });
-    window.scrollTo({ top:0, behavior:"smooth" });
-    return;
-  }
-  ROUND++; startRound();
-  window.scrollTo({ top:0, behavior:"smooth" });
-});
+} catch(e){}
 })();
 
 </script>
