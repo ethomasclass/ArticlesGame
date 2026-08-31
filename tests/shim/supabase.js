@@ -101,6 +101,15 @@ const TEST_CFG = {
 /** Install onto a Playwright BrowserContext. */
 async function install(ctx, cfg) {
   const config = Object.assign({}, TEST_CFG, cfg || {});
+
+  // Most suites are not about the first-run tour, and a modal overlay in the
+  // middle of round one breaks them for no useful reason. Mark it seen by
+  // default; tour.test.js clears the flag itself.
+  if (!(cfg && cfg.showTour)) {
+    await ctx.addInitScript(() => {
+      try { localStorage.setItem('aoc_tour_done', '1'); } catch (e) {}
+    });
+  }
   await ctx.route('**/assets/config.js', r =>
     r.fulfill({ contentType: 'application/javascript',
                 body: 'window.AOC_CONFIG = ' + JSON.stringify(config) + ';' }));

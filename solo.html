@@ -46,7 +46,10 @@
 
   <section id="s-play" class="hidden">
     <div class="card" id="dossier">
-      <div class="eyebrow">Your state</div>
+      <div class="spread">
+        <div class="eyebrow">Your state</div>
+        <button class="btn ghost sm" id="tour-btn">Show me around</button>
+      </div>
       <h2 id="d-name"></h2>
       <p id="d-bg"></p>
       <div class="callout warn"><div class="eyebrow">Your objective</div><div id="d-obj" style="font-size:1.05rem"></div></div>
@@ -189,6 +192,7 @@
 <script src="assets/map.js"></script>
 <script src="assets/engine.js"></script>
 <script src="assets/debrief.js"></script>
+<script src="assets/tour.js"></script>
 <script>
 (function(){
 "use strict";
@@ -202,6 +206,29 @@ var DEAL_LIMIT = 3, lastRequested = 0;
 function show(id){ ["s-pick","s-play","s-end"].forEach(function(x){ $(x).classList.toggle("hidden", x!==id); }); }
 function me(){ return S.filter(function(x){ return x.name===MINE; })[0]; }
 function res(){ return D.RESOLUTIONS[ROUND]; }
+
+/* -------------------------------------------------------------- tour
+   Solo players have nobody to ask, so the walk-through matters more here
+   than it does in a classroom. Same engine, this screen's stops.        */
+window.AOC_TOUR_STEPS = [
+  { sel:"#dispatch", title:"The situation",
+    body:"Each round opens with the scene. In class a teacher reads this out loud; here, read it yourself." },
+  { sel:"#r-question", title:"What you are voting on",
+    body:"Everything above is background. This one sentence is the decision." },
+  { sel:".outcomes", title:"What each answer does",
+    body:"Read both before you decide. Sometimes passing a resolution changes nothing at all — that is the point." },
+  { sel:"#d-obj", title:"Your objective",
+    body:"What your state wants. Your score is how well you protect it, and nothing else." },
+  { sel:"#cost-card", title:"What it costs and what it touches",
+    body:"Your share in real money on the left, and which of your interests this pulls on the right." },
+  { sel:"#lean", title:"Read the room",
+    body:"How the other twelve states are leaning right now. You need nine yes votes, so count before you spend an offer." },
+  { sel:"#deal-card", title:"Go buy votes",
+    body:"You cannot reach nine alone. Offer a state something it wants and it will answer you straight away." },
+  { sel:"#vote-card", title:"Then vote",
+    body:"Abstaining is not neutral. Nine yes votes are needed, so an abstention helps a resolution fail." }
+];
+$("tour-btn").addEventListener("click", function(){ window.AOCTOUR.start(); });
 
 /* ------------------------------------------------------------- pick */
 (function(){
@@ -297,6 +324,9 @@ function startRound(){
   $("vote-card").classList.remove("hidden");
   $("seat-card").classList.add("hidden");
   $("t-money").classList.add("hidden");
+  if (ROUND === 0 && !window.AOCTOUR.seen()) {
+    setTimeout(function(){ window.AOCTOUR.start(); }, 700);
+  }
   $("pay-card").classList.add("hidden");
   $("out-card").classList.add("hidden");
   refresh();

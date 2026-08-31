@@ -186,6 +186,19 @@ record strip shows what they voted and whether they paid in every earlier round,
 Round 4 land; and the two factions are numbered as **Delegate 1** and **Delegate 2**, so the pair has an
 argument to have before they agree on a vote.
 
+### The first-run tour
+
+The first time a delegation reaches a resolution, eight spotlight steps walk them round their own
+screen — the action bar, the question, both outcomes, the secret objective, the cost, what it touches,
+and the two factions they have to reconcile. One line each.
+
+It runs during the brief, while you are reading the opening aloud, and **retires itself the instant
+debate opens** so nobody is reading a tooltip while the room argues without them. It shows once per
+device; the **Tour** button on the state card replays it for anyone who skipped it or joined late.
+
+Solo mode has its own version with stops suited to playing alone, including how to read the room before
+spending an offer.
+
 ### Making deals
 
 The deal panel separates the states a **bot** plays ("answers right away") from the ones **other students**
@@ -307,6 +320,7 @@ node tests/map.test.js           # map board, roll call, payment reveal
 node tests/deals.test.js         # bot offers answer, human offers are only delivered
 node tests/narration.test.js     # read-aloud on both screens, live treasury token
 node tests/explain.test.js       # every resolution states the question, both outcomes and the stake
+node tests/tour.test.js          # first-run tour: runs once, yields to the vote, replays on demand
 ```
 
 The multiplayer test replaces the Firebase SDK with a small localStorage-backed stand-in

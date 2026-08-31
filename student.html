@@ -275,8 +275,13 @@
       <div class="rail">
         <div class="statecard">
           <div class="top">
-            <div class="nm" id="p-name">—</div>
-            <div class="who" id="p-who"></div>
+            <div class="spread" style="align-items:flex-start">
+              <div>
+                <div class="nm" id="p-name">—</div>
+                <div class="who" id="p-who"></div>
+              </div>
+              <button class="tourbtn" id="tour-btn" title="Show me around this screen">Tour</button>
+            </div>
           </div>
           <div class="body">
             <div class="blk">
@@ -328,6 +333,7 @@
 
 <div id="s-debrief" class="wrap hidden"></div>
 
+
 <script src="assets/game-data.js"></script>
 <script src="assets/engine.js"></script>
 <script src="assets/config.js"></script>
@@ -335,6 +341,7 @@
 <script src="assets/net-supabase.js"></script>
 <script src="assets/net.js"></script>
 <script src="assets/debrief.js"></script>
+<script src="assets/tour.js"></script>
 <script>
 (function(){
 "use strict";
@@ -538,6 +545,16 @@ function render(){
 
   if (ph === "caucus") renderDeals();
 
+  // Run it once, on the first resolution a delegation ever sees. Never while
+  // they are being asked to act.
+  if (!window.AOCTOUR.seen() && !window.AOCTOUR.isOpen() &&
+      ph === "brief" && G.round === 0 && !amAbsent) {
+    setTimeout(function(){ if (G.phase === "brief") window.AOCTOUR.start(); }, 900);
+  }
+  // The tour belongs to the brief. The moment debate opens, students need to
+  // be out of their seats and clicking things, so it gets out of the way.
+  if (window.AOCTOUR.isOpen() && ph !== "brief") window.AOCTOUR.stop();
+
   // result
   var showRes = (ph === "tally" || ph === "reveal" || ph === "done") && G.result;
   $("out-card").classList.toggle("hidden", !showRes);
@@ -683,6 +700,31 @@ $("deal-send").addEventListener("click", function(){
   dealTarget = null;
   Array.prototype.forEach.call($("deal-targets").children, function(c){ c.classList.remove("on"); });
 });
+
+/* ------------------------------------------------------------ the tour
+   Eight one-line stops around the screen, the first time a delegation
+   reaches a resolution. The engine lives in assets/tour.js; these are just
+   this screen's stops. It retires itself the moment voting opens, so nobody
+   is reading a tooltip while the room votes without them.                */
+window.AOC_TOUR_STEPS = [
+  { sel:"#actionbar", title:"Start here",
+    body:"This bar always tells you what you are supposed to be doing right now. During debate it counts down your time." },
+  { sel:"#res-card", title:"The resolution",
+    body:"What Congress is arguing about today. Underlined words have a definition — tap one." },
+  { sel:"#r-question", title:"The actual question",
+    body:"Everything above is background. This one sentence is what your delegation is voting on." },
+  { sel:".outcomes", title:"What each answer does",
+    body:"Read both before you decide. Sometimes passing a resolution changes nothing at all — that is the point." },
+  { sel:"#p-obj", title:"Your secret objective",
+    body:"What your state wants. Your score is how well you protect it. Do not read this out loud." },
+  { sel:"#p-cost-blk", title:"What it costs you",
+    body:"Your share in real money, and what slice of your treasury that is." },
+  { sel:"#p-touch-blk", title:"What it touches",
+    body:"Which of your state's interests this pulls, and how hard. Up is toward yes, down is toward no." },
+  { sel:"#p-factions", title:"You two disagree",
+    body:"Your state is split, and you each speak for one side. Settle it between you, then vote." }
+];
+$("tour-btn").addEventListener("click", function(){ window.AOCTOUR.start(); });
 
 /* ------------------------------------------------------------ glossary */
 function glossify(text, terms){

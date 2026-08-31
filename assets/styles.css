@@ -370,3 +370,34 @@ ul.clean li::before{content:"—";position:absolute;left:0;color:var(--gold-dk);
 .outcome.fail .h{color:#8a2019}
 .outcome p{margin:0;font-size:.98rem;line-height:1.45}
 .nocost{font-size:.9rem;color:var(--ink-soft);line-height:1.45}
+
+/* ============================================================
+   THE FIRST-RUN TOUR (student + solo)
+   ============================================================ */
+/* ---- first-run tour ---- */
+#tour{position:fixed;inset:0;z-index:300}
+.tour-block{position:fixed;inset:0;z-index:300;cursor:default}
+.tour-hole{position:fixed;z-index:301;border-radius:12px;pointer-events:none;
+  box-shadow:0 0 0 9999px rgba(12,10,8,.76);transition:all .32s cubic-bezier(.2,.8,.2,1);
+  outline:3px solid var(--gold);outline-offset:2px}
+.tour-card{position:fixed;z-index:302;width:min(340px,calc(100vw - 28px));
+  max-height:calc(100vh - 16px);overflow-y:auto;
+  background:var(--parch);border:2px solid var(--line);border-radius:12px;
+  box-shadow:0 12px 32px rgba(0,0,0,.45);padding:16px 18px;
+  transition:top .32s cubic-bezier(.2,.8,.2,1), left .32s cubic-bezier(.2,.8,.2,1)}
+.tour-card .step{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.66rem;font-weight:800;
+  letter-spacing:.13em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:5px}
+.tour-card h4{margin:0 0 6px;font-size:1.18rem;color:var(--red-dk);line-height:1.2}
+.tour-card p{margin:0 0 13px;font-size:.98rem;line-height:1.45}
+.tour-card .row{display:flex;gap:9px;align-items:center}
+.tour-card .btn{flex:0 0 auto}
+.tour-card .skip{margin-left:auto;background:none;border:0;font-family:inherit;
+  font-size:.86rem;color:var(--ink-faint);text-decoration:underline;cursor:pointer;padding:4px}
+.tour-card .skip:hover{color:var(--red)}
+@media (prefers-reduced-motion:reduce){
+  .tour-hole,.tour-card{transition:none}
+}
+.tourbtn{background:none;border:1px solid rgba(245,236,216,.35);color:var(--parch);
+  font-family:ui-sans-serif,system-ui,sans-serif;font-size:.66rem;font-weight:700;
+  letter-spacing:.09em;text-transform:uppercase;border-radius:99px;padding:3px 9px;cursor:pointer}
+.tourbtn:hover{background:rgba(245,236,216,.16)}

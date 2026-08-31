@@ -2,6 +2,8 @@ const { chromium } = require('playwright');
 (async () => {
   const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
   const p = await b.newPage({ viewport: { width: 1280, height: 1000 } });
+  // this suite is about the game, not the first-run tour
+  await p.addInitScript(() => { try { localStorage.setItem('aoc_tour_done','1'); } catch(e){} });
   const errs = [];
   p.on('pageerror', e => errs.push('PAGEERROR: ' + e.message));
   p.on('console', m => { if (m.type() === 'error') errs.push('CONSOLE: ' + m.text()); });
