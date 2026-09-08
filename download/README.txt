@@ -19,17 +19,14 @@ alongside it. Double-click to open in a browser.
                                Open it and press Print; the button in the
                                corner toggles the answer key.
 
-IMPORTANT — THE TEACHER AND STUDENT FILES NEED HOSTING
-  You cannot just double-click confederation-teacher.html and have it work.
-  Browsers do not let a page opened from your own computer (a file:// address)
-  talk to a database, so creating a session will fail.
+BEFORE YOU TEACH IT — CHECK THE DATABASE IS AWAKE
+  Free Supabase projects pause after about a week of inactivity. If you run
+  this once a unit, it will be asleep every time. Open your project at
+  supabase.com and press Restore if it needs it; give it a minute or two.
 
-  Put the folder on a web host — GitHub Pages is free — and open the pages
-  from that link instead. If you are stuck, open the teacher page and press
-  "Test connection"; it names the exact problem.
-
-  confederation-solo.html is the exception. It talks to nothing, so it works
-  perfectly as a plain file.
+  A paused project looks exactly like a broken app: sessions will not create
+  and the error says nothing useful. Open the teacher page and press
+  "Test connection" — it names the actual problem.
 
 RUNNING A CLASS
   1. Open the teacher file. Click "Create the session".

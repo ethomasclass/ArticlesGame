@@ -421,15 +421,19 @@ function runDiagnostics(){
   }
   box.innerHTML = '<div class="card" style="margin:0"><p class="lede" style="margin:0">Testing…</p></div>';
   NET.diagnose().then(function(steps){
-    var bad = steps.filter(function(s){ return !s.ok; });
+    var bad = steps.filter(function(s){ return s.ok === false; });
+    var warn = steps.filter(function(s){ return s.ok === "warn"; });
     box.innerHTML =
       '<div class="card" style="margin:0;border-width:3px;border-color:' +
         (bad.length ? "#8a2019" : "#2f7d4f") + '">' +
       '<h3 style="margin-top:0;color:' + (bad.length ? "#8a2019" : "#1d5233") + '">' +
-        (bad.length ? "Found the problem" : "Everything checks out") + '</h3>' +
+        (bad.length ? "Found the problem"
+          : (warn.length ? "Working, with one note" : "Everything checks out")) + '</h3>' +
       steps.map(function(s){
+        var mark = s.ok === true ? "✓" : (s.ok === "warn" ? "!" : "✗");
+        var col  = s.ok === true ? "" : (s.ok === "warn" ? "color:#8f6413" : "color:#8a2019");
         return '<div style="padding:7px 0;border-bottom:1px dashed var(--line)">' +
-          '<strong>' + (s.ok ? "✓" : "✗") + ' ' + s.name + '</strong>' +
+          '<strong style="' + col + '">' + mark + ' ' + s.name + '</strong>' +
           '<div class="small">' + s.detail + '</div>' +
           (s.fix ? '<div class="small" style="color:#8a2019;margin-top:3px"><strong>Fix:</strong> ' +
                    s.fix + '</div>' : '') +

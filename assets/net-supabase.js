@@ -269,15 +269,35 @@
     diagnose: function () {
       var out = [], base = URL_BASE, key = KEY;
 
+      var isFile = location.protocol === "file:";
+
+      // ok may be true, false, or "warn" — a caution that does not by itself
+      // mean anything is broken.
       function step(name, ok, detail, fix) {
         out.push({ name: name, ok: ok, detail: detail, fix: fix || "" });
       }
 
+      // A plain GET with no extra headers slips through even from a file://
+      // page; anything carrying the key triggers a CORS preflight, and that is
+      // what gets blocked. Without this note the report reads as a
+      // contradiction: reachable, then unreachable.
+      // A paused project and a browser block look identical from here: both
+      // surface as "Failed to fetch", because a paused project's error reply
+      // arrives without the headers the browser needs to show it. Name both
+      // rather than guessing.
+      function fileNote(msg) {
+        var base = "The request did not complete (" + msg + "). ";
+        return base + "Two things cause this and they look the same: the project being paused, or " +
+          (isFile ? "this page being opened from a file rather than a web address."
+                  : "a network or filter problem.");
+      }
+
       if (location.protocol === "file:") {
-        step("Opened from a file", false,
-          "This page was opened straight from your computer (a file:// address), and browsers block " +
-          "pages like that from talking to a database.",
-          "Put the files on GitHub Pages, or any web host, and open them from that link instead.");
+        step("Opened from a file", "warn",
+          "This page was opened straight from your computer rather than from a web address. Some " +
+          "browsers restrict what such a page may contact. If the checks below all pass, it is working " +
+          "and you can ignore this.",
+          "Only if the checks below fail: put the files on a web host and open them from that link.");
       }
 
       if (!configured()) {
@@ -290,7 +310,18 @@
 
       return fetch(base + "/rest/v1/", { method: "GET" })
         .then(function (r) {
-          step("Reaching Supabase", true, "The project answered (status " + r.status + ").");
+          // Free projects go to sleep after about a week idle. A sleeping one
+          // still resolves in DNS, so without this it looks like a code fault.
+          if (r.status >= 500) {
+            step("Reaching Supabase", false,
+              "The project answered with status " + r.status + ", which usually means it is paused " +
+              "or still waking up.",
+              "Open your project at supabase.com. If it says paused, press Restore, wait a minute or " +
+              "two, then test again.");
+            return;
+          }
+          step("Reaching Supabase", true,
+            "The project is awake and answering (status " + r.status + ").");
         })
         .catch(function (e) {
           step("Reaching Supabase", false,
@@ -317,7 +348,12 @@
             return r.text().then(function (t) {
               step("Tables", false, "Unexpected reply (status " + r.status + "): " + t.slice(0, 160));
             });
-          }).catch(function (e) { step("Tables", false, e.message); });
+          }).catch(function (e) {
+            step("Tables", false, fileNote(e.message),
+              "Check the project is awake at supabase.com first" +
+              (isFile ? "; if it is awake and this still fails, host the files instead of opening them " +
+                        "directly." : "."));
+          });
         })
         .then(function () {
           return fetch(base + "/rest/v1/rpc/aoc_pulse", {
@@ -336,7 +372,9 @@
             return r.text().then(function (t) {
               step("Functions", false, "Status " + r.status + ": " + t.slice(0, 160));
             });
-          }).catch(function (e) { step("Functions", false, e.message); });
+          }).catch(function (e) {
+            step("Functions", false, fileNote(e.message), "Same cause as above.");
+          });
         })
         .then(function () { return out; });
     },

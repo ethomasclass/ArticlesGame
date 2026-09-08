@@ -268,12 +268,16 @@ The teacher page has a **Test connection** button next to *Create the session*. 
 settings, network, tables, functions — and names the one link that is broken, with the fix. Press that
 before doing anything else.
 
-The two common answers:
+The three common answers:
 
-- **"Opened from a file"** — teacher and student pages cannot be opened straight from your Downloads
-  folder. A page on a `file://` address is not allowed to talk to a database, and no setting changes
-  that. Host the folder (GitHub Pages is free) and open them from that link. Only `solo.html` works as a
-  local file, because it talks to nothing.
+- **"It is paused or still waking up"** — free Supabase projects sleep after about a week of
+  inactivity, so if you teach this once a unit it will be asleep every time. Open the project at
+  supabase.com, press **Restore**, give it a minute or two. Worth checking the morning of, not at
+  the bell.
+
+- **"Opened from a file"** — shown as a caution, not a failure. Opening the pages directly from a
+  folder does work in current browsers; try it before going to the trouble of hosting. If the checks
+  below it fail even with the project awake, hosting the folder is the fix.
 - **"The aoc_games table does not exist"** — the setup SQL has not run. Open `supabase-setup.sql`, select
   and copy **all of its contents**, paste into the Supabase SQL Editor and press Run.
 
