@@ -262,6 +262,21 @@ each other through a database. Three steps, about five minutes:
 Then `teacher.html` is your projector and `student.html` is the link the groups open. If you skip step 1
 or 2, the teacher page says so in plain English on load rather than failing when you try to start.
 
+### When it will not connect
+
+The teacher page has a **Test connection** button next to *Create the session*. It walks the chain —
+settings, network, tables, functions — and names the one link that is broken, with the fix. Press that
+before doing anything else.
+
+The two common answers:
+
+- **"Opened from a file"** — teacher and student pages cannot be opened straight from your Downloads
+  folder. A page on a `file://` address is not allowed to talk to a database, and no setting changes
+  that. Host the folder (GitHub Pages is free) and open them from that link. Only `solo.html` works as a
+  local file, because it talks to nothing.
+- **"The aoc_games table does not exist"** — the setup SQL has not run. Open `supabase-setup.sql`, select
+  and copy **all of its contents**, paste into the Supabase SQL Editor and press Run.
+
 ### Switching backends
 
 `assets/config.js` has a `backend` field: `"supabase"` or `"firebase"`. Both implement the same handful

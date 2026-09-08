@@ -19,6 +19,18 @@ alongside it. Double-click to open in a browser.
                                Open it and press Print; the button in the
                                corner toggles the answer key.
 
+IMPORTANT — THE TEACHER AND STUDENT FILES NEED HOSTING
+  You cannot just double-click confederation-teacher.html and have it work.
+  Browsers do not let a page opened from your own computer (a file:// address)
+  talk to a database, so creating a session will fail.
+
+  Put the folder on a web host — GitHub Pages is free — and open the pages
+  from that link instead. If you are stuck, open the teacher page and press
+  "Test connection"; it names the exact problem.
+
+  confederation-solo.html is the exception. It talks to nothing, so it works
+  perfectly as a plain file.
+
 RUNNING A CLASS
   1. Open the teacher file. Click "Create the session".
   2. Write the 4-letter code on the board.

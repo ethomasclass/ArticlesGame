@@ -2207,6 +2207,83 @@ window.AOC_CONFIG = {
       }).catch(function () { return []; });
     },
 
+    /* Works out exactly which link in the chain is broken, so a teacher gets
+       a specific instruction instead of "could not reach the server". */
+    diagnose: function () {
+      var out = [], base = URL_BASE, key = KEY;
+
+      function step(name, ok, detail, fix) {
+        out.push({ name: name, ok: ok, detail: detail, fix: fix || "" });
+      }
+
+      if (location.protocol === "file:") {
+        step("Opened from a file", false,
+          "This page was opened straight from your computer (a file:// address), and browsers block " +
+          "pages like that from talking to a database.",
+          "Put the files on GitHub Pages, or any web host, and open them from that link instead.");
+      }
+
+      if (!configured()) {
+        step("Settings", false,
+          "The project URL or the anon key in assets/config.js is missing or still a placeholder.",
+          "Supabase → Project Settings → API. Copy the Project URL and the anon public key.");
+        return Promise.resolve(out);
+      }
+      step("Settings", true, "URL and key look right: " + base);
+
+      return fetch(base + "/rest/v1/", { method: "GET" })
+        .then(function (r) {
+          step("Reaching Supabase", true, "The project answered (status " + r.status + ").");
+        })
+        .catch(function (e) {
+          step("Reaching Supabase", false,
+            "The browser could not reach " + base + " at all. (" + e.message + ")",
+            "Usually this is the page being opened as a file, no internet, or a school filter " +
+            "blocking supabase.co.");
+        })
+        .then(function () {
+          return fetch(base + "/rest/v1/aoc_games?select=code&limit=1", {
+            headers: { "apikey": key, "Authorization": "Bearer " + key }
+          }).then(function (r) {
+            if (r.status === 200) { step("Tables", true, "Found the aoc_games table."); return; }
+            if (r.status === 401 || r.status === 403) {
+              step("Tables", false, "Supabase rejected the key (status " + r.status + ").",
+                "Check you pasted the anon public key, not something else.");
+              return;
+            }
+            if (r.status === 404) {
+              step("Tables", false, "The aoc_games table does not exist.",
+                "The setup SQL has not been run. Open supabase-setup.sql, copy ALL of its contents, " +
+                "paste into the Supabase SQL Editor and press Run.");
+              return;
+            }
+            return r.text().then(function (t) {
+              step("Tables", false, "Unexpected reply (status " + r.status + "): " + t.slice(0, 160));
+            });
+          }).catch(function (e) { step("Tables", false, e.message); });
+        })
+        .then(function () {
+          return fetch(base + "/rest/v1/rpc/aoc_pulse", {
+            method: "POST",
+            headers: { "apikey": key, "Authorization": "Bearer " + key,
+                       "Content-Type": "application/json" },
+            body: JSON.stringify({ p_code: "TEST" })
+          }).then(function (r) {
+            if (r.ok) { step("Functions", true, "The game's database functions are installed."); return; }
+            if (r.status === 404) {
+              step("Functions", false, "The function aoc_pulse is missing.",
+                "The setup SQL did not finish. Run supabase-setup.sql again — all of it — and watch " +
+                "for an error part-way through.");
+              return;
+            }
+            return r.text().then(function (t) {
+              step("Functions", false, "Status " + r.status + ": " + t.slice(0, 160));
+            });
+          }).catch(function (e) { step("Functions", false, e.message); });
+        })
+        .then(function () { return out; });
+    },
+
     isConfigured: configured,
     boot: function () { return Promise.resolve(); }
   };

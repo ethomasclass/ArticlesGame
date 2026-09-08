@@ -101,8 +101,13 @@
           </select>
         </div>
       </div>
-      <button class="btn big" id="create-btn">Create the session</button>
-      <p class="small muted" style="margin-top:8px">You will get a 4&#8209;letter code to put on the board.</p>
+      <div class="btn-row">
+        <button class="btn big" id="create-btn">Create the session</button>
+        <button class="btn ghost" id="test-btn">Test connection</button>
+      </div>
+      <p class="small muted" style="margin-top:8px">You will get a 4&#8209;letter code to put on the board.
+      If creating a session fails, press <strong>Test connection</strong> — it says which step is broken.</p>
+      <div id="diag" class="hidden" style="margin-top:14px"></div>
     </div>
 
     <div class="card" id="resume-card">
@@ -392,10 +397,50 @@ $("create-btn").addEventListener("click", function(){
     openSession(code, $("sess-label").value.trim() || "Join code");
   }).catch(function(err){
     b.disabled = false; b.textContent = "Create the session";
-    alert("Could not reach the server.\n\n" + err.message +
-      "\n\nIf your school blocks Firebase, use the Solo page instead — it needs no internet.");
+    $("diag").classList.remove("hidden");
+    $("diag").innerHTML =
+      '<div class="card" style="border-color:#8a2019;border-width:3px;margin:0">' +
+      '<h3 style="color:#8a2019;margin-top:0">Could not create the session</h3>' +
+      '<p class="small" style="font-family:ui-monospace,Menlo,Consolas,monospace">' +
+      String(err.message).replace(/</g, "&lt;") + '</p>' +
+      '<p class="small">Checking what went wrong…</p></div>';
+    runDiagnostics();
   });
 });
+
+/* ------------------------------------------------------------ diagnostics
+   When a teacher cannot start a session, "could not reach the server" is
+   useless. This walks the chain — settings, network, tables, functions —
+   and names the one thing that is actually broken.                        */
+function runDiagnostics(){
+  var box = $("diag");
+  box.classList.remove("hidden");
+  if (!NET.diagnose) {
+    box.innerHTML = '<div class="card" style="margin:0">This backend has no connection test.</div>';
+    return;
+  }
+  box.innerHTML = '<div class="card" style="margin:0"><p class="lede" style="margin:0">Testing…</p></div>';
+  NET.diagnose().then(function(steps){
+    var bad = steps.filter(function(s){ return !s.ok; });
+    box.innerHTML =
+      '<div class="card" style="margin:0;border-width:3px;border-color:' +
+        (bad.length ? "#8a2019" : "#2f7d4f") + '">' +
+      '<h3 style="margin-top:0;color:' + (bad.length ? "#8a2019" : "#1d5233") + '">' +
+        (bad.length ? "Found the problem" : "Everything checks out") + '</h3>' +
+      steps.map(function(s){
+        return '<div style="padding:7px 0;border-bottom:1px dashed var(--line)">' +
+          '<strong>' + (s.ok ? "✓" : "✗") + ' ' + s.name + '</strong>' +
+          '<div class="small">' + s.detail + '</div>' +
+          (s.fix ? '<div class="small" style="color:#8a2019;margin-top:3px"><strong>Fix:</strong> ' +
+                   s.fix + '</div>' : '') +
+        '</div>';
+      }).join("") +
+      (bad.length ? '' : '<p class="small" style="margin:10px 0 0">If creating a session still fails, ' +
+        'the error above the test will say why.</p>') +
+      '</div>';
+  });
+}
+$("test-btn").addEventListener("click", runDiagnostics);
 
 function subscribe(){
   NET.onGame(CODE, function(g){ G = g; render(); });
