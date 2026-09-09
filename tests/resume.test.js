@@ -84,14 +84,32 @@ const EXE = '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
   await S2.goto('http://localhost:8899/student.html');
   await S2.fill('#names','Maya and Dev'); await S2.fill('#code',code); await S2.click('#join-btn');
   await S2.waitForSelector('#s-claim:not(.hidden)');
-  const held = await S2.$$eval('.claim', els => els.filter(e => /held by/i.test(e.innerText))   // the pill renders uppercase
-    .map(e => e.querySelector('.t').innerText.replace(/\s+/g,' ').trim()));
-  console.log('DAY 2  states shown as held:', held.join(' | ') || '(none)');
+  const listed = await S2.$$eval('.claim', els => els.map(e => ({
+    name: e.querySelector('.t').innerText.replace(/\s+/g,' ').trim(), locked: e.disabled })));
+  const vaRow = listed.find(x => /Virginia/.test(x.name));
+  console.log('DAY 2  their own state :', JSON.stringify(vaRow),
+              vaRow && !vaRow.locked ? '  <- unlocked for them' : '  <- LOCKED, cannot rejoin');
+  console.log('DAY 2  others locked   :',
+    listed.filter(x => x.locked).map(x => x.name).join(', ') || '(none)');
   await S2.locator('.claim',{has:S2.locator('.t',{hasText:/Virginia/})}).click();
   await S2.waitForSelector('#live:not(.hidden)', { timeout: 15000 });
   await S2.waitForTimeout(900);
   console.log('DAY 2  Virginia back with treasury', await S2.textContent('#p-treas'),
               'interest', await S2.textContent('#p-int'));
+
+  // somebody else must not be able to walk off with it on day two
+  const X = await day2.newPage();
+  await X.goto('http://localhost:8899/student.html');
+  await X.evaluate(() => localStorage.removeItem('aoc_student'));
+  await X.goto('http://localhost:8899/student.html');
+  await X.fill('#names','Different Kids'); await X.fill('#code', code); await X.click('#join-btn');
+  await X.waitForSelector('#s-claim:not(.hidden)', { timeout: 15000 });
+  const xRow = await X.$$eval('.claim', els => {
+    const e = els.find(el => /Virginia/.test(el.innerText));
+    return e ? { name: e.querySelector('.t').innerText.replace(/\s+/g,' ').trim(), locked: e.disabled } : null;
+  });
+  console.log('DAY 2  a different group sees Virginia:', JSON.stringify(xRow),
+              xRow && xRow.locked ? '  <- correctly locked out' : '  <- PROBLEM, not locked');
 
   console.log('\nSTATE CARRIED OVER:',
     (await T2.textContent('#nat-treasury')) === d1.treasury &&
