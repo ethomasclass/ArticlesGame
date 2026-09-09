@@ -148,9 +148,10 @@ out of **Recent sessions**, which lists every session with its name, its code, a
 treasury and vote history. You can resume on a completely different computer; nothing depends on the
 machine you started on.
 
-**Students** use the same code and pick the same state. If a group ends up on a different laptop, their
-state will show as *held by* their names — tapping it takes it back, and their treasury, score and
-voting record are all still there. Worth telling them on day one to write down which state they are.
+**Students** use the same code and pick the same state. A claimed state is closed to everyone else, but
+a group that types **the same names they used before** gets their own state back with its treasury, score
+and voting record intact. Worth telling them on day one to write down both their state and the names they
+typed. If they cannot remember, *Free up a claimed state* on your panel opens it again.
 
 A good place to break is after the reveal of Resolution 2. Day two then opens on the import tax
 amendment, which is the round that needs the most argument.
@@ -222,6 +223,20 @@ device; the **Tour** button on the state card replays it for anyone who skipped 
 
 Solo mode has its own version with stops suited to playing alone, including how to read the room before
 spending an offer.
+
+### Who owns a state
+
+Once a group claims a state it is closed to everybody else — the button greys out on every other screen
+within about a second, without anyone reloading. Two groups tapping the same state at the same moment is
+handled too: the roster is re-read at the moment of claiming, and whoever is second is told to pick again
+rather than silently overwriting the first.
+
+The one exception is the group that already holds it. Type the same names as before and the state
+unlocks, which is what makes a two-day run work. Matching ignores capitals and extra spaces.
+
+**Free up a claimed state** on your panel releases one, for the group whose laptop died or the pair that
+typed their names differently on day two. It is on the lobby controls and under Teacher extras during
+play. The score and treasury belong to the state, not the group, so nothing is lost by reassigning it.
 
 ### Making deals
 

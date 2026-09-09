@@ -565,6 +565,7 @@ ul.clean li::before{content:"—";position:absolute;left:0;color:var(--gold-dk);
           <div class="eyebrow">Controls</div>
           <button class="btn gold big" id="begin-btn">Begin Resolution 1</button>
           <button class="btn ghost sm" id="fill-bots-btn">Turn unclaimed states into bots</button>
+          <button class="btn ghost sm" id="release-btn">Free up a claimed state</button>
           <hr class="rule">
           <p class="small muted">You can start before every group joins. Any state nobody claimed is played by a bot.</p>
         </div>
@@ -698,6 +699,7 @@ ul.clean li::before{content:"—";position:absolute;left:0;color:var(--gold-dk);
           <button class="btn gold hidden" id="force-btn">Congress tries again — force it through</button>
           <hr class="rule">
           <div class="eyebrow">Teacher extras</div>
+          <button class="btn ghost sm" id="release-btn-2">Free up a claimed state</button>
           <button class="btn ghost sm" id="walkout-btn">Send 3 delegations home</button>
           <button class="btn ghost sm" id="pause-btn">Stop here — continue another day</button>
           <button class="btn ghost sm" id="end-btn">End game &amp; show debrief</button>
@@ -3398,6 +3400,29 @@ $("walkout-btn").addEventListener("click", function(){
 $("end-btn").addEventListener("click", function(){
   if (confirm("End the game now and show the debrief?")) NET.endGame(CODE);
 });
+/* A state is locked to the group that claimed it, so the only way to hand it
+   to somebody else is through the person standing in the room. */
+function releaseFlow(){
+  var claimed = STATES.filter(function(s){ return (s.players||[]).length > 0; });
+  if (!claimed.length) { alert("No states have been claimed yet."); return; }
+  var lines = claimed.map(function(s, i){
+    return (i + 1) + ". " + s.name + " — " + s.players.join(", ");
+  }).join("\n");
+  var pick = prompt("Which state should be freed up?\n\n" + lines +
+    "\n\nType the number. The group that had it loses the state; its score and " +
+    "treasury stay with the state, not with them.");
+  if (!pick) return;
+  var idx = parseInt(pick, 10) - 1;
+  if (isNaN(idx) || idx < 0 || idx >= claimed.length) { alert("That was not one of the numbers."); return; }
+  var target = claimed[idx];
+  if (!confirm("Free up " + target.name + ", currently held by " + target.players.join(", ") + "?")) return;
+  NET.releaseState(CODE, target.name).then(function(){
+    alert(target.name + " is open again. A group can claim it from the join screen.");
+  });
+}
+$("release-btn").addEventListener("click", releaseFlow);
+$("release-btn-2").addEventListener("click", releaseFlow);
+
 $("fill-bots-btn").addEventListener("click", function(){
   var ups = STATES.filter(function(s){ return (s.players||[]).length === 0 && !s.isBot; })
     .map(function(s){ return { name:s.name, patch:{ isBot:true } }; });

@@ -545,6 +545,7 @@ ul.clean li::before{content:"—";position:absolute;left:0;color:var(--gold-dk);
       <h2>Choose your state</h2>
       <p class="lede">Read these carefully. The state you pick decides what you want and what you fear.</p>
       <div id="claim-list"></div>
+      <p class="small muted" id="claim-note" style="margin-top:12px"></p>
     </div>
   </section>
 </div>
@@ -2744,7 +2745,7 @@ window.AOC_CONFIG = {
 var D = window.AOC, E = window.ENGINE;
 var $ = function(id){ return document.getElementById(id); };
 
-var CODE=null, NAMES=null, MINE=null, G=null, ME=null, ALL=[];
+var CODE=null, NAMES=null, MINE=null, G=null, ME=null, ALL=[], claimWatch=null;
 var dealTarget=null, tickTimer=null;
 
 function myData(){ return D.byName(MINE); }
@@ -2765,51 +2766,93 @@ $("join-btn").addEventListener("click", function(){
       $("s-join").classList.add("hidden");
       $("s-claim").classList.remove("hidden");
       renderClaims();
+      // states other groups take should grey out while this list is on screen
+      if (claimWatch) claimWatch();
+      claimWatch = NET.onStates(code, function(rows){
+        if (MINE) return;
+        ALL = rows;
+        renderClaims();
+      });
       try{ localStorage.setItem("aoc_student", JSON.stringify({code:code,names:names})); }catch(e){}
     });
   }).catch(function(err){ $("join-err").textContent = "Could not connect: " + err.message; });
 });
 $("code").addEventListener("keydown", function(e){ if (e.key === "Enter") $("join-btn").click(); });
 
+/* Names are compared loosely so a group that types "maya and dev" on day two
+   still gets back the state "Maya and Dev" claimed on day one. */
+function sameNames(a, b){
+  var norm = function(x){ return String(x||"").toLowerCase().replace(/\s+/g," ").trim(); };
+  return norm(a) && norm(a) === norm(b);
+}
+
 function renderClaims(){
   var slots = (G.studentStates||[]);
   var list = $("claim-list"); list.innerHTML = "";
   var open = ALL.filter(function(s){ return slots.indexOf(s.name) !== -1; });
   if (!open.length) open = ALL;
+  var anyHeld = false;
+
   open.sort(function(a,b){ return a.name.localeCompare(b.name); }).forEach(function(s){
     var d = D.byName(s.name);
-    var held = (s.players||[]).length > 0;
+    var players = s.players || [];
+    var held = players.length > 0;
+    // A claimed state is closed to everyone else. The one exception is the
+    // group that already holds it coming back on another laptop, which is
+    // what makes a two-day run work.
+    var mine = held && players.some(function(p){ return sameNames(p, NAMES); });
+    if (held && !mine) anyHeld = true;
+
     var b = document.createElement("button");
     b.className = "claim";
-    // A state that is already held stays clickable, because on the second day
-    // a group is often on a different laptop and has to get its own state
-    // back. Taking someone else's is possible, so it asks first and the
-    // teacher can see every delegation's names on the roster.
+    b.disabled = held && !mine;
     b.innerHTML = '<div class="t">' + s.name +
-                  (held ? ' <span class="pill">held by ' + s.players.join(", ") + '</span>' : '') + '</div>' +
-                  '<div class="d">' + d.motto + '</div>' +
-                  (held ? '<div class="d" style="color:var(--red-dk);font-weight:700">' +
-                          'Tap to take this state back</div>' : '');
-    b.addEventListener("click", function(){
-      if (held && !confirm(s.name + " is currently held by " + s.players.join(", ") +
-          ".\n\nTake it over as \"" + NAMES + "\"?")) return;
-      claim(s.name);
-    });
+      (held ? ' <span class="pill">' + (mine ? "yours" : "taken") + '</span>' : '') + '</div>' +
+      '<div class="d">' + d.motto + '</div>' +
+      (held ? '<div class="d" style="font-weight:700;color:' +
+              (mine ? "var(--yes)" : "var(--ink-faint)") + '">' +
+              (mine ? "This is yours — tap to carry on" : "Claimed by " + players.join(", ")) +
+              '</div>' : '');
+    if (!b.disabled) b.addEventListener("click", function(){ claim(s.name); });
     list.appendChild(b);
   });
+
+  var note = $("claim-note");
+  if (note) {
+    note.innerHTML = anyHeld
+      ? 'A greyed-out state has already been taken by another group. If one of those is <em>yours</em> ' +
+        'from a previous day, type the same names you used before and it will unlock. If you are stuck, ' +
+        'ask your teacher to release it.'
+      : '';
+  }
 }
 
 function claim(name){
-  MINE = name;
-  // claimState also clears isBot, which matters when a group returns to a
-  // state that was filled in by a bot while they were away.
-  NET.claimState(CODE, name, [NAMES]).then(function(){
-    try{ localStorage.setItem("aoc_student", JSON.stringify({code:CODE,names:NAMES,state:name})); }catch(e){}
-    startListening();
+  // Two groups can tap the same open state within the same second, and the
+  // list they are looking at is a moment old. Re-read the roster and refuse
+  // if somebody got there first, rather than quietly overwriting them.
+  NET.listStates(CODE).then(function(fresh){
+    ALL = fresh;
+    var row = fresh.filter(function(x){ return x.name === name; })[0];
+    var players = (row && row.players) || [];
+    var mine = players.some(function(p){ return sameNames(p, NAMES); });
+    if (players.length && !mine) {
+      renderClaims();
+      alert(name + " was just taken by " + players.join(", ") + ".\n\nPick another state.");
+      return;
+    }
+    MINE = name;
+    // claimState also clears isBot, which matters when a group returns to a
+    // state a bot filled in while they were away.
+    return NET.claimState(CODE, name, [NAMES]).then(function(){
+      try{ localStorage.setItem("aoc_student", JSON.stringify({code:CODE,names:NAMES,state:name})); }catch(e){}
+      startListening();
+    });
   });
 }
 
 function startListening(){
+  if (claimWatch) { claimWatch(); claimWatch = null; }
   var d = myData();
   $("pre").classList.add("hidden");
   $("live").classList.remove("hidden");
